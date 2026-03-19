@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Generated Prisma client (rebuilt inside Docker)
+app/generated
+
+# Environment files — never bake secrets into the image
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+
+# Editor / OS artifacts
+.DS_Store
+*.swp
+*.swo
+.idea
+.vscode
+
+# Docs (not needed in image)
+*.md
+AGENTS.md
+CLAUDE.md
+
+# Test / lint artifacts
+coverage
+.eslintcache
+
+# Local dev tooling
+.husky

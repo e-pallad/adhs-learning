@@ -1,0 +1,18 @@
+services:
+  app:
+    build:
+      context: .
+      # NEXT_PUBLIC_* vars are baked into the JS bundle at build time.
+      # They are read from .env.production (via the env_file below) during
+      # `docker compose build`, so you only need one file for both build and run.
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    image: devfluent:latest
+    ports:
+      - "3000:3000"
+    # Runtime environment variables (DATABASE_URL, etc.)
+    # Place this file next to docker-compose.yml on the TrueNAS host.
+    env_file:
+      - .env.production
+    restart: unless-stopped
