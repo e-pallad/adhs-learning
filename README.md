@@ -1,36 +1,93 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Devfluent
+
+An ADHD-friendly developer learning tracker. Track your learning curriculum, roadmap progress, external courses, and monthly projects — with gamification (XP, levels, streaks, achievements) to keep momentum going.
+
+## Stack
+
+- **Framework**: Next.js 16.2.0 (App Router, Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase PostgreSQL
+- **ORM**: Prisma 7.5.0 with `@prisma/adapter-pg`
+- **Auth**: Supabase magic link (passwordless email OTP) via `@supabase/ssr`
+
+## Features
+
+- **Learning curriculum** — 12-month weekly structured curriculum with Pomodoro timer
+- **Roadmap tracker** — Browse roadmap.sh roadmaps and track topic/subtopic completion
+- **External courses** — Log courses from any platform with progress tracking
+- **Monthly projects** — Track build projects tied to each learning month
+- **Progress & achievements** — XP system, levels, streaks, 30-day activity calendar
+- **Settings** — Profile name, logout
 
 ## Getting Started
 
-First, run the development server:
+1. Copy `.env.local.example` → `.env.local` and fill in your Supabase credentials and DB connection strings.
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Generate the Prisma client:
+
+```bash
+npx prisma generate
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+| `DATABASE_URL` | Pooled connection string (pgbouncer port 6543) |
+| `DIRECT_URL` | Direct connection string (port 5432, used by migrations) |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  (auth)/login/         # Magic link login page
+  (dashboard)/          # All authenticated pages
+    page.tsx            # Main dashboard
+    learning/           # Curriculum browser
+    roadmap/            # Roadmap tracker
+    training/           # External courses
+    projects/           # Monthly projects
+    progress/           # XP history & achievements
+    settings/           # Profile & account
+  api/                  # API routes
+    auth/callback/      # Supabase auth callback
+    progress/           # block, course, project, roadmap
+    user/               # stats, profile
+  generated/prisma/     # Generated Prisma client (do not edit)
+lib/                    # Shared utilities
+  prisma.ts             # Prisma client singleton (uses @prisma/adapter-pg)
+  supabase/             # Supabase server/client helpers
+  xp.ts                 # XP values, level thresholds, achievements
+  roadmap.ts            # roadmap.sh API integration
+  user.ts               # getCurrentUser helper
+components/
+  ui/                   # card, button, badge, progress-bar
+  gamification/         # xp-display, streak-counter, celebration-modal
+  learning/             # pomodoro-timer, block-card, month-card
+  roadmap/              # roadmap-list, roadmap-node-item
+  training/             # course-card, add-course-form
+  layout/               # sidebar, top-bar
+content/
+  curriculum/index.ts   # Full 12-month curriculum definition
+prisma/
+  schema.prisma         # Database schema
+prisma.config.ts        # Prisma 7 config (datasource URL lives here)
+proxy.ts                # Auth proxy (Next.js 16 — replaces middleware.ts)
+```

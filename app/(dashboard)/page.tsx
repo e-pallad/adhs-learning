@@ -1,0 +1,233 @@
+import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/user"
+import { getXPProgress, LEVEL_THRESHOLDS } from "@/lib/xp"
+import { CURRICULUM } from "@/content/curriculum"
+import { ProgressBar } from "@/components/ui/progress-bar"
+import { Card, CardContent } from "@/components/ui/card"
+import Link from "next/link"
+import { redirect } from "next/navigation"
+
+export default async function DashboardPage() {
+  const user = await getCurrentUser()
+  if (!user) redirect("/login")
+
+  const xpProgress = getXPProgress(user.totalXP)
+  const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)
+
+  // Block completion stats grouped by month
+  const blockProgress = await prisma.blockProgress.findMany({
+    where: { userId: user.id },
+    select: { blockId: true, month: true, status: true },
+  })
+
+  const completedByMonth: Record<number, number> = {}
+  for (const bp of blockProgress) {
+    if (bp.status === "COMPLETED") {
+      completedByMonth[bp.month] = (completedByMonth[bp.month] ?? 0) + 1
+    }
+  }
+
+  // Total blocks per month
+  const totalByMonth: Record<number, number> = {}
+  for (const m of CURRICULUM) {
+    totalByMonth[m.month] = m.weeks.flatMap((w) => w.blocks).length
+  }
+
+  // Determine current month (first month with < 100% completion)
+  let currentMonth = 1
+  for (const m of CURRICULUM) {
+    const done = completedByMonth[m.month] ?? 0
+    const total = totalByMonth[m.month] ?? 1
+    if (done < total) {
+      currentMonth = m.month
+      break
+    }
+  }
+
+  const currentMonthData = CURRICULUM.find((m) => m.month === currentMonth)!
+  const currentMonthBlocks = currentMonthData.weeks.flatMap((w) => w.blocks)
+  const currentMonthDone = completedByMonth[currentMonth] ?? 0
+
+  // Recent achievements
+  const recentAchievements = await prisma.achievement.findMany({
+    where: { userId: user.id },
+    orderBy: { unlockedAt: "desc" },
+    take: 3,
+  })
+
+  // 7-day activity
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
+  sevenDaysAgo.setHours(0, 0, 0, 0)
+
+  const recentLogs = await prisma.dailyLog.findMany({
+    where: { userId: user.id, date: { gte: sevenDaysAgo } },
+    orderBy: { date: "asc" },
+  })
+
+  // Build 7-day heatmap
+  const days: { date: Date; xp: number }[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    d.setHours(0, 0, 0, 0)
+    const log = recentLogs.find((l) => new Date(l.date).toDateString() === d.toDateString())
+    days.push({ date: d, xp: log?.xpEarned ?? 0 })
+  }
+
+  const totalBlocksDone = blockProgress.filter((b) => b.status === "COMPLETED").length
+  const totalBlocksAll = CURRICULUM.flatMap((m) => m.weeks.flatMap((w) => w.blocks)).length
+
+  const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Welcome back{user.name ? `, ${user.name}` : ""}!</p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Level</p>
+            <p className="text-2xl font-bold text-indigo-600 mt-1">{xpProgress.level}</p>
+            <p className="text-xs text-gray-400">{xpProgress.label}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total XP</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">{user.totalXP.toLocaleString()}</p>
+            <p className="text-xs text-gray-400">{nextLevel ? `${nextLevel.xpRequired - user.totalXP} to level ${nextLevel.level}` : "Max level!"}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Streak</p>
+            <p className="text-2xl font-bold text-orange-500 mt-1">{user.streak}</p>
+            <p className="text-xs text-gray-400">days</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Blocks done</p>
+            <p className="text-2xl font-bold text-green-600 mt-1">{totalBlocksDone}</p>
+            <p className="text-xs text-gray-400">of {totalBlocksAll}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* XP progress to next level */}
+      {nextLevel && (
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-gray-900">Level {xpProgress.level}: {xpProgress.label}</span>
+              <span className="text-gray-400">{xpProgress.currentLevelXP} / {xpProgress.nextLevelXP} XP</span>
+            </div>
+            <ProgressBar value={xpProgress.progress} color="indigo" />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Current month */}
+      <Card>
+        <CardContent className="p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Now studying — Month {currentMonth}</p>
+              <h2 className="text-base font-semibold text-gray-900 mt-0.5">{currentMonthData.title}</h2>
+            </div>
+            <Link
+              href={`/learning/${currentMonth}`}
+              className="text-sm text-indigo-600 hover:underline font-medium"
+            >
+              Open →
+            </Link>
+          </div>
+          <ProgressBar
+            value={currentMonthBlocks.length > 0 ? Math.round((currentMonthDone / currentMonthBlocks.length) * 100) : 0}
+            label={`${currentMonthDone} / ${currentMonthBlocks.length} blocks`}
+            showPercentage
+            color="indigo"
+          />
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 7-day activity */}
+        <Card>
+          <CardContent className="p-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Last 7 days</h3>
+            <div className="flex gap-2 items-end">
+              {days.map(({ date, xp }) => {
+                const height = xp === 0 ? 8 : Math.min(64, 8 + Math.round((xp / 50) * 56))
+                return (
+                  <div key={date.toISOString()} className="flex-1 flex flex-col items-center gap-1">
+                    <div
+                      className={`w-full rounded-sm ${xp > 0 ? "bg-indigo-500" : "bg-gray-100"}`}
+                      style={{ height }}
+                      title={`${xp} XP`}
+                    />
+                    <span className="text-xs text-gray-400">{DAY_LABELS[date.getDay()]}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent achievements */}
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-gray-900">Recent achievements</h3>
+              <Link href="/progress" className="text-xs text-indigo-600 hover:underline">View all</Link>
+            </div>
+            {recentAchievements.length === 0 ? (
+              <p className="text-sm text-gray-400">No achievements yet — keep going!</p>
+            ) : (
+              <ul className="space-y-2">
+                {recentAchievements.map((a) => (
+                  <li key={a.id} className="flex items-center gap-3">
+                    <span className="text-xl">{a.icon ?? "🏆"}</span>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{a.label}</p>
+                      <p className="text-xs text-gray-400">{a.description}</p>
+                    </div>
+                    {a.xpBonus > 0 && (
+                      <span className="ml-auto text-xs text-indigo-600">+{a.xpBonus} XP</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick navigation */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {[
+          { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}` },
+          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills" },
+          { href: "/training", label: "Courses", desc: "External resources" },
+          { href: "/projects", label: "Projects", desc: "Monthly builds" },
+          { href: "/progress", label: "Progress", desc: "XP & achievements" },
+          { href: "/settings", label: "Settings", desc: "Account & preferences" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition-all"
+          >
+            <p className="text-sm font-medium text-gray-900">{item.label}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,206 @@
+import { redirect } from "next/navigation"
+import { prisma } from "@/lib/prisma"
+import { getCurrentUser } from "@/lib/user"
+import { getXPProgress, LEVEL_THRESHOLDS, ACHIEVEMENT_DEFINITIONS } from "@/lib/xp"
+import { ProgressBar } from "@/components/ui/progress-bar"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+
+export const metadata = { title: "Progress — Devfluent" }
+
+export default async function ProgressPage() {
+  const user = await getCurrentUser()
+  if (!user) redirect("/login")
+
+  const xpProgress = getXPProgress(user.totalXP)
+
+  const [achievements, dailyLogs, blockStats] = await Promise.all([
+    prisma.achievement.findMany({
+      where: { userId: user.id },
+      orderBy: { unlockedAt: "desc" },
+    }),
+    prisma.dailyLog.findMany({
+      where: { userId: user.id },
+      orderBy: { date: "desc" },
+      take: 30,
+    }),
+    prisma.blockProgress.groupBy({
+      by: ["status"],
+      where: { userId: user.id },
+      _count: true,
+    }),
+  ])
+
+  const unlockedSlugs = new Set(achievements.map((a) => a.slug))
+
+  // Build 30-day calendar
+  const days: { date: Date; xp: number }[] = []
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    d.setHours(0, 0, 0, 0)
+    const log = dailyLogs.find((l) => new Date(l.date).toDateString() === d.toDateString())
+    days.push({ date: d, xp: log?.xpEarned ?? 0 })
+  }
+
+  const totalXPFromLogs = dailyLogs.reduce((sum, l) => sum + l.xpEarned, 0)
+  const blocksDone = blockStats.find((s) => s.status === "COMPLETED")?._count ?? 0
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-xl font-bold text-gray-900">Progress</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Your XP history and achievements</p>
+      </div>
+
+      {/* XP & Level */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Total XP</p>
+            <p className="text-2xl font-bold text-indigo-600 mt-1">{user.totalXP.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Level</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">{xpProgress.level}</p>
+            <p className="text-xs text-gray-400">{xpProgress.label}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Blocks done</p>
+            <p className="text-2xl font-bold text-green-600 mt-1">{blocksDone}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Level progress */}
+      <Card>
+        <CardContent className="p-5 space-y-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold text-gray-900">
+              Level {xpProgress.level}: {xpProgress.label}
+            </span>
+            {xpProgress.nextLevelXP ? (
+              <span className="text-gray-400">{xpProgress.currentLevelXP} / {xpProgress.nextLevelXP} XP</span>
+            ) : (
+              <span className="text-indigo-600 font-medium">Max level reached!</span>
+            )}
+          </div>
+          <ProgressBar value={xpProgress.progress} color="indigo" />
+
+          <div className="grid grid-cols-5 gap-1 mt-2">
+            {LEVEL_THRESHOLDS.map((t) => (
+              <div
+                key={t.level}
+                className={`text-center p-1.5 rounded-lg text-xs ${
+                  t.level <= xpProgress.level
+                    ? "bg-indigo-100 text-indigo-700 font-medium"
+                    : "bg-gray-50 text-gray-400"
+                }`}
+              >
+                <div className="font-semibold">{t.level}</div>
+                <div className="text-[10px] leading-tight">{t.label}</div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 30-day activity calendar */}
+      <Card>
+        <CardContent className="p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">30-day activity</h3>
+          <div className="flex gap-1 flex-wrap">
+            {days.map(({ date, xp }) => {
+              const intensity =
+                xp === 0 ? "bg-gray-100" :
+                xp < 20 ? "bg-indigo-200" :
+                xp < 50 ? "bg-indigo-400" :
+                "bg-indigo-600"
+              return (
+                <div
+                  key={date.toISOString()}
+                  className={`w-6 h-6 rounded-sm ${intensity}`}
+                  title={`${date.toLocaleDateString()}: ${xp} XP`}
+                />
+              )
+            })}
+          </div>
+          <div className="flex items-center gap-1 mt-3 text-xs text-gray-400">
+            <span>Less</span>
+            <div className="w-3 h-3 rounded-sm bg-gray-100" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-200" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-400" />
+            <div className="w-3 h-3 rounded-sm bg-indigo-600" />
+            <span>More</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Achievements */}
+      <Card>
+        <CardContent className="p-5">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+            Achievements ({achievements.length} / {ACHIEVEMENT_DEFINITIONS.length})
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {ACHIEVEMENT_DEFINITIONS.map((def) => {
+              const unlocked = unlockedSlugs.has(def.slug)
+              const earned = achievements.find((a) => a.slug === def.slug)
+              return (
+                <div
+                  key={def.slug}
+                  className={`flex items-start gap-3 p-3 rounded-xl border ${
+                    unlocked ? "border-yellow-200 bg-yellow-50" : "border-gray-100 bg-gray-50 opacity-60"
+                  }`}
+                >
+                  <span className="text-2xl">{def.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-medium text-gray-900">{def.label}</p>
+                      {unlocked && <Badge variant="success">Unlocked</Badge>}
+                    </div>
+                    <p className="text-xs text-gray-500">{def.description}</p>
+                    <p className="text-xs text-indigo-600 mt-0.5">+{def.xpBonus} XP</p>
+                    {earned && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(earned.unlockedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent logs */}
+      {dailyLogs.length > 0 && (
+        <Card>
+          <CardContent className="p-5">
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent activity</h3>
+            <div className="space-y-2">
+              {dailyLogs.slice(0, 14).map((log) => (
+                <div key={log.id} className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">
+                    {new Date(log.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
+                  </span>
+                  <span className="text-indigo-600 font-medium">+{log.xpEarned} XP</span>
+                </div>
+              ))}
+            </div>
+            {totalXPFromLogs > 0 && (
+              <p className="text-xs text-gray-400 mt-3 border-t border-gray-100 pt-3">
+                {totalXPFromLogs} XP earned in the last 30 days
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}

@@ -1,0 +1,178 @@
+// Devfluent — ADHD-friendly developer learning tracker
+// Multi-user ready (single-user now, userId on every model)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum NodeStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum BlockStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+
+model User {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String?
+  avatarUrl  String?
+  totalXP    Int       @default(0)
+  level      Int       @default(1)
+  streak     Int       @default(0)
+  lastSeenAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  dailyLogs       DailyLog[]
+  roadmapProgress RoadmapProgress[]
+  blockProgress   BlockProgress[]
+  externalCourses ExternalCourse[]
+  monthlyProjects MonthlyProject[]
+  achievements    Achievement[]
+
+  @@map("users")
+}
+
+// ─── Daily Log ───────────────────────────────────────────────────────────────
+
+model DailyLog {
+  id              String   @id @default(cuid())
+  userId          String
+  date            DateTime @db.Date
+  xpEarned        Int      @default(0)
+  minutesStudied  Int      @default(0)
+  blocksCompleted Int      @default(0)
+  streakDay       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_logs")
+}
+
+// ─── Roadmap Progress ────────────────────────────────────────────────────────
+
+model RoadmapProgress {
+  id          String     @id @default(cuid())
+  userId      String
+  roadmapId   String
+  nodeId      String
+  nodeLabel   String
+  nodeType    String
+  status      NodeStatus @default(NOT_STARTED)
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roadmapId, nodeId])
+  @@map("roadmap_progress")
+}
+
+// ─── Learning Block Progress ─────────────────────────────────────────────────
+
+model BlockProgress {
+  id           String      @id @default(cuid())
+  userId       String
+  blockId      String
+  month        Int
+  week         Int
+  status       BlockStatus @default(NOT_STARTED)
+  minutesSpent Int         @default(0)
+  xpEarned     Int         @default(0)
+  completedAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, blockId])
+  @@map("block_progress")
+}
+
+// ─── External Courses ────────────────────────────────────────────────────────
+
+model ExternalCourse {
+  id               String    @id @default(cuid())
+  userId           String
+  title            String
+  platform         String
+  url              String?
+  totalLessons     Int       @default(0)
+  completedLessons Int       @default(0)
+  xpEarned         Int       @default(0)
+  isCompleted      Boolean   @default(false)
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("external_courses")
+}
+
+// ─── Monthly Projects ────────────────────────────────────────────────────────
+
+model MonthlyProject {
+  id          String        @id @default(cuid())
+  userId      String
+  month       Int
+  title       String
+  description String?
+  repoUrl     String?
+  liveUrl     String?
+  status      ProjectStatus @default(NOT_STARTED)
+  xpEarned    Int           @default(0)
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month])
+  @@map("monthly_projects")
+}
+
+// ─── Achievements ─────────────────────────────────────────────────────────────
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  slug        String
+  label       String
+  description String?
+  icon        String?
+  xpBonus     Int      @default(0)
+  unlockedAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, slug])
+  @@map("achievements")
+}
