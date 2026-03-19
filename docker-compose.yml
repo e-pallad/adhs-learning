@@ -8,9 +8,9 @@ services:
       args:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-    image: devfluent:latest
+    image: 192.168.178.10:5000/devfluent:latest
     ports:
-      - "3000:3000"
+      - "30005:3000"
     # Runtime environment variables (DATABASE_URL, etc.)
     # Place this file next to docker-compose.yml on the TrueNAS host.
     env_file:
