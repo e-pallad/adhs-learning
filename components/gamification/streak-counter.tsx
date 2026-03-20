@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { Flame, Zap } from "lucide-react"
 
 interface StreakCounterProps {
   streak: number
@@ -9,13 +10,16 @@ interface StreakCounterProps {
 }
 
 export function StreakCounter({ streak, compact, className }: StreakCounterProps) {
-  const isHot = streak >= 7
   const isOnFire = streak >= 30
 
   if (compact) {
     return (
       <div className={cn("flex items-center gap-1", className)}>
-        <span>{isOnFire ? "⚡" : "🔥"}</span>
+        {isOnFire ? (
+          <Zap className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+        ) : (
+          <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+        )}
         <span className="text-sm font-bold text-gray-700">{streak}</span>
       </div>
     )
@@ -23,7 +27,13 @@ export function StreakCounter({ streak, compact, className }: StreakCounterProps
 
   return (
     <div className={cn("text-center space-y-1", className)}>
-      <div className="text-4xl">{isOnFire ? "⚡" : isHot ? "🔥" : "🔥"}</div>
+      <div className="flex justify-center">
+        {isOnFire ? (
+          <Zap className="w-10 h-10 text-yellow-500 fill-yellow-500" />
+        ) : (
+          <Flame className="w-10 h-10 text-orange-500 fill-orange-500" />
+        )}
+      </div>
       <div className="text-3xl font-bold text-gray-900">{streak}</div>
       <div className="text-sm text-gray-500">day streak</div>
       {streak === 0 && (

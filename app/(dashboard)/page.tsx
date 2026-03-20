@@ -6,6 +6,19 @@ import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import {
+  Star,
+  Zap,
+  Flame,
+  CheckSquare,
+  BookOpen,
+  Map,
+  GraduationCap,
+  Rocket,
+  TrendingUp,
+  Settings,
+  ArrowRight,
+} from "lucide-react"
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
@@ -83,7 +96,7 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500 mt-0.5">Welcome back{user.name ? `, ${user.name}` : ""}!</p>
       </div>
 
@@ -91,30 +104,50 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Level</p>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">{xpProgress.level}</p>
-            <p className="text-xs text-gray-400">{xpProgress.label}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Level</p>
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <Star className="w-3.5 h-3.5 text-indigo-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-indigo-600">{xpProgress.level}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{xpProgress.label}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total XP</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{user.totalXP.toLocaleString()}</p>
-            <p className="text-xs text-gray-400">{nextLevel ? `${nextLevel.xpRequired - user.totalXP} to level ${nextLevel.level}` : "Max level!"}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total XP</p>
+              <div className="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-violet-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{user.totalXP.toLocaleString()}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{nextLevel ? `${nextLevel.xpRequired - user.totalXP} to level ${nextLevel.level}` : "Max level!"}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Streak</p>
-            <p className="text-2xl font-bold text-orange-500 mt-1">{user.streak}</p>
-            <p className="text-xs text-gray-400">days</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Streak</p>
+              <div className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+                <Flame className="w-3.5 h-3.5 text-orange-500" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-orange-500">{user.streak}</p>
+            <p className="text-xs text-gray-400 mt-0.5">days</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Blocks done</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">{totalBlocksDone}</p>
-            <p className="text-xs text-gray-400">of {totalBlocksAll}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Blocks done</p>
+              <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+                <CheckSquare className="w-3.5 h-3.5 text-green-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-green-600">{totalBlocksDone}</p>
+            <p className="text-xs text-gray-400 mt-0.5">of {totalBlocksAll}</p>
           </CardContent>
         </Card>
       </div>
@@ -142,9 +175,10 @@ export default async function DashboardPage() {
             </div>
             <Link
               href={`/learning/${currentMonth}`}
-              className="text-sm text-indigo-600 hover:underline font-medium"
+              className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
             >
-              Open →
+              Open
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
           <ProgressBar
@@ -164,14 +198,17 @@ export default async function DashboardPage() {
             <div className="flex gap-2 items-end">
               {days.map(({ date, xp }) => {
                 const height = xp === 0 ? 8 : Math.min(64, 8 + Math.round((xp / 50) * 56))
+                const isToday = date.toDateString() === new Date().toDateString()
                 return (
                   <div key={date.toISOString()} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className={`w-full rounded-sm ${xp > 0 ? "bg-indigo-500" : "bg-gray-100"}`}
+                      className={`w-full rounded-sm transition-all ${xp > 0 ? "bg-indigo-500" : "bg-gray-100"} ${isToday && xp > 0 ? "ring-1 ring-indigo-300 ring-offset-1" : ""}`}
                       style={{ height }}
                       title={`${xp} XP`}
                     />
-                    <span className="text-xs text-gray-400">{DAY_LABELS[date.getDay()]}</span>
+                    <span className={`text-xs ${isToday ? "text-indigo-600 font-semibold" : "text-gray-400"}`}>
+                      {DAY_LABELS[date.getDay()]}
+                    </span>
                   </div>
                 )
               })}
@@ -184,7 +221,10 @@ export default async function DashboardPage() {
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-900">Recent achievements</h3>
-              <Link href="/progress" className="text-xs text-indigo-600 hover:underline">View all</Link>
+              <Link href="/progress" className="flex items-center gap-0.5 text-xs text-indigo-600 hover:text-indigo-700 transition-colors">
+                View all
+                <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
             {recentAchievements.length === 0 ? (
               <p className="text-sm text-gray-400">No achievements yet — keep going!</p>
@@ -192,13 +232,15 @@ export default async function DashboardPage() {
               <ul className="space-y-2">
                 {recentAchievements.map((a) => (
                   <li key={a.id} className="flex items-center gap-3">
-                    <span className="text-xl">{a.icon ?? "🏆"}</span>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{a.label}</p>
-                      <p className="text-xs text-gray-400">{a.description}</p>
+                    <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0 text-base">
+                      {a.icon ?? "🏆"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{a.label}</p>
+                      <p className="text-xs text-gray-400 truncate">{a.description}</p>
                     </div>
                     {a.xpBonus > 0 && (
-                      <span className="ml-auto text-xs text-indigo-600">+{a.xpBonus} XP</span>
+                      <span className="ml-auto text-xs font-medium text-indigo-600 flex-shrink-0">+{a.xpBonus} XP</span>
                     )}
                   </li>
                 ))}
@@ -211,22 +253,30 @@ export default async function DashboardPage() {
       {/* Quick navigation */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
-          { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}` },
-          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills" },
-          { href: "/training", label: "Courses", desc: "External resources" },
-          { href: "/projects", label: "Projects", desc: "Monthly builds" },
-          { href: "/progress", label: "Progress", desc: "XP & achievements" },
-          { href: "/settings", label: "Settings", desc: "Account & preferences" },
-        ].map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="block p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition-all"
-          >
-            <p className="text-sm font-medium text-gray-900">{item.label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{item.desc}</p>
-          </Link>
-        ))}
+          { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}`, icon: BookOpen, color: "text-indigo-600 bg-indigo-50" },
+          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: Map, color: "text-blue-600 bg-blue-50" },
+          { href: "/training", label: "Courses", desc: "External resources", icon: GraduationCap, color: "text-violet-600 bg-violet-50" },
+          { href: "/projects", label: "Projects", desc: "Monthly builds", icon: Rocket, color: "text-orange-600 bg-orange-50" },
+          { href: "/progress", label: "Progress", desc: "XP & achievements", icon: TrendingUp, color: "text-green-600 bg-green-50" },
+          { href: "/settings", label: "Settings", desc: "Account & preferences", icon: Settings, color: "text-gray-600 bg-gray-100" },
+        ].map((item) => {
+          const Icon = item.icon
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer"
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                <Icon className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                <p className="text-xs text-gray-400 mt-0.5 truncate">{item.desc}</p>
+              </div>
+            </Link>
+          )
+        })}
       </div>
     </div>
   )
