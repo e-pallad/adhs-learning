@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
       status,
       minutesSpent: { increment: minutesSpent ?? 0 },
       completedAt: isCompleting ? new Date() : undefined,
+      ...(xpToAward > 0 && !alreadyCompleted ? { xpEarned: xpToAward } : {}),
     },
   })
 
