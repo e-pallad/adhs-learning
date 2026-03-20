@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
+import { ExternalLink, Trash2 } from "lucide-react"
 
 interface Course {
   id: string
@@ -59,9 +60,9 @@ export function CourseCard({ course, onUpdate, onDelete }: CourseCardProps) {
               href={course.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-indigo-600 hover:underline flex-shrink-0"
+              className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 transition-colors flex-shrink-0"
             >
-              Open →
+              Open <ExternalLink className="w-3 h-3" />
             </a>
           )}
         </div>
@@ -103,8 +104,9 @@ export function CourseCard({ course, onUpdate, onDelete }: CourseCardProps) {
         {onDelete && (
           <button
             onClick={() => onDelete(course.id)}
-            className="text-xs text-red-400 hover:text-red-600 mt-3 block"
+            className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 mt-3 transition-colors cursor-pointer"
           >
+            <Trash2 className="w-3 h-3" />
             Remove course
           </button>
         )}

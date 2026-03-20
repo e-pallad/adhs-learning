@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { WeekSection } from "./week-section"
+import { ChevronRight, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
 
 interface Props {
   params: Promise<{ month: string }>
@@ -47,9 +48,9 @@ export default async function MonthPage({ params }: Props) {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/learning" className="hover:text-gray-600">Learning</Link>
-        <span>/</span>
+      <div className="flex items-center gap-1.5 text-sm text-gray-400">
+        <Link href="/learning" className="hover:text-gray-600 transition-colors">Learning</Link>
+        <ChevronRight className="w-3.5 h-3.5" />
         <span className="text-gray-900">Month {monthNum}</span>
       </div>
 
@@ -58,7 +59,7 @@ export default async function MonthPage({ params }: Props) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Month {monthNum}</p>
-            <h1 className="text-xl font-bold text-gray-900 mt-0.5">{monthData.title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{monthData.title}</h1>
             <p className="text-sm text-gray-500 mt-1">{monthData.description}</p>
           </div>
           {isCompleted && <Badge variant="success">Completed</Badge>}
@@ -76,8 +77,9 @@ export default async function MonthPage({ params }: Props) {
         <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">Monthly project</p>
         <p className="text-sm font-semibold text-gray-900">{monthData.projectTitle}</p>
         <p className="text-xs text-gray-500">{monthData.projectDescription}</p>
-        <Link href="/projects" className="text-xs text-indigo-600 hover:underline mt-1 block">
-          Track in Projects →
+        <Link href="/projects" className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 mt-1 transition-colors">
+          Track in Projects
+          <ExternalLink className="w-3 h-3" />
         </Link>
       </div>
 
@@ -97,13 +99,15 @@ export default async function MonthPage({ params }: Props) {
       {/* Navigation */}
       <div className="flex justify-between pt-4 border-t border-gray-100">
         {monthNum > 1 ? (
-          <Link href={`/learning/${monthNum - 1}`} className="text-sm text-indigo-600 hover:underline">
-            ← Month {monthNum - 1}
+          <Link href={`/learning/${monthNum - 1}`} className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            Month {monthNum - 1}
           </Link>
         ) : <div />}
         {monthNum < 12 ? (
-          <Link href={`/learning/${monthNum + 1}`} className="text-sm text-indigo-600 hover:underline">
-            Month {monthNum + 1} →
+          <Link href={`/learning/${monthNum + 1}`} className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+            Month {monthNum + 1}
+            <ArrowRight className="w-4 h-4" />
           </Link>
         ) : <div />}
       </div>
