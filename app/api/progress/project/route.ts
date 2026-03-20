@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
         repoUrl: repoUrl || null,
         liveUrl: liveUrl || null,
         completedAt: new Date(),
+        ...(!wasCompleted ? { xpEarned: XP_VALUES.COMPLETE_PROJECT } : {}),
       },
     })
 
@@ -69,10 +70,6 @@ export async function POST(req: NextRequest) {
       const result = await awardXP(user.id, XP_VALUES.COMPLETE_PROJECT)
       leveledUp = result.leveledUp
       newLevel = result.newLevel
-      await prisma.monthlyProject.update({
-        where: { id: project.id },
-        data: { xpEarned: XP_VALUES.COMPLETE_PROJECT },
-      })
       await checkAchievements(user.id)
     }
 
