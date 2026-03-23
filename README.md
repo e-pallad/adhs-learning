@@ -76,7 +76,7 @@ lib/                    # Shared utilities
   supabase/             # Supabase server/client helpers
   xp.ts                 # XP values, level thresholds, achievements
   roadmap.ts            # roadmap.sh API integration
-  user.ts               # getCurrentUser helper
+  user.ts               # getCurrentUser, awardDailyLoginXP, awardXP, updateStreak, checkAchievements
 components/
   ui/                   # card, button, badge, progress-bar
   gamification/         # xp-display, streak-counter, celebration-modal
