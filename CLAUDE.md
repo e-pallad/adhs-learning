@@ -36,7 +36,7 @@ Key library files:
 - `lib/xp.ts` — XP values, level thresholds, achievement definitions (single source of truth)
 - `lib/roadmap.ts` — roadmap.sh API integration with 24-hour cache + local JSON fallback
 - `lib/supabase/server.ts` / `client.ts` — Supabase SSR/client helpers
-- `content/curriculum/index.ts` — Static 12-month curriculum definition (all block data)
+- `content/curriculum/index.ts` — Static 12-month curriculum definition (all block data); Month 1 blocks include `quiz` questions and `practicalExample` fields
 - `proxy.ts` — Auth guard replacing `middleware.ts` (Next.js 16)
 
 Generated code: `app/generated/prisma/` — never edit directly.
