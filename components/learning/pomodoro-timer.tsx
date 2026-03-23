@@ -18,38 +18,40 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const [secondsLeft, setSecondsLeft] = useState(FOCUS_MINUTES * 60)
   const [pomodoros, setPomodoros] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const stateRef = useRef<TimerState>("idle")
+  const onCompleteRef = useRef(onComplete)
+  stateRef.current = state
+  onCompleteRef.current = onComplete
 
-  const clear = () => {
+  const secondsLeftRef = useRef(FOCUS_MINUTES * 60)
+  const tickRef = useRef<() => void>(() => {})
+
+  const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
-  }
-
-  const tick = useCallback(() => {
-    setSecondsLeft((prev) => {
-      if (prev <= 1) {
-        clear()
-        return 0
-      }
-      return prev - 1
-    })
   }, [])
 
-  useEffect(() => {
-    if (secondsLeft === 0) {
-      if (state === "running") {
-        setPomodoros((p) => p + 1)
-        setState("break")
-        setSecondsLeft(BREAK_MINUTES * 60)
-        intervalRef.current = setInterval(tick, 1000)
-      } else if (state === "break") {
-        setState("done")
-        onComplete?.()
-      }
+  const tick = useCallback(() => {
+    secondsLeftRef.current -= 1
+    setSecondsLeft(secondsLeftRef.current)
+    if (secondsLeftRef.current > 0) return
+    clear()
+    if (stateRef.current === "running") {
+      setPomodoros((p) => p + 1)
+      setState("break")
+      secondsLeftRef.current = BREAK_MINUTES * 60
+      setSecondsLeft(BREAK_MINUTES * 60)
+      intervalRef.current = setInterval(() => tickRef.current(), 1000)
+    } else if (stateRef.current === "break") {
+      setState("done")
+      onCompleteRef.current?.()
     }
-  }, [secondsLeft, state, tick, onComplete])
+  }, [clear])
+  tickRef.current = tick
 
-  useEffect(() => () => clear(), [])
+  useEffect(() => () => clear(), [clear])
 
   const start = () => {
+    secondsLeftRef.current = FOCUS_MINUTES * 60
     setState("running")
     setSecondsLeft(FOCUS_MINUTES * 60)
     clear()
@@ -64,6 +66,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const reset = () => {
     clear()
     setState("idle")
+    secondsLeftRef.current = FOCUS_MINUTES * 60
     setSecondsLeft(FOCUS_MINUTES * 60)
   }
 
