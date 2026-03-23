@@ -1,0 +1,12 @@
+# TrueNAS / Dockge deployment — no build sections.
+# Image is pulled from the local registry after running build-and-push.sh.
+# Fill in the required env vars via the Dockge UI (stack → Env tab).
+
+services:
+  app:
+    image: 192.168.178.10:5000/devfluent:latest
+    ports:
+      - "30005:3000"
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -15,6 +15,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
   }
 
+  const validStatuses = ["COMPLETED", "SKIPPED", "IN_PROGRESS"]
+  if (!validStatuses.includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+  }
+
+  const safeMinutes = typeof minutesSpent === "number" && minutesSpent >= 0 ? Math.floor(minutesSpent) : 0
+
   const block = getBlock(blockId)
   if (!block) return NextResponse.json({ error: "Block not found" }, { status: 404 })
 
@@ -30,41 +37,46 @@ export async function POST(req: NextRequest) {
     ? usedTimer ? XP_VALUES.COMPLETE_BLOCK_POMODORO : XP_VALUES.COMPLETE_BLOCK
     : isSkipping ? XP_VALUES.SKIP_BLOCK : 0
 
-  // Check if already completed (no double-XP)
-  const existing = await prisma.blockProgress.findUnique({
-    where: { userId_blockId: { userId: user.id, blockId } },
+  // Wrap check + upsert + XP award in a transaction to prevent double-XP under concurrent requests
+  const { record, alreadyCompleted, leveledUp, newLevel, newXP } = await prisma.$transaction(async (tx) => {
+    const existing = await tx.blockProgress.findUnique({
+      where: { userId_blockId: { userId: user.id, blockId } },
+    })
+    const alreadyCompleted = existing?.status === "COMPLETED"
+
+    const record = await tx.blockProgress.upsert({
+      where: { userId_blockId: { userId: user.id, blockId } },
+      create: {
+        userId: user.id,
+        blockId,
+        month,
+        week,
+        status,
+        minutesSpent: safeMinutes,
+        xpEarned: xpToAward,
+        completedAt: isCompleting ? new Date() : null,
+      },
+      update: {
+        status,
+        minutesSpent: { increment: safeMinutes },
+        completedAt: isCompleting ? new Date() : undefined,
+        ...(xpToAward > 0 && !alreadyCompleted ? { xpEarned: xpToAward } : {}),
+      },
+    })
+
+    let leveledUp = false
+    let newLevel = user.level
+    let newXP = user.totalXP
+
+    if (xpToAward > 0 && !alreadyCompleted) {
+      const result = await awardXP(user.id, xpToAward, { db: tx })
+      leveledUp = result.leveledUp
+      newLevel = result.newLevel
+      newXP = result.newXP
+    }
+
+    return { record, alreadyCompleted, leveledUp, newLevel, newXP }
   })
-  const alreadyCompleted = existing?.status === "COMPLETED"
-
-  const record = await prisma.blockProgress.upsert({
-    where: { userId_blockId: { userId: user.id, blockId } },
-    create: {
-      userId: user.id,
-      blockId,
-      month,
-      week,
-      status,
-      minutesSpent: minutesSpent ?? 0,
-      xpEarned: xpToAward,
-      completedAt: isCompleting ? new Date() : null,
-    },
-    update: {
-      status,
-      minutesSpent: { increment: minutesSpent ?? 0 },
-      completedAt: isCompleting ? new Date() : undefined,
-    },
-  })
-
-  let leveledUp = false
-  let newLevel = user.level
-  let newXP = user.totalXP
-
-  if (xpToAward > 0 && !alreadyCompleted) {
-    const result = await awardXP(user.id, xpToAward)
-    leveledUp = result.leveledUp
-    newLevel = result.newLevel
-    newXP = result.newXP
-  }
 
   if (isCompleting && !alreadyCompleted) {
     await updateStreak(user.id)

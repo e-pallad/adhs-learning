@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Month } from "@/content/curriculum"
+import { ExternalLink } from "lucide-react"
 
 type ProjectStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
 
@@ -119,11 +120,15 @@ export function ProjectsClient({ projects, curriculum }: ProjectsClientProps) {
                 <div className="flex gap-3">
                   {proj.repoUrl && (
                     <a href={proj.repoUrl} target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-indigo-600 hover:underline">Repo →</a>
+                      className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 transition-colors">
+                      Repo <ExternalLink className="w-3 h-3" />
+                    </a>
                   )}
                   {proj.liveUrl && (
                     <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-indigo-600 hover:underline">Live →</a>
+                      className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 transition-colors">
+                      Live <ExternalLink className="w-3 h-3" />
+                    </a>
                   )}
                 </div>
               )}

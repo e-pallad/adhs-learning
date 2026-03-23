@@ -5,6 +5,7 @@ import { getXPProgress, LEVEL_THRESHOLDS, ACHIEVEMENT_DEFINITIONS } from "@/lib/
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Zap, Star, CheckSquare } from "lucide-react"
 
 export const metadata = { title: "Progress — Devfluent" }
 
@@ -33,23 +34,35 @@ export default async function ProgressPage() {
 
   const unlockedSlugs = new Set(achievements.map((a) => a.slug))
 
-  // Build 30-day calendar
-  const days: { date: Date; xp: number }[] = []
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    d.setHours(0, 0, 0, 0)
+  // Build 30-day calendar aligned to week start (Sunday)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  // Find the Sunday on or before 29 days ago so the grid aligns
+  const startDay = new Date(today)
+  startDay.setDate(today.getDate() - 29)
+  const dayOfWeek = startDay.getDay() // 0=Sun
+  startDay.setDate(startDay.getDate() - dayOfWeek)
+
+  const calendarDays: { date: Date; xp: number; inRange: boolean }[] = []
+  const cursor = new Date(startDay)
+  while (cursor <= today) {
+    const d = new Date(cursor)
+    const inRange = d >= new Date(new Date().setDate(today.getDate() - 29) - 1)
     const log = dailyLogs.find((l) => new Date(l.date).toDateString() === d.toDateString())
-    days.push({ date: d, xp: log?.xpEarned ?? 0 })
+    calendarDays.push({ date: d, xp: log?.xpEarned ?? 0, inRange })
+    cursor.setDate(cursor.getDate() + 1)
   }
 
   const totalXPFromLogs = dailyLogs.reduce((sum, l) => sum + l.xpEarned, 0)
   const blocksDone = blockStats.find((s) => s.status === "COMPLETED")?._count ?? 0
 
+  const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-gray-900">Progress</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
         <p className="text-sm text-gray-500 mt-0.5">Your XP history and achievements</p>
       </div>
 
@@ -57,21 +70,36 @@ export default async function ProgressPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Total XP</p>
-            <p className="text-2xl font-bold text-indigo-600 mt-1">{user.totalXP.toLocaleString()}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Total XP</p>
+              <div className="w-7 h-7 rounded-lg bg-violet-50 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-violet-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-indigo-600">{user.totalXP.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Level</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{xpProgress.level}</p>
-            <p className="text-xs text-gray-400">{xpProgress.label}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Level</p>
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <Star className="w-3.5 h-3.5 text-indigo-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-gray-900">{xpProgress.level}</p>
+            <p className="text-xs text-gray-400 mt-0.5">{xpProgress.label}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Blocks done</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">{blocksDone}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Blocks done</p>
+              <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
+                <CheckSquare className="w-3.5 h-3.5 text-green-600" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-green-600">{blocksDone}</p>
           </CardContent>
         </Card>
       </div>
@@ -112,24 +140,34 @@ export default async function ProgressPage() {
       {/* 30-day activity calendar */}
       <Card>
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">30-day activity</h3>
-          <div className="flex gap-1 flex-wrap">
-            {days.map(({ date, xp }) => {
-              const intensity =
-                xp === 0 ? "bg-gray-100" :
-                xp < 20 ? "bg-indigo-200" :
-                xp < 50 ? "bg-indigo-400" :
-                "bg-indigo-600"
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">30-day activity</h3>
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {DAY_LABELS.map((d) => (
+              <div key={d} className="text-center text-[10px] text-gray-400 font-medium">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {calendarDays.map(({ date, xp, inRange }) => {
+              const intensity = !inRange
+                ? "bg-transparent"
+                : xp === 0
+                ? "bg-gray-100"
+                : xp < 20
+                ? "bg-indigo-200"
+                : xp < 50
+                ? "bg-indigo-400"
+                : "bg-indigo-600"
+              const isToday = date.toDateString() === new Date().toDateString()
               return (
                 <div
                   key={date.toISOString()}
-                  className={`w-6 h-6 rounded-sm ${intensity}`}
-                  title={`${date.toLocaleDateString()}: ${xp} XP`}
+                  className={`aspect-square rounded-sm ${intensity} ${isToday && inRange ? "ring-1 ring-indigo-500 ring-offset-1" : ""}`}
+                  title={inRange ? `${date.toLocaleDateString()}: ${xp} XP` : undefined}
                 />
               )
             })}
           </div>
-          <div className="flex items-center gap-1 mt-3 text-xs text-gray-400">
+          <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-400">
             <span>Less</span>
             <div className="w-3 h-3 rounded-sm bg-gray-100" />
             <div className="w-3 h-3 rounded-sm bg-indigo-200" />

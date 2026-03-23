@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 import { CourseCard } from "@/components/training/course-card"
 import { AddCourseForm } from "@/components/training/add-course-form"
 
@@ -23,13 +23,22 @@ interface TrainingClientProps {
 export function TrainingClient({ courses }: TrainingClientProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
 
-  const post = (body: object) =>
-    fetch("/api/progress/course", {
+  const post = async (body: object): Promise<boolean> => {
+    setError(null)
+    const res = await fetch("/api/progress/course", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setError(data.error ?? "Something went wrong. Please try again.")
+      return false
+    }
+    return true
+  }
 
   const handleAdd = async (data: {
     title: string
@@ -37,22 +46,30 @@ export function TrainingClient({ courses }: TrainingClientProps) {
     url: string
     totalLessons: number
   }) => {
-    await post({ action: "create", ...data })
-    startTransition(() => router.refresh())
+    if (await post({ action: "create", ...data })) {
+      startTransition(() => router.refresh())
+    }
   }
 
   const handleUpdate = async (id: string, completedLessons: number) => {
-    await post({ action: "update", id, completedLessons })
-    startTransition(() => router.refresh())
+    if (await post({ action: "update", id, completedLessons })) {
+      startTransition(() => router.refresh())
+    }
   }
 
   const handleDelete = async (id: string) => {
-    await post({ action: "delete", id })
-    startTransition(() => router.refresh())
+    if (await post({ action: "delete", id })) {
+      startTransition(() => router.refresh())
+    }
   }
 
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       <AddCourseForm onAdd={handleAdd} />
 
       {courses.length === 0 ? (
