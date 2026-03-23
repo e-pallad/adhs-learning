@@ -42,6 +42,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ### API Routes
 - Course/project/profile APIs use **action-based POST** pattern: `{ action: "create"|"update"|"delete", ...data }`
+- Quiz API uses a direct POST pattern: `{ blockId: string, score: number, answers?: Record<string, number> }`
 
 ## XP System
 
@@ -60,11 +61,15 @@ Defined in `lib/xp.ts` — single source of truth.
 | Complete course | 50 |
 | Complete project | 100 |
 | Skip block | 2 |
+| Quiz attempt (any score) | 5 |
+| Quiz pass (score ≥ 70%) | +15 (stacks with attempt) |
+| Quiz perfect (score 100%) | +30 (stacks with pass) |
 
 ## Architecture Notes
 
 - `userId` on **every** model — multi-user ready even though single-user now
 - Curriculum is weekly (12 months × N weeks × N blocks)
+- Each `LearningBlock` may have `quiz?: QuizQuestion[]` and `practicalExample?: string` — Month 1 fully populated
 - Roadmap display is a list view (grouped checklist), not a canvas/graph
 - `content/roadmaps/` — local JSON mirror fallback (not critical; roadmap fetches live from roadmap.sh API first)
 
@@ -89,6 +94,7 @@ All XP-awarding progress routes wrap their check → upsert → `awardXP` calls 
 - Roadmap route: validates `nodeType` against allowlist; uses stored `nodeType` on updates to prevent XP manipulation via re-submission
 - Profile PATCH: enforces `name` is a string ≤ 100 characters
 - Streak bonuses: awarded at most once per milestone via an `achievement` record check — prevents farming by breaking and rebuilding streak
+- Quiz route: validates `score` is integer 0–100; XP values stack (`QUIZ_TRY` always + `QUIZ_PASS` if ≥70 + `QUIZ_PERFECT` if 100); wrapped in `prisma.$transaction`
 
 ## Testing
 
