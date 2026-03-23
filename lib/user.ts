@@ -1,3 +1,4 @@
+import { startOfDay, differenceInCalendarDays } from "date-fns"
 import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { PrismaClient } from "@/app/generated/prisma/client"
@@ -90,27 +91,25 @@ export async function updateStreak(userId: string): Promise<number> {
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) throw new Error("User not found")
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-
-  const lastSeen = user.lastSeenAt ? new Date(user.lastSeenAt) : null
-  if (lastSeen) lastSeen.setHours(0, 0, 0, 0)
+  const today = startOfDay(new Date())
+  const lastSeen = user.lastSeenAt ? startOfDay(new Date(user.lastSeenAt)) : null
 
   let newStreak = user.streak
 
   if (!lastSeen) {
     newStreak = 1
-  } else if (lastSeen.getTime() === today.getTime()) {
-    // Already logged today — no change
-    return user.streak
-  } else if (lastSeen.getTime() === yesterday.getTime()) {
-    // Consecutive day
-    newStreak = user.streak + 1
   } else {
-    // Gap — reset
-    newStreak = 1
+    const daysDiff = differenceInCalendarDays(today, lastSeen)
+    if (daysDiff === 0) {
+      // Already logged today — no change
+      return user.streak
+    } else if (daysDiff === 1) {
+      // Consecutive day
+      newStreak = user.streak + 1
+    } else {
+      // Gap — reset
+      newStreak = 1
+    }
   }
 
   await prisma.user.update({
@@ -141,11 +140,14 @@ export async function updateStreak(userId: string): Promise<number> {
  * Check and unlock any newly earned achievements.
  */
 export async function checkAchievements(userId: string): Promise<string[]> {
-  const [user, existingAchievements, projects, blocks] = await Promise.all([
+  const [user, existingAchievements, projects, blocks, quizAttempts, quizzesPassed, perfectQuizzes] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.achievement.findMany({ where: { userId }, select: { slug: true } }),
     prisma.monthlyProject.count({ where: { userId, status: "COMPLETED" } }),
     prisma.blockProgress.count({ where: { userId, status: "COMPLETED" } }),
+    prisma.quizAttempt.count({ where: { userId } }),
+    prisma.quizAttempt.count({ where: { userId, passed: true } }),
+    prisma.quizAttempt.count({ where: { userId, perfect: true } }),
   ])
 
   if (!user) return []
@@ -157,6 +159,9 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     totalXP: user.totalXP,
     projectsCompleted: projects,
     blocksCompleted: blocks,
+    quizAttempts,
+    quizzesPassed,
+    perfectQuizzes,
   }
 
   const toUnlock = ACHIEVEMENT_DEFINITIONS.filter(

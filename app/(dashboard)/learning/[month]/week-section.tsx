@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useTransition } from "react"
+import { toast } from "sonner"
 import { BlockCard } from "@/components/learning/block-card"
 import type { LearningBlock } from "@/content/curriculum"
 
@@ -17,22 +18,42 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap }: WeekSectio
   const [, startTransition] = useTransition()
 
   const handleComplete = async (blockId: string, usedTimer: boolean) => {
-    const res = await fetch("/api/progress/block", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blockId, status: "COMPLETED", usedTimer }),
-    })
+    let res: Response
+    try {
+      res = await fetch("/api/progress/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockId, status: "COMPLETED", usedTimer }),
+      })
+    } catch {
+      toast.error("Failed to save progress. Please try again.")
+      return {}
+    }
+    if (!res.ok) {
+      toast.error("Failed to save progress. Please try again.")
+      return {}
+    }
     const data = await res.json()
     startTransition(() => router.refresh())
     return { leveledUp: data.leveledUp, newLevel: data.newLevel }
   }
 
-  const handleSkip = (blockId: string) => {
-    fetch("/api/progress/block", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blockId, status: "SKIPPED" }),
-    })
+  const handleSkip = async (blockId: string) => {
+    let res: Response
+    try {
+      res = await fetch("/api/progress/block", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockId, status: "SKIPPED" }),
+      })
+    } catch {
+      toast.error("Failed to save progress. Please try again.")
+      return
+    }
+    if (!res.ok) {
+      toast.error("Failed to save progress. Please try again.")
+      return
+    }
     startTransition(() => router.refresh())
   }
 

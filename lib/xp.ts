@@ -13,6 +13,9 @@ export const XP_VALUES = {
   COMPLETE_COURSE: 50,
   COMPLETE_PROJECT: 100,
   SKIP_BLOCK: 2,   // small XP even for skipping — keeps momentum
+  QUIZ_TRY: 5,     // any attempt
+  QUIZ_PASS: 15,   // score >= 70%
+  QUIZ_PERFECT: 30, // score 100%
 } as const
 
 export const LEVEL_THRESHOLDS: { level: number; xpRequired: number; label: string }[] = [
@@ -74,7 +77,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
   description: string
   icon: string
   xpBonus: number
-  check: (stats: { streak: number; level: number; totalXP: number; projectsCompleted: number; blocksCompleted: number }) => boolean
+  check: (stats: { streak: number; level: number; totalXP: number; projectsCompleted: number; blocksCompleted: number; quizAttempts?: number; quizzesPassed?: number; perfectQuizzes?: number }) => boolean
 }[] = [
   {
     slug: "first_block",
@@ -139,5 +142,29 @@ export const ACHIEVEMENT_DEFINITIONS: {
     icon: "💼",
     xpBonus: 100,
     check: (s) => s.projectsCompleted >= 3,
+  },
+  {
+    slug: "first-quiz",
+    label: "Quiz Taker",
+    description: "Complete your first quiz",
+    icon: "📝",
+    xpBonus: 10,
+    check: (s) => (s.quizAttempts ?? 0) >= 1,
+  },
+  {
+    slug: "quiz-master",
+    label: "Quiz Master",
+    description: "Pass 5 quizzes",
+    icon: "🧠",
+    xpBonus: 50,
+    check: (s) => (s.quizzesPassed ?? 0) >= 5,
+  },
+  {
+    slug: "perfect-score",
+    label: "Perfect Score",
+    description: "Get 100% on a quiz",
+    icon: "💯",
+    xpBonus: 25,
+    check: (s) => (s.perfectQuizzes ?? 0) >= 1,
   },
 ]
