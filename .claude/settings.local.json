@@ -4,5 +4,9 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(gh pr:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "claude-flow"
+  ],
+  "enableAllProjectMcpServers": true
 }
