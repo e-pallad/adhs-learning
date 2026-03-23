@@ -52,6 +52,7 @@ model User {
   externalCourses ExternalCourse[]
   monthlyProjects MonthlyProject[]
   achievements    Achievement[]
+  quizAttempts    QuizAttempt[]
 
   @@map("users")
 }
@@ -175,4 +176,20 @@ model Achievement {
 
   @@unique([userId, slug])
   @@map("achievements")
+}
+
+// ─── Quiz Attempts ────────────────────────────────────────────────────────────
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blockId     String
+  score       Int      // 0-100
+  passed      Boolean
+  perfect     Boolean
+  xpEarned    Int      @default(0)
+  attemptedAt DateTime @default(now())
+
+  @@index([userId, blockId])
 }
