@@ -20,9 +20,6 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const stateRef = useRef<TimerState>("idle")
   const onCompleteRef = useRef(onComplete)
-  stateRef.current = state
-  onCompleteRef.current = onComplete
-
   const secondsLeftRef = useRef(FOCUS_MINUTES * 60)
   const tickRef = useRef<() => void>(() => {})
 
@@ -46,8 +43,10 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
       onCompleteRef.current?.()
     }
   }, [clear])
-  tickRef.current = tick
 
+  useEffect(() => { stateRef.current = state }, [state])
+  useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])
+  useEffect(() => { tickRef.current = tick }, [tick])
   useEffect(() => () => clear(), [clear])
 
   const start = () => {
