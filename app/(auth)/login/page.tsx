@@ -90,8 +90,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg">
+    <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center mx-auto mb-3">
             <Zap className="w-6 h-6 text-white" />
@@ -119,7 +118,7 @@ function LoginForm() {
             </div>
             <p className="text-sm font-medium text-gray-900">Check your email</p>
             <p className="text-sm text-gray-500">
-              We sent a magic link to <strong>{email}</strong>.
+              We sent a magic link to <strong className="text-gray-700">{email}</strong>.
             </p>
             <button
               onClick={() => { setMagicSent(false); setMode("signin") }}
@@ -180,7 +179,7 @@ function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -191,7 +190,7 @@ function LoginForm() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                 </div>
 
@@ -214,7 +213,7 @@ function LoginForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   />
                 </div>
                 {error && <p className="text-sm text-red-600">{error}</p>}
@@ -244,7 +243,6 @@ function LoginForm() {
           </div>
         )}
       </div>
-    </div>
   )
 }
 
