@@ -105,8 +105,8 @@ describe("lib/user.ts helpers", () => {
 
     it("returns unchanged streak when already called today", async () => {
       await updateStreak(ID) // first call → streak = 1
-      const firstStreak = await updateStreak(ID) // second call same day → no change
-      expect(firstStreak).toBe(1)
+      const secondCallResult = await updateStreak(ID) // second call same day → no change
+      expect(secondCallResult).toBe(1)
     })
 
     it("awards 7-day streak bonus once and creates achievement record", async () => {
