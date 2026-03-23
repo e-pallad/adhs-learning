@@ -9,6 +9,10 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
   const { name } = body
 
+  if (name !== undefined && name !== null && (typeof name !== "string" || name.length > 100)) {
+    return NextResponse.json({ error: "Name must be a string of 100 characters or fewer" }, { status: 400 })
+  }
+
   const updated = await prisma.user.update({
     where: { id: user.id },
     data: { name: name ?? null },

@@ -9,6 +9,7 @@ import { CelebrationModal } from "@/components/gamification/celebration-modal"
 import { BLOCK_TYPE_COLORS, BLOCK_TYPE_LABELS, type LearningBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
 import { cn } from "@/lib/utils"
+import { ChevronDown, Check } from "lucide-react"
 
 interface BlockCardProps {
   block: LearningBlock
@@ -53,18 +54,14 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
               <button
                 onClick={() => !isCompleted && handleComplete()}
                 className={cn(
-                  "mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 transition-colors",
+                  "mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 transition-colors flex items-center justify-center",
                   isCompleted
                     ? "border-green-500 bg-green-500"
-                    : "border-gray-300 hover:border-indigo-400"
+                    : "border-gray-300 hover:border-indigo-400 cursor-pointer"
                 )}
                 aria-label={isCompleted ? "Completed" : "Mark complete"}
               >
-                {isCompleted && (
-                  <svg viewBox="0 0 20 20" fill="white" className="w-full h-full p-0.5">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                )}
+                {isCompleted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
               </button>
 
               <div className="flex-1 min-w-0">
@@ -86,13 +83,11 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
 
             <button
               onClick={() => setExpanded((e) => !e)}
-              className="text-gray-400 hover:text-gray-600 flex-shrink-0 transition-transform"
+              className="text-gray-400 hover:text-gray-600 flex-shrink-0 transition-transform cursor-pointer"
               style={{ transform: expanded ? "rotate(180deg)" : undefined }}
               aria-label={expanded ? "Collapse" : "Expand"}
             >
-              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
 

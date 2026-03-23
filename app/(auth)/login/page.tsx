@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import { Zap, Mail } from "lucide-react"
 
 function LoginForm() {
   const [email, setEmail] = useState("")
@@ -40,14 +41,18 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-lg">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-3">⚡</div>
+          <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center mx-auto mb-3">
+            <Zap className="w-6 h-6 text-white" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Devfluent</h1>
           <p className="text-sm text-gray-500 mt-1">Your ADHD-friendly dev journey</p>
         </div>
 
         {sent ? (
           <div className="text-center space-y-3">
-            <div className="text-4xl">📬</div>
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mx-auto">
+              <Mail className="w-6 h-6 text-indigo-600" />
+            </div>
             <p className="text-sm font-medium text-gray-900">Check your email</p>
             <p className="text-sm text-gray-500">
               We sent a magic link to <strong>{email}</strong>.
@@ -55,7 +60,7 @@ function LoginForm() {
             </p>
             <button
               onClick={() => setSent(false)}
-              className="text-xs text-indigo-600 hover:underline mt-4"
+              className="text-xs text-indigo-600 hover:underline mt-4 cursor-pointer"
             >
               Use a different email
             </button>

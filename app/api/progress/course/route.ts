@@ -35,31 +35,35 @@ export async function POST(req: NextRequest) {
     const { id, completedLessons } = data
     if (!id) return NextResponse.json({ error: "Missing course id" }, { status: 400 })
 
-    const course = await prisma.externalCourse.findUnique({ where: { id } })
-    if (!course || course.userId !== user.id) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 })
-    }
+    const { updated, justCompleted } = await prisma.$transaction(async (tx) => {
+      const course = await tx.externalCourse.findUnique({ where: { id } })
+      if (!course || course.userId !== user.id) return { updated: null, justCompleted: false }
 
-    const isNowCompleted = course.totalLessons > 0 && completedLessons >= course.totalLessons
-    const wasCompleted = course.isCompleted
+      const isNowCompleted = course.totalLessons > 0 && completedLessons >= course.totalLessons
+      const wasCompleted = course.isCompleted
 
-    const updated = await prisma.externalCourse.update({
-      where: { id },
-      data: {
-        completedLessons: Number(completedLessons),
-        isCompleted: isNowCompleted,
-        completedAt: isNowCompleted && !wasCompleted ? new Date() : course.completedAt,
-      },
+      const updated = await tx.externalCourse.update({
+        where: { id },
+        data: {
+          completedLessons: Number(completedLessons),
+          isCompleted: isNowCompleted,
+          completedAt: isNowCompleted && !wasCompleted ? new Date() : course.completedAt,
+        },
+      })
+
+      if (isNowCompleted && !wasCompleted) {
+        await awardXP(user.id, XP_VALUES.COMPLETE_COURSE, { db: tx })
+        await tx.externalCourse.update({
+          where: { id },
+          data: { xpEarned: { increment: XP_VALUES.COMPLETE_COURSE } },
+        })
+      }
+
+      return { updated, justCompleted: isNowCompleted && !wasCompleted }
     })
 
-    if (isNowCompleted && !wasCompleted) {
-      await awardXP(user.id, XP_VALUES.COMPLETE_COURSE)
-      await prisma.externalCourse.update({
-        where: { id },
-        data: { xpEarned: { increment: XP_VALUES.COMPLETE_COURSE } },
-      })
-      await checkAchievements(user.id)
-    }
+    if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 })
+    if (justCompleted) await checkAchievements(user.id)
 
     return NextResponse.json({ success: true, course: updated })
   }
