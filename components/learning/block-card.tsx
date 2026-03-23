@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PomodoroTimer } from "@/components/learning/pomodoro-timer"
 import { CelebrationModal } from "@/components/gamification/celebration-modal"
+import { QuizModal } from "@/components/learning/quiz-modal"
 import { BLOCK_TYPE_COLORS, BLOCK_TYPE_LABELS, type LearningBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
 import { cn } from "@/lib/utils"
@@ -23,6 +24,8 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   const [loading, setLoading] = useState(false)
   const [celebration, setCelebration] = useState<{ leveledUp?: boolean; newLevel?: number } | null>(null)
   const [timerUsed, setTimerUsed] = useState(false)
+  const [showQuiz, setShowQuiz] = useState(false)
+  const [quizCelebration, setQuizCelebration] = useState<{ xpEarned: number; passed: boolean; perfect: boolean } | null>(null)
 
   const isCompleted = status === "COMPLETED"
   const isSkipped = status === "SKIPPED"
@@ -38,7 +41,19 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
     }
   }
 
+  const handleQuizComplete = (result: {
+    xpEarned: number
+    passed: boolean
+    perfect: boolean
+    achievements: unknown[]
+  }) => {
+    if (result.passed) {
+      setQuizCelebration(result)
+    }
+  }
+
   const xpValue = timerUsed ? XP_VALUES.COMPLETE_BLOCK_POMODORO : XP_VALUES.COMPLETE_BLOCK
+  const hasQuiz = block.quiz && block.quiz.length > 0
 
   return (
     <>
@@ -122,6 +137,16 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
                   <p className="text-xs text-gray-400">
                     +{xpValue} XP {timerUsed && <span className="text-green-600">(timer bonus!)</span>}
                   </p>
+                  {hasQuiz && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setShowQuiz(true)}
+                      className="block w-full"
+                    >
+                      Take quiz
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     onClick={handleComplete}
@@ -157,6 +182,28 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
           leveledUp={celebration.leveledUp}
           newLevel={celebration.newLevel}
           onClose={() => setCelebration(null)}
+        />
+      )}
+
+      {showQuiz && hasQuiz && (
+        <QuizModal
+          blockId={block.id}
+          blockTitle={block.title}
+          questions={block.quiz!}
+          onComplete={handleQuizComplete}
+          onClose={() => setShowQuiz(false)}
+        />
+      )}
+
+      {quizCelebration && (
+        <CelebrationModal
+          title={quizCelebration.perfect ? "Perfect Score!" : "Quiz Passed!"}
+          message={quizCelebration.perfect
+            ? `Flawless on "${block.title}"!`
+            : `You passed the quiz for "${block.title}"!`
+          }
+          xpGained={quizCelebration.xpEarned > 0 ? quizCelebration.xpEarned : undefined}
+          onClose={() => setQuizCelebration(null)}
         />
       )}
     </>
