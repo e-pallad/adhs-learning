@@ -17,19 +17,26 @@ export function SettingsClient({ name: initialName, email }: SettingsClientProps
   const [saving, setSaving] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    await fetch("/api/user/profile", {
+    setSaveError(null)
+    const res = await fetch("/api/user/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
     })
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-    startTransition(() => router.refresh())
+    if (res.ok) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+      startTransition(() => router.refresh())
+    } else {
+      const data = await res.json().catch(() => ({}))
+      setSaveError(data.error ?? "Failed to save. Please try again.")
+    }
   }
 
   const handleSignOut = async () => {
@@ -63,6 +70,7 @@ export function SettingsClient({ name: initialName, email }: SettingsClientProps
         <Button type="submit" size="sm" loading={saving}>
           {saved ? "Saved!" : "Save changes"}
         </Button>
+        {saveError && <p className="text-xs text-red-600">{saveError}</p>}
       </form>
 
       {/* Divider */}

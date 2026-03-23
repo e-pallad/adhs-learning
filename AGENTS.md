@@ -68,6 +68,28 @@ Defined in `lib/xp.ts` — single source of truth.
 - Roadmap display is a list view (grouped checklist), not a canvas/graph
 - `content/roadmaps/` — local JSON mirror fallback (not critical; roadmap fetches live from roadmap.sh API first)
 
+### `lib/user.ts` — User & XP utilities
+
+| Export | Description |
+|---|---|
+| `getCurrentUser()` | Upserts authenticated user on first login (race-safe) |
+| `awardDailyLoginXP(userId)` | Awards 5 XP at most once per calendar day — call on every dashboard load |
+| `awardXP(userId, amount, { db? })` | Awards XP + updates level; accepts optional transaction client via `db` |
+| `updateStreak(userId)` | Updates streak counter; awards streak bonuses idempotently via achievement records |
+| `checkAchievements(userId)` | Unlocks achievements using `createMany({ skipDuplicates: true })` — concurrent-safe |
+
+### Concurrency & Data Integrity
+
+All XP-awarding progress routes wrap their check → upsert → `awardXP` calls in a single `prisma.$transaction(...)` to prevent double-XP under concurrent requests. `awardXP` accepts a `db` parameter (transaction client type: `Omit<PrismaClient, "$connect" | ...>`) so it can participate in the caller's transaction.
+
+### Security Patterns
+
+- Auth callback (`app/api/auth/callback/route.ts`): `next` redirect param is validated to be a relative path (starts with `/`, not `//`) — prevents open redirect
+- Block progress route: validates `status` against allowlist and sanitizes `minutesSpent` to non-negative integer before any DB write
+- Roadmap route: validates `nodeType` against allowlist; uses stored `nodeType` on updates to prevent XP manipulation via re-submission
+- Profile PATCH: enforces `name` is a string ≤ 100 characters
+- Streak bonuses: awarded at most once per milestone via an `achievement` record check — prevents farming by breaking and rebuilding streak
+
 ## Known Non-Critical Warnings
 
 - `lib/roadmap.ts` dynamic import of `@/content/roadmaps/*.json` produces a Turbopack module-not-found warning — intentional, it's a try/catch fallback that returns `[]` on failure

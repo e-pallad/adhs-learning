@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/user"
+import { getCurrentUser, awardDailyLoginXP } from "@/lib/user"
 import { getXPProgress, LEVEL_THRESHOLDS } from "@/lib/xp"
 import { CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
@@ -23,6 +23,9 @@ import {
 export default async function DashboardPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+
+  // Award daily login XP (idempotent — at most once per day)
+  await awardDailyLoginXP(user.id)
 
   const xpProgress = getXPProgress(user.totalXP)
   const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)

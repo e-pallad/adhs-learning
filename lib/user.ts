@@ -1,6 +1,10 @@
 import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
+import { PrismaClient } from "@/app/generated/prisma/client"
 import { getLevelFromXP, ACHIEVEMENT_DEFINITIONS, XP_VALUES } from "@/lib/xp"
+
+// Accepts either the full PrismaClient or a transaction client
+type DbClient = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
 
 /**
  * Gets the current authenticated user's database record.
@@ -11,20 +15,36 @@ export async function getCurrentUser() {
   const { data: { user: authUser } } = await supabase.auth.getUser()
   if (!authUser) return null
 
-  let user = await prisma.user.findUnique({ where: { id: authUser.id } })
-
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        id: authUser.id,
-        email: authUser.email!,
-        name: authUser.user_metadata?.name ?? null,
-        avatarUrl: authUser.user_metadata?.avatar_url ?? null,
-      },
-    })
-  }
+  // upsert prevents unique constraint errors when concurrent requests race on first login
+  const user = await prisma.user.upsert({
+    where: { id: authUser.id },
+    update: {},
+    create: {
+      id: authUser.id,
+      email: authUser.email!,
+      name: authUser.user_metadata?.name ?? null,
+      avatarUrl: authUser.user_metadata?.avatar_url ?? null,
+    },
+  })
 
   return user
+}
+
+/**
+ * Award the 5 XP daily login bonus — idempotent, at most once per calendar day.
+ * Safe to call on every dashboard load.
+ */
+export async function awardDailyLoginXP(userId: string): Promise<void> {
+  const today = new Date()
+  const dateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+  // Only award if there is no log entry for today yet
+  const existing = await prisma.dailyLog.findUnique({
+    where: { userId_date: { userId, date: dateOnly } },
+  })
+  if (!existing) {
+    await awardXP(userId, XP_VALUES.DAILY_LOGIN)
+  }
 }
 
 /**
@@ -34,16 +54,17 @@ export async function getCurrentUser() {
 export async function awardXP(
   userId: string,
   amount: number,
-  context: { date?: Date } = {}
+  context: { date?: Date; db?: DbClient } = {}
 ): Promise<{ leveledUp: boolean; newLevel: number; newXP: number }> {
-  const user = await prisma.user.findUnique({ where: { id: userId } })
+  const db = context.db ?? prisma
+  const user = await db.user.findUnique({ where: { id: userId } })
   if (!user) throw new Error("User not found")
 
   const newXP = user.totalXP + amount
   const newLevel = getLevelFromXP(newXP)
   const leveledUp = newLevel > user.level
 
-  await prisma.user.update({
+  await db.user.update({
     where: { id: userId },
     data: { totalXP: newXP, level: newLevel },
   })
@@ -52,7 +73,7 @@ export async function awardXP(
   const today = context.date ?? new Date()
   const dateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
-  await prisma.dailyLog.upsert({
+  await db.dailyLog.upsert({
     where: { userId_date: { userId, date: dateOnly } },
     create: { userId, date: dateOnly, xpEarned: amount },
     update: { xpEarned: { increment: amount } },
@@ -97,11 +118,20 @@ export async function updateStreak(userId: string): Promise<number> {
     data: { streak: newStreak, lastSeenAt: new Date() },
   })
 
-  // Streak bonuses
+  // Streak bonuses — only award once per streak cycle (exact milestone, not re-award on re-reach)
+  // Check via achievement record to prevent farming by breaking and rebuilding streak
   if (newStreak === 7) {
-    await awardXP(userId, XP_VALUES.STREAK_BONUS_7)
+    const alreadyAwarded = await prisma.achievement.findFirst({ where: { userId, slug: "streak_bonus_7" } })
+    if (!alreadyAwarded) {
+      await prisma.achievement.create({ data: { userId, slug: "streak_bonus_7", label: "7-Day Streak Bonus", description: "Bonus XP for a 7-day streak", icon: "🔥", xpBonus: XP_VALUES.STREAK_BONUS_7 } })
+      await awardXP(userId, XP_VALUES.STREAK_BONUS_7)
+    }
   } else if (newStreak === 30) {
-    await awardXP(userId, XP_VALUES.STREAK_BONUS_30)
+    const alreadyAwarded = await prisma.achievement.findFirst({ where: { userId, slug: "streak_bonus_30" } })
+    if (!alreadyAwarded) {
+      await prisma.achievement.create({ data: { userId, slug: "streak_bonus_30", label: "30-Day Streak Bonus", description: "Bonus XP for a 30-day streak", icon: "⚡", xpBonus: XP_VALUES.STREAK_BONUS_30 } })
+      await awardXP(userId, XP_VALUES.STREAK_BONUS_30)
+    }
   }
 
   return newStreak
@@ -129,26 +159,30 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     blocksCompleted: blocks,
   }
 
-  const newlyUnlocked: string[] = []
+  const toUnlock = ACHIEVEMENT_DEFINITIONS.filter(
+    (def) => !existingSlugs.has(def.slug) && def.check(stats)
+  )
 
-  for (const def of ACHIEVEMENT_DEFINITIONS) {
-    if (!existingSlugs.has(def.slug) && def.check(stats)) {
-      await prisma.achievement.create({
-        data: {
-          userId,
-          slug: def.slug,
-          label: def.label,
-          description: def.description,
-          icon: def.icon,
-          xpBonus: def.xpBonus,
-        },
-      })
-      if (def.xpBonus > 0) {
-        await awardXP(userId, def.xpBonus)
-      }
-      newlyUnlocked.push(def.slug)
+  if (toUnlock.length === 0) return []
+
+  // skipDuplicates prevents unique constraint errors from concurrent calls
+  await prisma.achievement.createMany({
+    data: toUnlock.map((def) => ({
+      userId,
+      slug: def.slug,
+      label: def.label,
+      description: def.description,
+      icon: def.icon,
+      xpBonus: def.xpBonus,
+    })),
+    skipDuplicates: true,
+  })
+
+  for (const def of toUnlock) {
+    if (def.xpBonus > 0) {
+      await awardXP(userId, def.xpBonus)
     }
   }
 
-  return newlyUnlocked
+  return toUnlock.map((d) => d.slug)
 }
