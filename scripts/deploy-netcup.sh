@@ -21,8 +21,8 @@ if [[ ! -f .env.production ]]; then
   exit 1
 fi
 
-echo "==> Replacing placeholder domain in nginx config ..."
-sed -i "s/DOMAIN/${DOMAIN}/g" nginx/netcup.conf
+echo "==> Generating active nginx config (does not modify tracked file) ..."
+sed "s/DOMAIN/${DOMAIN}/g" nginx/netcup.conf > nginx/netcup-active.conf
 
 echo "==> Obtaining TLS certificate (certbot standalone) ..."
 # Stop nginx if it is already running so certbot can bind port 80
@@ -30,8 +30,8 @@ $COMPOSE stop nginx 2>/dev/null || true
 certbot certonly --standalone -d "${DOMAIN}" -d "www.${DOMAIN}" \
   --non-interactive --agree-tos --register-unsafely-without-email
 
-echo "==> Building app image ..."
-$COMPOSE build
+echo "==> Building app image (NEXT_PUBLIC_* vars sourced from .env.production) ..."
+$COMPOSE --env-file .env.production build
 
 echo "==> Starting all services ..."
 $COMPOSE up -d

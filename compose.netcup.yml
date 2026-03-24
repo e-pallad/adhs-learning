@@ -26,7 +26,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/netcup.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/netcup-active.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
     depends_on:
