@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-DOMAIN="${1:?Usage: $0 <domain>}"
+DOMAIN="${1:-devfluent.de}"
 COMPOSE="docker compose -f compose.netcup.yml"
 
 echo "==> Checking for .env.production ..."
@@ -27,8 +27,8 @@ sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" nginx/netcup.conf
 echo "==> Obtaining TLS certificate (certbot standalone) ..."
 # Stop nginx if it is already running so certbot can bind port 80
 $COMPOSE stop nginx 2>/dev/null || true
-certbot certonly --standalone -d "${DOMAIN}" --non-interactive --agree-tos \
-  --register-unsafely-without-email
+certbot certonly --standalone -d "${DOMAIN}" -d "www.${DOMAIN}" \
+  --non-interactive --agree-tos --register-unsafely-without-email
 
 echo "==> Building app image ..."
 $COMPOSE build
