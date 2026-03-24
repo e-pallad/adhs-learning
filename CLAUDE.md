@@ -16,11 +16,50 @@ npx prisma migrate dev       # Create + apply a new migration (requires DIRECT_U
 
 > Migrations cannot run from WSL against port 5432 — use the `supabase_apply_migration` MCP tool instead.
 
-## Docker
+## Docker (local / TrueNAS)
 
 ```bash
 docker compose build   # Build image (passes Supabase public keys as build args)
 docker compose up -d   # Run on port 30005 → container 3000, using .env.production
+```
+
+## Netcup vServer Deployment
+
+One-time setup on the server:
+
+```bash
+# Install Docker and certbot
+apt install -y docker.io docker-compose-plugin certbot
+systemctl enable --now docker
+
+# Clone repo & create env file
+git clone <repo-url> /opt/devfluent
+cd /opt/devfluent
+cp .env.production.example .env.production
+# → fill in all values in .env.production
+
+# Deploy (obtains TLS cert, builds image, starts app + nginx)
+./scripts/deploy-netcup.sh your.domain.com
+```
+
+Relevant files:
+- `compose.netcup.yml` — builds app + runs nginx reverse proxy on 80/443
+- `nginx/netcup.conf` — nginx config (HTTP→HTTPS redirect + proxy_pass to app:3000)
+- `scripts/deploy-netcup.sh` — full deploy script
+
+To update after a code push:
+
+```bash
+cd /opt/devfluent
+git pull
+docker compose -f compose.netcup.yml build
+docker compose -f compose.netcup.yml up -d
+```
+
+Certificate auto-renewal (add to crontab):
+
+```
+0 3 * * * certbot renew --quiet && docker compose -f /opt/devfluent/compose.netcup.yml restart nginx
 ```
 
 ## App Structure
