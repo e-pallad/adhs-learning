@@ -22,7 +22,7 @@ if [[ ! -f .env.production ]]; then
 fi
 
 echo "==> Replacing placeholder domain in nginx config ..."
-sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" nginx/netcup.conf
+sed -i "s/DOMAIN/${DOMAIN}/g" nginx/netcup.conf
 
 echo "==> Obtaining TLS certificate (certbot standalone) ..."
 # Stop nginx if it is already running so certbot can bind port 80
