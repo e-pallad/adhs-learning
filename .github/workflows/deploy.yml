@@ -32,7 +32,7 @@ jobs:
             git pull --ff-only origin master
 
             echo "==> Building new image..."
-            docker compose -f compose.netcup.yml build
+            docker compose -f compose.netcup.yml --env-file .env.production build
 
             echo "==> Restarting services with zero-downtime swap..."
             docker compose -f compose.netcup.yml up -d --remove-orphans
