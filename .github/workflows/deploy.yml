@@ -20,6 +20,9 @@ jobs:
     environment: production
 
     steps:
+      - name: Show runner IP
+        run: curl -s https://api.ipify.org && echo
+
       - name: Write SSH key
         run: |
           mkdir -p /home/runner/.ssh
