@@ -33,10 +33,12 @@ jobs:
 
       - name: Test SSH connection (verbose)
         run: |
+          echo "Username length: $(echo -n '${{ secrets.DEPLOY_USER }}' | wc -c)"
           ssh -vvv -i /home/runner/.ssh/deploy_key \
             -o StrictHostKeyChecking=no \
             -o BatchMode=yes \
-            ${{ secrets.DEPLOY_USER }}@185.243.11.25 "echo SSH_OK" 2>&1 || true
+            -l root \
+            185.243.11.25 "echo SSH_OK_HARDCODED" 2>&1 || true
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
