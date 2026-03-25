@@ -25,6 +25,8 @@ jobs:
           mkdir -p /home/runner/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" | base64 -d > /home/runner/.ssh/deploy_key
           chmod 600 /home/runner/.ssh/deploy_key
+          echo "=== Public key from decoded secret ==="
+          ssh-keygen -y -f /home/runner/.ssh/deploy_key
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
