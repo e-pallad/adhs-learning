@@ -69,14 +69,18 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
               <button
                 onClick={() => !isCompleted && handleComplete()}
                 className={cn(
-                  "mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 transition-colors flex items-center justify-center",
-                  isCompleted
-                    ? "border-green-500 bg-green-500"
-                    : "border-gray-300 hover:border-indigo-400 cursor-pointer"
+                  "mt-0.5 flex-shrink-0 p-2 -m-2 rounded-full transition-colors flex items-center justify-center",
+                  isCompleted ? "cursor-default" : "cursor-pointer hover:opacity-70"
                 )}
                 aria-label={isCompleted ? "Completed" : "Mark complete"}
+                disabled={isCompleted}
               >
+                <span className={cn(
+                  "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                  isCompleted ? "border-green-500 bg-green-500" : "border-gray-300 hover:border-indigo-400"
+                )}>
                 {isCompleted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                </span>
               </button>
 
               <div className="flex-1 min-w-0">
