@@ -20,32 +20,20 @@ jobs:
     environment: production
 
     steps:
-      - name: Show runner IP
-        run: curl -s https://api.ipify.org && echo
-
-      - name: Write SSH key
+      - name: Decode SSH key
+        id: ssh-key
         run: |
-          mkdir -p /home/runner/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" | base64 -d > /home/runner/.ssh/deploy_key
-          chmod 600 /home/runner/.ssh/deploy_key
-          echo "=== Public key from decoded secret ==="
-          ssh-keygen -y -f /home/runner/.ssh/deploy_key
-
-      - name: Test SSH connection (verbose)
-        run: |
-          echo "Username length: $(echo -n '${{ secrets.DEPLOY_USER }}' | wc -c)"
-          ssh -vvv -i /home/runner/.ssh/deploy_key \
-            -o StrictHostKeyChecking=no \
-            -o BatchMode=yes \
-            -l root \
-            185.243.11.25 "echo SSH_OK_HARDCODED" 2>&1 || true
+          KEY=$(echo "${{ secrets.DEPLOY_SSH_KEY }}" | base64 -d)
+          echo "key<<SSHKEYEOF" >> $GITHUB_OUTPUT
+          echo "$KEY" >> $GITHUB_OUTPUT
+          echo "SSHKEYEOF" >> $GITHUB_OUTPUT
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 185.243.11.25
           username: ${{ secrets.DEPLOY_USER }}
-          key_path: /home/runner/.ssh/deploy_key
+          key: ${{ steps.ssh-key.outputs.key }}
           script: |
             set -euo pipefail
             cd /opt/devfluent
