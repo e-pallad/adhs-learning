@@ -20,25 +20,28 @@ jobs:
     environment: production
 
     steps:
-      - name: Decode SSH key
-        id: ssh-key
-        run: |
-          KEY=$(echo "${{ secrets.DEPLOY_SSH_KEY }}" | base64 -d)
-          echo "key<<SSHKEYEOF" >> $GITHUB_OUTPUT
-          echo "$KEY" >> $GITHUB_OUTPUT
-          echo "SSHKEYEOF" >> $GITHUB_OUTPUT
-
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: 185.243.11.25
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ steps.ssh-key.outputs.key }}
-          script: |
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          echo "$DEPLOY_KEY" | base64 -d > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh-keygen -y -f /tmp/deploy_key
+          ssh -i /tmp/deploy_key \
+            -o StrictHostKeyChecking=no \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            "${DEPLOY_USER}@185.243.11.25" '
             set -euo pipefail
             cd /opt/devfluent
+            echo "==> Pulling latest code..."
             git pull --ff-only origin master
+            echo "==> Building new image..."
             docker compose -f compose.netcup.yml --env-file .env.production build
+            echo "==> Restarting services..."
             docker compose -f compose.netcup.yml up -d --remove-orphans
+            echo "==> Pruning old images..."
             docker image prune -f
             echo "==> Deploy complete."
+          '
