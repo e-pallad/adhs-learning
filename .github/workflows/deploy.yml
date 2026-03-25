@@ -32,7 +32,7 @@ jobs:
             -o StrictHostKeyChecking=no \
             -o BatchMode=yes \
             -o IdentitiesOnly=yes \
-            "${DEPLOY_USER}@185.243.11.25" '
+            "${DEPLOY_USER}@188.68.57.27" '
             set -euo pipefail
             cd /opt/devfluent
             echo "==> Pulling latest code..."
