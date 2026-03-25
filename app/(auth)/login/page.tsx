@@ -265,8 +265,14 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
+    <div className="flex flex-col items-center gap-4">
+      <Suspense>
+        <LoginForm />
+      </Suspense>
+      <p className="text-xs text-gray-400 flex gap-3">
+        <a href="/impressum" className="hover:text-gray-600 transition-colors">Impressum</a>
+        <a href="/datenschutz" className="hover:text-gray-600 transition-colors">Datenschutz</a>
+      </p>
+    </div>
   )
 }
