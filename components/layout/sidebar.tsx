@@ -63,7 +63,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-3 border-t border-gray-800">
+      <div className="p-3 border-t border-gray-800 space-y-0.5">
         <Link
           href="/settings"
           aria-current={pathname === "/settings" ? "page" : undefined}
@@ -77,6 +77,10 @@ export function Sidebar() {
           <Settings className="w-4 h-4 flex-shrink-0" />
           <span>Settings</span>
         </Link>
+        <div className="flex gap-3 px-3 py-2">
+          <Link href="/impressum" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Impressum</Link>
+          <Link href="/datenschutz" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Datenschutz</Link>
+        </div>
       </div>
     </aside>
   )
