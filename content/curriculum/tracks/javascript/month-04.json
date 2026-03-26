@@ -1,0 +1,127 @@
+{
+  "month": 4,
+  "title": "React Fundamentals",
+  "description": "Components, hooks, state, props, state management, and a testing first look",
+  "projectTitle": "Recipe App",
+  "projectDescription": "A recipe browser with filtering — React + TypeScript, no framework",
+  "alternativeProjects": [
+    {
+      "title": "Habit Tracker",
+      "description": "Mark daily habits, visualize streaks, persist to localStorage — Context API for global state and Zustand for comparison"
+    },
+    {
+      "title": "Movie Search App",
+      "description": "Search the TMDB API, display results with filtering, and save favourites — demonstrates Context, custom hooks, and async data"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "React Core Concepts",
+      "blocks": [
+        {
+          "id": "m4w1-b1",
+          "title": "JSX & Components",
+          "description": "JSX syntax, functional components, props, children",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m4w1-b2",
+          "title": "useState & Events",
+          "description": "useState hook, event handlers, controlled vs uncontrolled inputs",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m4w1-b3",
+          "title": "Lists & Conditional Rendering",
+          "description": "map with keys, ternary patterns, short-circuit rendering",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "React Hooks",
+      "blocks": [
+        {
+          "id": "m4w2-b1",
+          "title": "useEffect",
+          "description": "side effects, dependency array, cleanup functions",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m4w2-b2",
+          "title": "useRef & useMemo",
+          "description": "DOM refs, persisting values, memoizing expensive computations",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m4w2-b3",
+          "title": "Custom Hooks",
+          "description": "extracting logic into reusable hooks, useFetch pattern",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "State Management",
+      "blocks": [
+        {
+          "id": "m4w3-b1",
+          "title": "Context API",
+          "description": "createContext, useContext, avoiding prop drilling",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m4w3-b2",
+          "title": "useReducer",
+          "description": "reducer pattern, actions, when to prefer over useState",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m4w3-b3",
+          "title": "External State Management — Zustand",
+          "description": "when Context isn't enough; Zustand store, slices, devtools — compare with Context for different scales",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project & Testing First Look",
+      "blocks": [
+        {
+          "id": "m4w4-b1",
+          "title": "React Performance",
+          "description": "memo, useCallback, profiler — avoiding unnecessary re-renders",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m4w4-b2",
+          "title": "Recipe App Project",
+          "description": "Build a recipe browser with search/filter — React + TypeScript",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m4w4-b3",
+          "title": "Testing First Look",
+          "description": "Why test, what to test — write your first Vitest unit test and one React Testing Library smoke test for the Recipe App",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    }
+  ]
+}

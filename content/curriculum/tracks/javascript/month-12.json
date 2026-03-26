@@ -1,0 +1,127 @@
+{
+  "month": 12,
+  "title": "Capstone & Career",
+  "description": "Portfolio capstone project, interview prep, job search strategy",
+  "projectTitle": "Capstone Project",
+  "projectDescription": "A full-stack application of your choice — built, tested, documented, and deployed",
+  "alternativeProjects": [
+    {
+      "title": "SaaS MVP",
+      "description": "A subscription-based app with mock Stripe billing, user auth, a feature-gated dashboard, and a public marketing page — the complete SaaS skeleton"
+    },
+    {
+      "title": "Open Source Contribution Sprint",
+      "description": "Land meaningful PRs on 3 open source projects over the month — document your process, what you learned, and what impact each contribution had"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Capstone Planning",
+      "blocks": [
+        {
+          "id": "m12w1-b1",
+          "title": "Project Architecture",
+          "description": "scope definition, data model, tech stack decisions, timeline",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m12w1-b2",
+          "title": "Capstone Build Sprint 1",
+          "description": "Core data model, auth, basic pages — foundation complete",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m12w1-b3",
+          "title": "Interview Prep: CS Fundamentals",
+          "description": "Big O, data structures overview, sorting algorithms",
+          "durationMinutes": 60,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Capstone Build",
+      "blocks": [
+        {
+          "id": "m12w2-b1",
+          "title": "Capstone Build Sprint 2",
+          "description": "Main features, API routes, database queries",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m12w2-b2",
+          "title": "Interview Prep: JavaScript Specifics",
+          "description": "closures, event loop, prototype chain, common gotchas",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m12w2-b3",
+          "title": "Writing a Technical README",
+          "description": "project overview, setup instructions, architecture decisions",
+          "durationMinutes": 30,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Polish & Deploy",
+      "blocks": [
+        {
+          "id": "m12w3-b1",
+          "title": "Capstone Build Sprint 3",
+          "description": "Polish, edge cases, error handling, mobile responsive",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m12w3-b2",
+          "title": "Interview Prep: React & Next.js",
+          "description": "hooks rules, rendering strategies, common interview questions",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m12w3-b3",
+          "title": "Portfolio Review",
+          "description": "Review all projects, write case studies, update portfolio page",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Career Launch",
+      "blocks": [
+        {
+          "id": "m12w4-b1",
+          "title": "Capstone Final Deployment",
+          "description": "Production deploy, CI/CD, monitoring — your capstone is live",
+          "durationMinutes": 60,
+          "type": "project"
+        },
+        {
+          "id": "m12w4-b2",
+          "title": "Job Search Strategy",
+          "description": "resume, LinkedIn, cold outreach, how to find junior roles",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m12w4-b3",
+          "title": "Open Source & Community",
+          "description": "finding good first issues, PR etiquette, why OSS contributions stand out on a junior portfolio — make your first contribution today",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    }
+  ]
+}

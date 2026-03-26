@@ -1,0 +1,9 @@
+{
+  "month": 1,
+  "title": "Python Foundations",
+  "description": "Variables, data types, control flow, and functions",
+  "projectTitle": "CLI Calculator",
+  "projectDescription": "Build a command-line calculator with basic arithmetic operations",
+  "alternativeProjects": [],
+  "weeks": []
+}

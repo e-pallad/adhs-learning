@@ -2,21 +2,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
-import { CURRICULUM } from "@/content/curriculum"
 import { cn } from "@/lib/utils"
 
 interface MonthCardProps {
   month: number
+  title: string
+  description: string
   completedBlocks: number
   totalBlocks: number
   isLocked?: boolean
   isCurrent?: boolean
 }
 
-export function MonthCard({ month, completedBlocks, totalBlocks, isLocked, isCurrent }: MonthCardProps) {
-  const data = CURRICULUM.find((m) => m.month === month)
-  if (!data) return null
-
+export function MonthCard({ month, title, description, completedBlocks, totalBlocks, isLocked, isCurrent }: MonthCardProps) {
   const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0
   const isCompleted = completedBlocks === totalBlocks && totalBlocks > 0
 
@@ -31,7 +29,7 @@ export function MonthCard({ month, completedBlocks, totalBlocks, isLocked, isCur
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Month {month}</p>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{data.title}</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{title}</h3>
           </div>
           <div className="flex flex-col items-end gap-1">
             {isCurrent && <Badge variant="info">Current</Badge>}
@@ -39,7 +37,7 @@ export function MonthCard({ month, completedBlocks, totalBlocks, isLocked, isCur
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{data.description}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{description}</p>
 
         <ProgressBar value={progress} showPercentage color={isCompleted ? "green" : "indigo"} />
 

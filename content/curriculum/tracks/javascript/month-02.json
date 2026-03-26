@@ -1,0 +1,268 @@
+{
+  "month": 2,
+  "title": "JavaScript Fundamentals",
+  "description": "Core JS: variables, functions, DOM, async basics — plus Git from day one",
+  "projectTitle": "Interactive To-Do App",
+  "projectDescription": "A to-do list with add/remove/complete — vanilla JS, no libraries, tracked in Git",
+  "alternativeProjects": [
+    {
+      "title": "Quiz Game",
+      "description": "Multiple-choice quiz with a timer, score tracking, and a results screen — all vanilla JS with DOM manipulation"
+    },
+    {
+      "title": "Weather Dashboard",
+      "description": "Fetch from the Open-Meteo API and display current conditions and a 5-day forecast with animated weather icons"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Git & JS Basics",
+      "blocks": [
+        {
+          "id": "m2w1-b1",
+          "title": "Git Basics",
+          "description": "init, add, commit, status, log — set up version control before writing a single line of JS",
+          "durationMinutes": 45,
+          "type": "practice",
+          "practicalExample": "```bash\n# Start a new project with Git from day one\nmkdir my-project && cd my-project\ngit init\n\n# Stage specific files (never use `git add .` blindly)\ngit add index.html style.css\ngit commit -m \"feat: add initial HTML and CSS structure\"\n\n# Check what changed before staging\ngit diff          # unstaged changes\ngit diff --staged # what is about to be committed\n\n# View history\ngit log --oneline --graph\n```\nWrite commit messages in the imperative mood: **\"Add login form\"** not **\"Added login form\"** — it reads like a recipe step applied to the repo.",
+          "quiz": [
+            {
+              "question": "What does `git add` do?",
+              "options": [
+                "Saves changes permanently to the repository history",
+                "Moves changed files to the staging area (index) in preparation for a commit",
+                "Downloads changes from a remote repository",
+                "Creates a new branch"
+              ],
+              "correctIndex": 1,
+              "explanation": "git add moves changes into Git's staging area (also called the index). Only staged changes are included in the next commit. This two-step (add then commit) workflow lets you craft precise commits even when multiple files have changed."
+            },
+            {
+              "question": "What information does `git status` show?",
+              "options": [
+                "The full diff of every changed file",
+                "The history of all commits on the current branch",
+                "Which files are staged, unstaged, or untracked in the working directory",
+                "The network connectivity to the remote repository"
+              ],
+              "correctIndex": 2,
+              "explanation": "git status gives a summary of your working directory state: files staged for the next commit (green), files changed but not yet staged (red), and files Git has never tracked (untracked). It is the most useful command to run before any other git operation."
+            },
+            {
+              "question": "Which command shows the history of commits on the current branch?",
+              "options": [
+                "git status",
+                "git log",
+                "git diff",
+                "git show"
+              ],
+              "correctIndex": 1,
+              "explanation": "git log lists commits in reverse chronological order with author, date, and message. `git log --oneline --graph` gives a compact visual view. `git show <hash>` shows the diff of one specific commit."
+            },
+            {
+              "question": "What is the correct order of operations to save work in Git?",
+              "options": [
+                "commit → add → push",
+                "add → push → commit",
+                "add → commit → (optionally push)",
+                "commit → push → add"
+              ],
+              "correctIndex": 2,
+              "explanation": "The workflow is: modify files → `git add` to stage → `git commit` to save to local history → `git push` to share with a remote. Committing before pushing lets you build up a series of meaningful local commits before sharing them."
+            }
+          ]
+        },
+        {
+          "id": "m2w1-b2",
+          "title": "Variables & Data Types",
+          "description": "let, const, var — primitives, objects, arrays, typeof",
+          "durationMinutes": 45,
+          "type": "theory",
+          "practicalExample": "```js\n// Prefer const by default; use let when you need to reassign\nconst PI = 3.14159\nlet score = 0\nscore += 10  // OK — let allows reassignment\n\n// typeof for runtime type checking\nconsole.log(typeof 42)          // \"number\"\nconsole.log(typeof \"hello\")     // \"string\"\nconsole.log(typeof undefined)   // \"undefined\"\nconsole.log(typeof null)        // \"object\" ← famous JS bug, not a real object\nconsole.log(typeof [])          // \"object\" ← arrays are objects too!\nconsole.log(Array.isArray([]))  // true ← use this to check for arrays\n```",
+          "quiz": [
+            {
+              "question": "What is the key difference between `let` and `const`?",
+              "options": [
+                "const is block-scoped; let is function-scoped",
+                "let allows reassignment; const does not allow the variable binding to be reassigned",
+                "const prevents any mutations to the value; let allows all mutations",
+                "let is for primitives; const is for objects and arrays"
+              ],
+              "correctIndex": 1,
+              "explanation": "const prevents the variable binding from being reassigned (you cannot do `const x = 1; x = 2`). However, const does not make objects or arrays immutable — you can still push to a const array or modify a const object's properties."
+            },
+            {
+              "question": "What does `typeof null` return in JavaScript?",
+              "options": [
+                "\"null\"",
+                "\"undefined\"",
+                "\"object\"",
+                "\"boolean\""
+              ],
+              "correctIndex": 2,
+              "explanation": "typeof null returns \"object\" — this is a well-known JavaScript bug from its initial implementation that was never fixed to avoid breaking existing code. To check for null, use strict equality: `value === null`."
+            },
+            {
+              "question": "Which of these values is falsy in JavaScript?",
+              "options": [
+                "\"0\" (a string containing zero)",
+                "[] (an empty array)",
+                "0 (the number zero)",
+                "{} (an empty object)"
+              ],
+              "correctIndex": 2,
+              "explanation": "JavaScript has exactly six falsy values: false, 0, 0n (BigInt zero), \"\" (empty string), null, undefined, and NaN. The string \"0\" is truthy because it is a non-empty string. Empty arrays and objects are always truthy."
+            },
+            {
+              "question": "Why is using `var` generally discouraged in modern JavaScript?",
+              "options": [
+                "var cannot hold objects or arrays",
+                "var is slower than let and const",
+                "var is function-scoped and hoisted as undefined, leading to confusing bugs in block structures",
+                "var triggers strict mode automatically"
+              ],
+              "correctIndex": 2,
+              "explanation": "var declarations are function-scoped (not block-scoped) and are hoisted to the top of their function with value `undefined`. This means a var declared inside an if block is accessible outside it, which causes subtle bugs. let and const are block-scoped and behave more predictably."
+            }
+          ]
+        },
+        {
+          "id": "m2w1-b3",
+          "title": "Functions & Scope",
+          "description": "declaration vs expression, arrow functions, closures, hoisting",
+          "durationMinutes": 60,
+          "type": "theory",
+          "practicalExample": "```js\n// Function declaration — hoisted, can be called before definition\nfunction greet(name) {\n  return `Hello, ${name}!`\n}\n\n// Arrow function — shorter, no own `this`\nconst double = (n) => n * 2\n\n// Closure — inner function remembers outer scope\nfunction makeCounter(start = 0) {\n  let count = start  // enclosed variable\n  return {\n    increment: () => ++count,\n    decrement: () => --count,\n    value: () => count,\n  }\n}\nconst counter = makeCounter(10)\nconsole.log(counter.increment()) // 11\nconsole.log(counter.value())     // 11\n```\nClosures are the mechanism behind React hooks like `useState` — the state value is a closed-over variable inside the React internals.",
+          "quiz": [
+            {
+              "question": "What is 'hoisting' in JavaScript?",
+              "options": [
+                "Moving slow code to run after the page loads",
+                "The browser process of compiling JavaScript before running it",
+                "The behaviour where declarations are moved to the top of their scope before execution",
+                "Automatically importing modules at the start of a script"
+              ],
+              "correctIndex": 2,
+              "explanation": "Hoisting means JavaScript processes declarations (function declarations and var) before executing code. Function declarations are fully hoisted (body included), so you can call them before they appear in the file. var declarations are hoisted but initialised to undefined, not their assigned value."
+            },
+            {
+              "question": "What is a closure?",
+              "options": [
+                "A function that calls itself recursively",
+                "A function that retains access to variables from its outer (enclosing) scope even after that scope has returned",
+                "A method for closing browser windows via JavaScript",
+                "A private class method in JavaScript"
+              ],
+              "correctIndex": 1,
+              "explanation": "A closure forms when a function 'closes over' variables from its enclosing scope. Those variables remain alive as long as the inner function exists, even after the outer function has returned. This enables patterns like factory functions, memoisation, and encapsulated state."
+            },
+            {
+              "question": "What is a key difference between arrow functions and regular functions regarding `this`?",
+              "options": [
+                "Arrow functions cannot use `this` at all",
+                "Arrow functions have their own `this` that changes with each caller",
+                "Arrow functions do not have their own `this` — they inherit it from the enclosing lexical scope",
+                "Regular functions always have `this === undefined` in strict mode"
+              ],
+              "correctIndex": 2,
+              "explanation": "Arrow functions lack their own `this` binding. They inherit `this` from the surrounding lexical context (the scope where they were defined). This makes them ideal for callbacks inside class methods or React components where you want `this` to refer to the outer context, not the callback's caller."
+            },
+            {
+              "question": "What is the output of this code?\n```js\nconsole.log(typeof greet)\nfunction greet() { return 'hi' }\n```",
+              "options": [
+                "\"undefined\" — greet is not defined yet",
+                "\"function\" — function declarations are hoisted with their body",
+                "ReferenceError: greet is not defined",
+                "\"object\""
+              ],
+              "correctIndex": 1,
+              "explanation": "Function declarations are fully hoisted — the entire function definition is available at the start of the scope, before any code runs. So even though `console.log` appears before the function declaration in the source, it correctly sees greet as a 'function'."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Arrays, DOM & Events",
+      "blocks": [
+        {
+          "id": "m2w2-b1",
+          "title": "Arrays & Objects",
+          "description": "map, filter, reduce, spread, destructuring — modern patterns",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m2w2-b2",
+          "title": "DOM API",
+          "description": "querySelector, createElement, appendChild, innerHTML vs textContent",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m2w2-b3",
+          "title": "Events",
+          "description": "addEventListener, event delegation, preventDefault, bubbling",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Async JavaScript",
+      "blocks": [
+        {
+          "id": "m2w3-b1",
+          "title": "Callbacks & the Event Loop",
+          "description": "call stack, web APIs, task queue — how async JS actually works",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m2w3-b2",
+          "title": "Promises & async/await",
+          "description": "promise chaining, async/await, error handling with try/catch",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m2w3-b3",
+          "title": "Fetch API",
+          "description": "GET and POST requests, JSON parsing, error states",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Modern JS & Project",
+      "blocks": [
+        {
+          "id": "m2w4-b1",
+          "title": "Forms & Validation",
+          "description": "reading form values, custom validation, FormData API",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m2w4-b2",
+          "title": "ES Modules & Browser Storage",
+          "description": "import/export, default vs named, module bundler concepts; localStorage, sessionStorage, cookies — when to use each",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m2w4-b3",
+          "title": "To-Do App Project",
+          "description": "Build an interactive to-do list with vanilla JS — CRUD operations, localStorage persistence, committed to a Git repo",
+          "durationMinutes": 120,
+          "type": "project"
+        }
+      ]
+    }
+  ]
+}

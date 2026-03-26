@@ -1,0 +1,127 @@
+{
+  "month": 8,
+  "title": "DevOps & Deployment",
+  "description": "CI/CD, Docker, Vercel, monitoring, environment management",
+  "projectTitle": "Production-Ready Deployment",
+  "projectDescription": "Deploy your Month 6 API with Docker, CI/CD pipeline, and monitoring",
+  "alternativeProjects": [
+    {
+      "title": "Multi-Environment CI/CD",
+      "description": "Set up dev, staging, and production deployments for a previous project — automated tests gate merges and Vercel preview URLs appear on every PR"
+    },
+    {
+      "title": "Docker Compose Dev Stack",
+      "description": "Containerize a full-stack Next.js app with a Postgres DB and Nginx reverse proxy — include a hot-reload dev mode and a hardened production image"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Deployment Basics",
+      "blocks": [
+        {
+          "id": "m8w1-b1",
+          "title": "Environment Variables & Secrets",
+          "description": "env management, .env files, secrets in CI, Vercel env",
+          "durationMinutes": 30,
+          "type": "theory"
+        },
+        {
+          "id": "m8w1-b2",
+          "title": "Vercel Deployment",
+          "description": "git-based deploys, preview deployments, custom domains",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m8w1-b3",
+          "title": "DNS & Custom Domains",
+          "description": "A records, CNAME, SSL certificates, Vercel domain config",
+          "durationMinutes": 30,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Docker",
+      "blocks": [
+        {
+          "id": "m8w2-b1",
+          "title": "Docker Basics",
+          "description": "images, containers, Dockerfile, docker build/run/ps",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m8w2-b2",
+          "title": "Docker Compose",
+          "description": "multi-container apps, networking, volumes, compose up/down",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m8w2-b3",
+          "title": "Containerizing a Next.js App",
+          "description": "standalone output, multi-stage builds, production image",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "CI/CD",
+      "blocks": [
+        {
+          "id": "m8w3-b1",
+          "title": "GitHub Actions",
+          "description": "workflows, jobs, steps, triggers — lint/test/deploy pipeline",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m8w3-b2",
+          "title": "Automated Testing in CI",
+          "description": "running Vitest in CI, test coverage, failing PRs on test failures",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m8w3-b3",
+          "title": "Database Migrations in CI",
+          "description": "prisma migrate deploy, migration safety, rollback strategies",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m8w4-b1",
+          "title": "Monitoring & Logging",
+          "description": "Sentry error tracking, Vercel Analytics, structured logging",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m8w4-b2",
+          "title": "Production Deployment Project",
+          "description": "Full deployment pipeline — Docker, CI, Vercel, monitoring",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m8w4-b3",
+          "title": "Month 8 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}

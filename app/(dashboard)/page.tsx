@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardDailyLoginXP } from "@/lib/user"
 import { getXPProgress, LEVEL_THRESHOLDS } from "@/lib/xp"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
@@ -30,9 +30,12 @@ export default async function DashboardPage() {
   const xpProgress = getXPProgress(user.totalXP)
   const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)
 
-  // Block completion stats grouped by month
+  const curriculum = getTrackById(user.track)?.months ?? CURRICULUM
+  const trackBlockIds = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
+
+  // Block completion stats grouped by month (scoped to active track)
   const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, blockId: { in: trackBlockIds } },
     select: { blockId: true, month: true, status: true },
   })
 
@@ -45,13 +48,13 @@ export default async function DashboardPage() {
 
   // Total blocks per month
   const totalByMonth: Record<number, number> = {}
-  for (const m of CURRICULUM) {
+  for (const m of curriculum) {
     totalByMonth[m.month] = m.weeks.flatMap((w) => w.blocks).length
   }
 
   // Determine current month (first month with < 100% completion)
   let currentMonth = 1
-  for (const m of CURRICULUM) {
+  for (const m of curriculum) {
     const done = completedByMonth[m.month] ?? 0
     const total = totalByMonth[m.month] ?? 1
     if (done < total) {
@@ -60,7 +63,7 @@ export default async function DashboardPage() {
     }
   }
 
-  const currentMonthData = CURRICULUM.find((m) => m.month === currentMonth)!
+  const currentMonthData = curriculum.find((m) => m.month === currentMonth)!
   const currentMonthBlocks = currentMonthData.weeks.flatMap((w) => w.blocks)
   const currentMonthDone = completedByMonth[currentMonth] ?? 0
 
@@ -92,7 +95,7 @@ export default async function DashboardPage() {
   }
 
   const totalBlocksDone = blockProgress.filter((b) => b.status === "COMPLETED").length
-  const totalBlocksAll = CURRICULUM.flatMap((m) => m.weeks.flatMap((w) => w.blocks)).length
+  const totalBlocksAll = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks)).length
 
   const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 

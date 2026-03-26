@@ -1,0 +1,127 @@
+{
+  "month": 10,
+  "title": "Performance & Security",
+  "description": "Web vitals, caching, CSP, OWASP top 10, rate limiting",
+  "projectTitle": "Performance Audit",
+  "projectDescription": "Audit and optimize a previous project to score 90+ on Lighthouse",
+  "alternativeProjects": [
+    {
+      "title": "Security-Hardened API",
+      "description": "Audit the Month 6 Expense Tracker API — add rate limiting, strict CSP headers, input sanitization, and OWASP-aligned security checks; document each finding"
+    },
+    {
+      "title": "Core Web Vitals Optimization",
+      "description": "Take any previous project from a baseline Lighthouse score to 95+ on all metrics — document what changed and why it helped"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Web Performance",
+      "blocks": [
+        {
+          "id": "m10w1-b1",
+          "title": "Core Web Vitals",
+          "description": "LCP, FID/INP, CLS — what they measure and why Google cares",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m10w1-b2",
+          "title": "Image Optimization",
+          "description": "next/image, WebP, lazy loading, srcset, placeholder blur",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m10w1-b3",
+          "title": "Code Splitting & Lazy Loading",
+          "description": "dynamic imports, React.lazy, Suspense, route-level splitting",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Caching",
+      "blocks": [
+        {
+          "id": "m10w2-b1",
+          "title": "HTTP Caching",
+          "description": "Cache-Control, ETags, stale-while-revalidate, CDN caching",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m10w2-b2",
+          "title": "Next.js Caching Strategies",
+          "description": "unstable_cache, revalidatePath, revalidateTag, full-route cache",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m10w2-b3",
+          "title": "Database & Server-Side Caching",
+          "description": "N+1 problem and eager loading with Prisma include; Redis cache-aside pattern — when to reach for Redis vs Next.js built-in cache",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Security",
+      "blocks": [
+        {
+          "id": "m10w3-b1",
+          "title": "OWASP Top 10",
+          "description": "injection, broken auth, XSS, IDOR — what each means for web devs",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m10w3-b2",
+          "title": "Content Security Policy",
+          "description": "CSP headers, nonces, report-uri — defending against XSS",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m10w3-b3",
+          "title": "Rate Limiting & Input Sanitization",
+          "description": "rate limiting APIs, DOMPurify, SQL injection prevention with Prisma",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m10w4-b1",
+          "title": "Lighthouse & Performance Tooling",
+          "description": "running Lighthouse, reading waterfall charts, PageSpeed Insights",
+          "durationMinutes": 30,
+          "type": "practice"
+        },
+        {
+          "id": "m10w4-b2",
+          "title": "Performance Audit Project",
+          "description": "Audit and optimize a previous project — target 90+ Lighthouse score",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m10w4-b3",
+          "title": "Month 10 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}
