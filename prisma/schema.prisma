@@ -50,17 +50,21 @@ model User {
   githubUsername     String?
   githubAccessToken  String?
   githubLastSyncAt   DateTime?
+  apiKey             String?   @unique
   createdAt          DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  dailyLogs       DailyLog[]
-  roadmapProgress RoadmapProgress[]
-  blockProgress   BlockProgress[]
-  externalCourses ExternalCourse[]
-  monthlyProjects MonthlyProject[]
-  achievements    Achievement[]
-  quizAttempts    QuizAttempt[]
-  githubEvents    GithubEvent[]
+  dailyLogs          DailyLog[]
+  roadmapProgress    RoadmapProgress[]
+  blockProgress      BlockProgress[]
+  externalCourses    ExternalCourse[]
+  monthlyProjects    MonthlyProject[]
+  achievements       Achievement[]
+  quizAttempts       QuizAttempt[]
+  githubEvents       GithubEvent[]
+  aiRecommendation   AiRecommendation?
+  sentPairs          AccountabilityPair[] @relation("RequesterPairs")
+  receivedPairs      AccountabilityPair[] @relation("PartnerPairs")
 
   @@map("users")
 }
@@ -201,6 +205,35 @@ model QuizAttempt {
   attemptedAt DateTime @default(now())
 
   @@index([userId, blockId])
+}
+
+// ─── AI Recommendations ──────────────────────────────────────────────────────
+
+model AiRecommendation {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  content     String
+  generatedAt DateTime @default(now())
+  expiresAt   DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_recommendations")
+}
+
+// ─── Accountability Pairs ─────────────────────────────────────────────────────
+
+model AccountabilityPair {
+  id          String   @id @default(cuid())
+  requesterId String
+  partnerId   String
+  createdAt   DateTime @default(now())
+
+  requester User @relation("RequesterPairs", fields: [requesterId], references: [id], onDelete: Cascade)
+  partner   User @relation("PartnerPairs",   fields: [partnerId],   references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, partnerId])
+  @@map("accountability_pairs")
 }
 
 // ─── GitHub Events ────────────────────────────────────────────────────────────
