@@ -14,7 +14,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { month } = await params
-  const data = CURRICULUM.find((m) => m.month === Number(month))
+  const user = await getCurrentUser()
+  const months = user ? (getTrackById(user.track)?.months ?? CURRICULUM) : CURRICULUM
+  const data = months.find((m) => m.month === Number(month))
   return { title: data ? `Month ${month}: ${data.title} — Devfluent` : "Learning — Devfluent" }
 }
 

@@ -46,7 +46,7 @@ export default async function ProjectsPage() {
         </div>
         {(completedCount > 0 || inProgressCount > 0) && (
           <div className="text-right flex-shrink-0">
-            <p className="text-xs text-gray-400">{completedCount} / 12 completed</p>
+            <p className="text-xs text-gray-400">{completedCount} / {curriculum.length} completed</p>
             {inProgressCount > 0 && (
               <p className="text-xs text-indigo-600">{inProgressCount} in progress</p>
             )}

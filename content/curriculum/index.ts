@@ -48,12 +48,13 @@ export function getTrackById(id: string): Track | undefined {
   return TRACKS.find((t) => t.meta.id === id)
 }
 
-export function getMonth(month: number): Month | undefined {
-  return CURRICULUM.find((m) => m.month === month)
+export function getMonth(trackId: string, month: number): Month | undefined {
+  const months = getTrackById(trackId)?.months ?? CURRICULUM
+  return months.find((m) => m.month === month)
 }
 
-export function getWeek(month: number, week: number): Week | undefined {
-  return getMonth(month)?.weeks.find((w) => w.week === week)
+export function getWeek(trackId: string, month: number, week: number): Week | undefined {
+  return getMonth(trackId, month)?.weeks.find((w) => w.week === week)
 }
 
 export function getAllBlocks(): LearningBlock[] {
