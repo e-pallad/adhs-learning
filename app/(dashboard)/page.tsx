@@ -94,6 +94,12 @@ export default async function DashboardPage() {
     days.push({ date: d, xp: log?.xpEarned ?? 0 })
   }
 
+  // Goal progress: today and this week (from DailyLog.blocksCompleted)
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  const todayLog = recentLogs.find((l) => new Date(l.date).toDateString() === today.toDateString())
+  const todayBlocks = todayLog?.blocksCompleted ?? 0
+  const weeklyBlocks = recentLogs.reduce((sum, l) => sum + l.blocksCompleted, 0)
+
   const totalBlocksDone = blockProgress.filter((b) => b.status === "COMPLETED").length
   const totalBlocksAll = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks)).length
 
@@ -170,6 +176,40 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Daily & Weekly goals */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-gray-900 dark:text-gray-100">Today&apos;s goal</span>
+              <span className="text-gray-400">{todayBlocks} / {user.dailyGoalBlocks} blocks</span>
+            </div>
+            <ProgressBar
+              value={user.dailyGoalBlocks > 0 ? Math.min(100, Math.round((todayBlocks / user.dailyGoalBlocks) * 100)) : 0}
+              color={todayBlocks >= user.dailyGoalBlocks ? "green" : "indigo"}
+            />
+            {todayBlocks >= user.dailyGoalBlocks && (
+              <p className="text-xs text-green-600 font-medium">Goal reached!</p>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-gray-900 dark:text-gray-100">This week&apos;s goal</span>
+              <span className="text-gray-400">{weeklyBlocks} / {user.weeklyGoalBlocks} blocks</span>
+            </div>
+            <ProgressBar
+              value={user.weeklyGoalBlocks > 0 ? Math.min(100, Math.round((weeklyBlocks / user.weeklyGoalBlocks) * 100)) : 0}
+              color={weeklyBlocks >= user.weeklyGoalBlocks ? "green" : "indigo"}
+            />
+            {weeklyBlocks >= user.weeklyGoalBlocks && (
+              <p className="text-xs text-green-600 font-medium">Goal reached!</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Current month */}
       <Card>

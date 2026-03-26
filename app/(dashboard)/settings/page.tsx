@@ -21,6 +21,8 @@ export default async function SettingsPage() {
           email={user.email}
           track={user.track}
           streakFreezeUsedAt={user.streakFreezeUsedAt?.toISOString() ?? null}
+          dailyGoalBlocks={user.dailyGoalBlocks}
+          weeklyGoalBlocks={user.weeklyGoalBlocks}
         />
       </div>
     </div>
