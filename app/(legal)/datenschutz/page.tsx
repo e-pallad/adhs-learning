@@ -199,8 +199,8 @@ export default function DatenschutzPage() {
             </p>
             <p>
               Den Widerspruch können Sie formlos per E-Mail einlegen:{" "}
-              <a href="mailto:[E-Mail-Adresse]" className="text-indigo-600 hover:underline">
-                [E-Mail-Adresse]
+              <a href="mailto:kontakt@devfluent.de" className="text-indigo-600 hover:underline">
+                kontakt@devfluent.de
               </a>
             </p>
           </div>
