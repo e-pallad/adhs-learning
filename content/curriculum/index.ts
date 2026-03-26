@@ -57,7 +57,7 @@ export function getWeek(month: number, week: number): Week | undefined {
 }
 
 export function getAllBlocks(): LearningBlock[] {
-  return CURRICULUM.flatMap((m) => m.weeks.flatMap((w) => w.blocks))
+  return TRACKS.flatMap((t) => t.months.flatMap((m) => m.weeks.flatMap((w) => w.blocks)))
 }
 
 export function getBlock(blockId: string): LearningBlock | undefined {

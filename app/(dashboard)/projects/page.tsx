@@ -11,7 +11,7 @@ export default async function ProjectsPage() {
   if (!user) redirect("/login")
 
   const dbProjects = await prisma.monthlyProject.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, track: user.track },
     orderBy: { month: "asc" },
   })
 

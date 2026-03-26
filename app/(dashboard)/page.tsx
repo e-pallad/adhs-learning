@@ -31,10 +31,11 @@ export default async function DashboardPage() {
   const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)
 
   const curriculum = getTrackById(user.track)?.months ?? CURRICULUM
+  const trackBlockIds = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
 
-  // Block completion stats grouped by month
+  // Block completion stats grouped by month (scoped to active track)
   const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, blockId: { in: trackBlockIds } },
     select: { blockId: true, month: true, status: true },
   })
 

@@ -11,9 +11,10 @@ export default async function LearningPage() {
   if (!user) redirect("/login")
 
   const months = getTrackById(user.track)?.months ?? CURRICULUM
+  const trackBlockIds = months.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
 
   const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, blockId: { in: trackBlockIds } },
     select: { month: true, status: true },
   })
 
