@@ -250,6 +250,54 @@ else
   green "DailyLog upserts keep xpEarned and blocksCompleted in sync"
 fi
 
+# ── 5. API coverage gate ─────────────────────────────────────────────────────
+# Every non-auth API route touched in this branch must have a matching
+# integration test file. Naming convention:
+#   app/api/<a>/<b>/route.ts  →  tests/integration/<a>-<b>.test.ts
+#
+# Auth routes are excluded — browser-redirect / cookie flows aren't suited
+# to the integration-test harness used here.
+
+# Find the merge base so we only check routes actually changed in this branch.
+MERGE_BASE=$(git merge-base HEAD origin/master 2>/dev/null \
+  || git merge-base HEAD origin/main 2>/dev/null \
+  || git rev-list --max-parents=0 HEAD 2>/dev/null \
+  || echo "")
+
+if [ -n "$MERGE_BASE" ]; then
+  CHANGED_API=$(git diff --name-only "$MERGE_BASE" HEAD 2>/dev/null \
+    | grep "^app/api/.*/route\.ts$" \
+    | grep -v "^app/api/auth/" \
+    || true)
+else
+  CHANGED_API=""
+fi
+
+if [ -z "$CHANGED_API" ]; then
+  green "No non-auth API routes modified — coverage gate skipped"
+else
+  COVERAGE_FAIL=0
+  while IFS= read -r route_file; do
+    # Derive test name: app/api/user/api-key/route.ts → user-api-key
+    test_name=$(echo "$route_file" \
+      | sed 's|app/api/||' \
+      | sed 's|/route\.ts||' \
+      | tr '/' '-')
+    test_file="$ROOT/tests/integration/${test_name}.test.ts"
+    if [ ! -f "$test_file" ]; then
+      red "Modified API route has no integration test: $route_file"
+      echo "    Expected: tests/integration/${test_name}.test.ts"
+      COVERAGE_FAIL=1
+    fi
+  done <<< "$CHANGED_API"
+
+  if [ "$COVERAGE_FAIL" -eq 0 ]; then
+    green "All modified API routes have integration tests"
+  else
+    FAIL=1
+  fi
+fi
+
 echo ""
 if [ "$FAIL" -eq 1 ]; then
   red "Pre-push checks FAILED — fix the issues above before pushing."
