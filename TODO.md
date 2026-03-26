@@ -1,11 +1,8 @@
 # Devfluent — Open Tasks
 
 > Last updated: 2026-03-26
-> Active branch: `claude/add-legal-pages-todo-PdxBj`
-> To continue: check out the branch, read this file, tick off completed tasks.
 
-> **Branching rule:** Every phase / major feature gets its own branch and PR.
-> Never bundle multiple independent features into a single branch.
+> **Branching rule:** Every phase / major feature gets its own branch and PR. Never bundle multiple independent features into a single branch.
 
 ---
 
