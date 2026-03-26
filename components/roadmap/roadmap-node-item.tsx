@@ -11,10 +11,10 @@ interface RoadmapNodeItemProps {
 }
 
 const STATUS_STYLES: Record<NodeStatus, string> = {
-  NOT_STARTED: "border-gray-300 bg-white",
-  IN_PROGRESS: "border-blue-400 bg-blue-50",
-  COMPLETED: "border-green-400 bg-green-50",
-  SKIPPED: "border-gray-200 bg-gray-50 opacity-60",
+  NOT_STARTED: "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800",
+  IN_PROGRESS: "border-blue-400 bg-blue-50 dark:bg-blue-900/30",
+  COMPLETED: "border-green-400 bg-green-50 dark:bg-green-900/30",
+  SKIPPED: "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 opacity-60",
 }
 
 const STATUS_ICONS: Record<NodeStatus, string> = {
@@ -58,7 +58,7 @@ export function RoadmapNodeItem({ node, status, onStatusChange, indent }: Roadma
 
       <span className={cn(
         "text-sm",
-        node.type === "topic" ? "font-semibold text-gray-900" : "text-gray-700",
+        node.type === "topic" ? "font-semibold text-gray-900 dark:text-gray-100" : "text-gray-700 dark:text-gray-300",
         status === "COMPLETED" && "line-through text-gray-400",
         status === "SKIPPED" && "line-through",
       )}>

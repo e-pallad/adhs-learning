@@ -16,7 +16,11 @@ export default async function SettingsPage() {
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <SettingsClient name={user.name} email={user.email} />
+        <SettingsClient
+          name={user.name}
+          email={user.email}
+          streakFreezeUsedAt={user.streakFreezeUsedAt?.toISOString() ?? null}
+        />
       </div>
     </div>
   )

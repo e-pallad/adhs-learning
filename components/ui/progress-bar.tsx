@@ -33,7 +33,7 @@ export function ProgressBar({
           {showPercentage && <span>{clamped}%</span>}
         </div>
       )}
-      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+      <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
         <div
           className={cn("h-full rounded-full transition-all duration-500", colors[color])}
           style={{ width: `${clamped}%` }}

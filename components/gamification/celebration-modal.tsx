@@ -44,15 +44,15 @@ export function CelebrationModal({
       <div
         ref={ref}
         tabIndex={-1}
-        className="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 text-center space-y-4 outline-none"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-sm w-full mx-4 text-center space-y-4 outline-none"
       >
         <div className="text-5xl">{achievement ? achievement.icon : leveledUp ? "🎉" : "✅"}</div>
 
-        <h2 id="celebration-title" className="text-2xl font-bold text-gray-900">
+        <h2 id="celebration-title" className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {title}
         </h2>
 
-        <p className="text-gray-600">{message}</p>
+        <p className="text-gray-600 dark:text-gray-300">{message}</p>
 
         {xpGained && (
           <div className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 rounded-full px-4 py-2 text-sm font-bold">

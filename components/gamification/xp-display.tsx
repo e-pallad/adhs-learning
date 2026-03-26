@@ -20,7 +20,7 @@ export function XPDisplay({ totalXP, level, compact, className }: XPDisplayProps
         <span className="text-xs font-bold text-indigo-600 bg-indigo-50 rounded-full px-2 py-0.5">
           Lv.{level}
         </span>
-        <span className="text-xs text-gray-500">{totalXP.toLocaleString()} XP</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{totalXP.toLocaleString()} XP</span>
       </div>
     )
   }
@@ -32,9 +32,9 @@ export function XPDisplay({ totalXP, level, compact, className }: XPDisplayProps
           <span className="text-sm font-bold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
             Level {level}
           </span>
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
         </div>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 dark:text-gray-400">
           {totalXP.toLocaleString()} XP total
         </span>
       </div>

@@ -95,6 +95,7 @@ export async function updateStreak(userId: string): Promise<number> {
   const lastSeen = user.lastSeenAt ? startOfDay(new Date(user.lastSeenAt)) : null
 
   let newStreak = user.streak
+  let usedFreeze = false
 
   if (!lastSeen) {
     newStreak = 1
@@ -106,15 +107,29 @@ export async function updateStreak(userId: string): Promise<number> {
     } else if (daysDiff === 1) {
       // Consecutive day
       newStreak = user.streak + 1
+    } else if (daysDiff === 2) {
+      // Missed exactly one day — auto-consume freeze if available this week
+      const freezeAvailable = !user.streakFreezeUsedAt ||
+        differenceInCalendarDays(today, startOfDay(new Date(user.streakFreezeUsedAt))) >= 7
+      if (freezeAvailable) {
+        usedFreeze = true
+        newStreak = user.streak + 1
+      } else {
+        newStreak = 1
+      }
     } else {
-      // Gap — reset
+      // Gap > 1 day — reset
       newStreak = 1
     }
   }
 
   await prisma.user.update({
     where: { id: userId },
-    data: { streak: newStreak, lastSeenAt: new Date() },
+    data: {
+      streak: newStreak,
+      lastSeenAt: new Date(),
+      ...(usedFreeze ? { streakFreezeUsedAt: new Date() } : {}),
+    },
   })
 
   // Streak bonuses — only award once per streak cycle (exact milestone, not re-award on re-reach)

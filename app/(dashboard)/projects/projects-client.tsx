@@ -97,8 +97,8 @@ export function ProjectsClient({ projects, curriculum }: ProjectsClientProps) {
                       <span className="text-xs text-indigo-600">+{proj.xpEarned} XP</span>
                     )}
                   </div>
-                  <h3 className="text-sm font-semibold text-gray-900 mt-0.5">{proj.title}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">{proj.description}</p>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{proj.title}</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{proj.description}</p>
                 </div>
 
                 <div className="flex-shrink-0 flex gap-2">
@@ -135,22 +135,22 @@ export function ProjectsClient({ projects, curriculum }: ProjectsClientProps) {
 
               {/* Complete form */}
               {editingMonth === m.month && (
-                <div className="border-t border-gray-100 pt-3 space-y-3">
-                  <p className="text-xs font-medium text-gray-700">Add links (optional)</p>
+                <div className="border-t border-gray-100 dark:border-gray-700 pt-3 space-y-3">
+                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Add links (optional)</p>
                   <div className="space-y-2">
                     <input
                       type="url"
                       placeholder="GitHub repo URL"
                       value={form.repoUrl}
                       onChange={(e) => setForm((f) => ({ ...f, repoUrl: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                     />
                     <input
                       type="url"
                       placeholder="Live demo URL"
                       value={form.liveUrl}
                       onChange={(e) => setForm((f) => ({ ...f, liveUrl: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
                     />
                   </div>
                   <div className="flex gap-2">

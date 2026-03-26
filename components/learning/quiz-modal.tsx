@@ -144,24 +144,24 @@ export function QuizModal({
       <div
         ref={dialogRef}
         tabIndex={-1}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-lg outline-none flex flex-col"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-lg outline-none flex flex-col"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-700">
           <div>
             <p className="text-xs font-medium text-indigo-600 uppercase tracking-wide">
               Quiz
             </p>
             <h2
               id="quiz-modal-title"
-              className="text-base font-semibold text-gray-900 mt-0.5"
+              className="text-base font-semibold text-gray-900 dark:text-gray-100 mt-0.5"
             >
               {blockTitle}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-100"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
             aria-label="Close quiz"
           >
             <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
@@ -201,7 +201,7 @@ export function QuizModal({
               </div>
 
               {/* Question */}
-              <p className="text-sm font-medium text-gray-900 mb-4 leading-relaxed">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-4 leading-relaxed">
                 {currentQuestion.question}
               </p>
 
@@ -213,17 +213,17 @@ export function QuizModal({
                     i === currentQuestion.correctIndex
                   const showResult = phase === "reviewing"
 
-                  let optionStyle = "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer"
+                  let optionStyle = "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 hover:border-indigo-300 hover:bg-indigo-50 dark:hover:bg-gray-600 cursor-pointer"
                   if (showResult) {
                     if (isCorrectOption) {
-                      optionStyle = "border-green-400 bg-green-50 cursor-default"
+                      optionStyle = "border-green-400 bg-green-50 dark:bg-green-900/30 cursor-default"
                     } else if (isSelected && !isCorrectOption) {
-                      optionStyle = "border-red-400 bg-red-50 cursor-default"
+                      optionStyle = "border-red-400 bg-red-50 dark:bg-red-900/30 cursor-default"
                     } else {
-                      optionStyle = "border-gray-200 bg-white opacity-50 cursor-default"
+                      optionStyle = "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 opacity-50 cursor-default"
                     }
                   } else if (isSelected) {
-                    optionStyle = "border-indigo-500 bg-indigo-50"
+                    optionStyle = "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30"
                   }
 
                   return (
@@ -243,12 +243,12 @@ export function QuizModal({
                             ? "bg-green-500 text-white"
                             : showResult && isSelected && !isCorrectOption
                             ? "bg-red-500 text-white"
-                            : "bg-gray-100 text-gray-600"
+                            : "bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300"
                         )}
                       >
                         {OPTION_LABELS[i]}
                       </span>
-                      <span className="text-sm text-gray-800 leading-snug pt-0.5">
+                      <span className="text-sm text-gray-800 dark:text-gray-200 leading-snug pt-0.5">
                         {option}
                       </span>
                     </button>
@@ -283,14 +283,14 @@ export function QuizModal({
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                   {result?.perfect
                     ? "Perfect score!"
                     : result?.passed
                     ? "Quiz passed!"
                     : "Keep practising"}
                 </h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   {correctCount} of {questions.length} correct (
                   {Math.round((correctCount / questions.length) * 100)}%)
                 </p>

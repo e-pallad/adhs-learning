@@ -20,7 +20,7 @@ export function StreakCounter({ streak, compact, className }: StreakCounterProps
         ) : (
           <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
         )}
-        <span className="text-sm font-bold text-gray-700">{streak}</span>
+        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">{streak}</span>
       </div>
     )
   }
@@ -34,7 +34,7 @@ export function StreakCounter({ streak, compact, className }: StreakCounterProps
           <Flame className="w-10 h-10 text-orange-500 fill-orange-500" />
         )}
       </div>
-      <div className="text-3xl font-bold text-gray-900">{streak}</div>
+      <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">{streak}</div>
       <div className="text-sm text-gray-500">day streak</div>
       {streak === 0 && (
         <p className="text-xs text-gray-400">Complete a block to start your streak</p>

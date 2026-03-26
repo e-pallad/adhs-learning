@@ -62,8 +62,8 @@ export default async function ProgressPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Progress</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Your XP history and achievements</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Progress</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Your XP history and achievements</p>
       </div>
 
       {/* XP & Level */}
@@ -108,7 +108,7 @@ export default async function ProgressPage() {
       <Card>
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold text-gray-900">
+            <span className="font-semibold text-gray-900 dark:text-gray-100">
               Level {xpProgress.level}: {xpProgress.label}
             </span>
             {xpProgress.nextLevelXP ? (
@@ -125,8 +125,8 @@ export default async function ProgressPage() {
                 key={t.level}
                 className={`text-center p-1.5 rounded-lg text-xs ${
                   t.level <= xpProgress.level
-                    ? "bg-indigo-100 text-indigo-700 font-medium"
-                    : "bg-gray-50 text-gray-400"
+                    ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-medium"
+                    : "bg-gray-50 dark:bg-gray-700 text-gray-400"
                 }`}
               >
                 <div className="font-semibold">{t.level}</div>
@@ -140,7 +140,7 @@ export default async function ProgressPage() {
       {/* 30-day activity calendar */}
       <Card>
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">30-day activity</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">30-day activity</h3>
           <div className="grid grid-cols-7 gap-1 mb-1">
             {DAY_LABELS.map((d) => (
               <div key={d} className="text-center text-[10px] text-gray-400 font-medium">{d}</div>
@@ -151,7 +151,7 @@ export default async function ProgressPage() {
               const intensity = !inRange
                 ? "bg-transparent"
                 : xp === 0
-                ? "bg-gray-100"
+                ? "bg-gray-100 dark:bg-gray-700"
                 : xp < 20
                 ? "bg-indigo-200"
                 : xp < 50
@@ -169,7 +169,7 @@ export default async function ProgressPage() {
           </div>
           <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-400">
             <span>Less</span>
-            <div className="w-3 h-3 rounded-sm bg-gray-100" />
+            <div className="w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-700" />
             <div className="w-3 h-3 rounded-sm bg-indigo-200" />
             <div className="w-3 h-3 rounded-sm bg-indigo-400" />
             <div className="w-3 h-3 rounded-sm bg-indigo-600" />
@@ -181,7 +181,7 @@ export default async function ProgressPage() {
       {/* Achievements */}
       <Card>
         <CardContent className="p-5">
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Achievements ({achievements.length} / {ACHIEVEMENT_DEFINITIONS.length})
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -192,13 +192,13 @@ export default async function ProgressPage() {
                 <div
                   key={def.slug}
                   className={`flex items-start gap-3 p-3 rounded-xl border ${
-                    unlocked ? "border-yellow-200 bg-yellow-50" : "border-gray-100 bg-gray-50 opacity-60"
+                    unlocked ? "border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700" : "border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 opacity-60"
                   }`}
                 >
                   <span className="text-2xl">{def.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-gray-900">{def.label}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{def.label}</p>
                       {unlocked && <Badge variant="success">Unlocked</Badge>}
                     </div>
                     <p className="text-xs text-gray-500">{def.description}</p>
@@ -220,11 +220,11 @@ export default async function ProgressPage() {
       {dailyLogs.length > 0 && (
         <Card>
           <CardContent className="p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent activity</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Recent activity</h3>
             <div className="space-y-2">
               {dailyLogs.slice(0, 14).map((log) => (
                 <div key={log.id} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-400">
                     {new Date(log.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}
                   </span>
                   <span className="text-indigo-600 font-medium">+{log.xpEarned} XP</span>
@@ -232,7 +232,7 @@ export default async function ProgressPage() {
               ))}
             </div>
             {totalXPFromLogs > 0 && (
-              <p className="text-xs text-gray-400 mt-3 border-t border-gray-100 pt-3">
+              <p className="text-xs text-gray-400 mt-3 border-t border-gray-100 dark:border-gray-700 pt-3">
                 {totalXPFromLogs} XP earned in the last 30 days
               </p>
             )}
