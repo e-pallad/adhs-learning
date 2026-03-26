@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
+import { FocusSounds } from "./focus-sounds"
 
 type TimerState = "idle" | "running" | "break" | "done"
 
@@ -122,6 +123,8 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
           <Button onClick={reset} variant="ghost" size="sm">Reset</Button>
         )}
       </div>
+
+      <FocusSounds playing={state === "running"} />
     </div>
   )
 }
