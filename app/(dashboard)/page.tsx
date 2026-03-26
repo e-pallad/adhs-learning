@@ -99,8 +99,8 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Welcome back{user.name ? `, ${user.name}` : ""}!</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Welcome back{user.name ? `, ${user.name}` : ""}!</p>
       </div>
 
       {/* Stats row */}
@@ -125,7 +125,7 @@ export default async function DashboardPage() {
                 <Zap className="w-3.5 h-3.5 text-violet-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{user.totalXP.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{user.totalXP.toLocaleString()}</p>
             <p className="text-xs text-gray-400 mt-0.5">{nextLevel ? `${nextLevel.xpRequired - user.totalXP} to level ${nextLevel.level}` : "Max level!"}</p>
           </CardContent>
         </Card>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium text-gray-900">Level {xpProgress.level}: {xpProgress.label}</span>
+              <span className="font-medium text-gray-900 dark:text-gray-100">Level {xpProgress.level}: {xpProgress.label}</span>
               <span className="text-gray-400">{xpProgress.currentLevelXP} / {xpProgress.nextLevelXP} XP</span>
             </div>
             <ProgressBar value={xpProgress.progress} color="indigo" />
@@ -174,7 +174,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Now studying — Month {currentMonth}</p>
-              <h2 className="text-base font-semibold text-gray-900 mt-0.5">{currentMonthData.title}</h2>
+              <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{currentMonthData.title}</h2>
             </div>
             <Link
               href={`/learning/${currentMonth}`}
@@ -197,7 +197,7 @@ export default async function DashboardPage() {
         {/* 7-day activity */}
         <Card>
           <CardContent className="p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Last 7 days</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Last 7 days</h3>
             <div className="flex gap-2 items-end">
               {days.map(({ date, xp }) => {
                 const height = xp === 0 ? 8 : Math.min(64, 8 + Math.round((xp / 50) * 56))
@@ -205,7 +205,7 @@ export default async function DashboardPage() {
                 return (
                   <div key={date.toISOString()} className="flex-1 flex flex-col items-center gap-1">
                     <div
-                      className={`w-full rounded-sm transition-all ${xp > 0 ? "bg-indigo-500" : "bg-gray-100"} ${isToday && xp > 0 ? "ring-1 ring-indigo-300 ring-offset-1" : ""}`}
+                      className={`w-full rounded-sm transition-all ${xp > 0 ? "bg-indigo-500" : "bg-gray-100 dark:bg-gray-700"} ${isToday && xp > 0 ? "ring-1 ring-indigo-300 ring-offset-1" : ""}`}
                       style={{ height }}
                       title={`${xp} XP`}
                     />
@@ -223,7 +223,7 @@ export default async function DashboardPage() {
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-900">Recent achievements</h3>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent achievements</h3>
               <Link href="/progress" className="flex items-center gap-0.5 text-xs text-indigo-600 hover:text-indigo-700 transition-colors">
                 View all
                 <ArrowRight className="w-3 h-3" />
@@ -239,7 +239,7 @@ export default async function DashboardPage() {
                       {a.icon ?? "🏆"}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{a.label}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{a.label}</p>
                       <p className="text-xs text-gray-400 truncate">{a.description}</p>
                     </div>
                     {a.xpBonus > 0 && (
@@ -268,13 +268,13 @@ export default async function DashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-start gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-sm transition-all cursor-pointer"
+              className="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-sm transition-all cursor-pointer"
             >
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
                 <Icon className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900">{item.label}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.label}</p>
                 <p className="text-xs text-gray-400 mt-0.5 truncate">{item.desc}</p>
               </div>
             </Link>

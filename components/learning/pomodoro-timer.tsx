@@ -97,7 +97,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-2xl font-bold font-mono text-gray-900">{display}</span>
+          <span className="text-2xl font-bold font-mono text-gray-900 dark:text-gray-100">{display}</span>
           <span className="text-xs text-gray-400">{state === "break" ? "Break" : "Focus"}</span>
         </div>
       </div>

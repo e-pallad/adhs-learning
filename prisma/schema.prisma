@@ -41,9 +41,10 @@ model User {
   avatarUrl  String?
   totalXP    Int       @default(0)
   level      Int       @default(1)
-  streak     Int       @default(0)
-  lastSeenAt DateTime?
-  createdAt  DateTime  @default(now())
+  streak             Int       @default(0)
+  lastSeenAt         DateTime?
+  streakFreezeUsedAt DateTime?
+  createdAt          DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   dailyLogs       DailyLog[]

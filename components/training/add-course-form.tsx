@@ -47,53 +47,53 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border border-gray-200 rounded-xl p-5 space-y-4 bg-white">
-      <h3 className="text-sm font-semibold text-gray-900">Add external course</h3>
+    <form onSubmit={handleSubmit} className="border border-gray-200 dark:border-gray-700 rounded-xl p-5 space-y-4 bg-white dark:bg-gray-800">
+      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Add external course</h3>
 
       <div className="space-y-3">
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">Title *</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
           <input
             required
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             placeholder="The Complete JavaScript Course"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Platform *</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Platform *</label>
             <select
               value={form.platform}
               onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
             >
               {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Total lessons</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Total lessons</label>
             <input
               type="number"
               min="0"
               value={form.totalLessons}
               onChange={(e) => setForm((f) => ({ ...f, totalLessons: e.target.value }))}
               placeholder="120"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">URL</label>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
           <input
             type="url"
             value={form.url}
             onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
             placeholder="https://www.udemy.com/..."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
           />
         </div>
       </div>

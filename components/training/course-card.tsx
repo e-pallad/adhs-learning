@@ -91,7 +91,7 @@ export function CourseCard({ course, onUpdate, onDelete }: CourseCardProps) {
                   min={0}
                   max={course.totalLessons}
                   onChange={(e) => setLessons(Number(e.target.value))}
-                  className="w-20 border border-gray-300 rounded-lg px-2 py-1 text-sm"
+                  className="w-20 border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                 />
                 <span className="text-sm text-gray-500">/ {course.totalLessons}</span>
                 <Button size="sm" onClick={handleSave} loading={loading}>Save</Button>

@@ -86,8 +86,8 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className={cn(
-                    "text-sm font-medium text-gray-900",
-                    isCompleted && "line-through text-gray-500"
+                    "text-sm font-medium text-gray-900 dark:text-gray-100",
+                    isCompleted && "line-through text-gray-500 dark:text-gray-400"
                   )}>
                     {block.title}
                   </h3>
@@ -102,7 +102,7 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
 
             <button
               onClick={() => setExpanded((e) => !e)}
-              className="text-gray-400 hover:text-gray-600 flex-shrink-0 transition-transform cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0 transition-transform cursor-pointer"
               style={{ transform: expanded ? "rotate(180deg)" : undefined }}
               aria-label={expanded ? "Collapse" : "Expand"}
             >
@@ -111,10 +111,10 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
           </div>
 
           {expanded && !isCompleted && (
-            <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+            <div className="mt-4 space-y-4 border-t border-gray-100 dark:border-gray-700 pt-4">
               {block.resources && block.resources.length > 0 && (
                 <div>
-                  <p className="text-xs font-medium text-gray-700 mb-1">Resources</p>
+                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Resources</p>
                   <ul className="space-y-1">
                     {block.resources.map((r) => (
                       <li key={r.url}>
@@ -138,7 +138,7 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
                   onComplete={() => setTimerUsed(true)}
                 />
                 <div className="space-y-2 text-right">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     +{xpValue} XP {timerUsed && <span className="text-green-600">(timer bonus!)</span>}
                   </p>
                   {hasQuiz && (

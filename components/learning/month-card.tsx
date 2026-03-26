@@ -31,7 +31,7 @@ export function MonthCard({ month, completedBlocks, totalBlocks, isLocked, isCur
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Month {month}</p>
-            <h3 className="text-sm font-semibold text-gray-900 mt-0.5">{data.title}</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{data.title}</h3>
           </div>
           <div className="flex flex-col items-end gap-1">
             {isCurrent && <Badge variant="info">Current</Badge>}
@@ -39,7 +39,7 @@ export function MonthCard({ month, completedBlocks, totalBlocks, isLocked, isCur
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 line-clamp-2">{data.description}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{data.description}</p>
 
         <ProgressBar value={progress} showPercentage color={isCompleted ? "green" : "indigo"} />
 

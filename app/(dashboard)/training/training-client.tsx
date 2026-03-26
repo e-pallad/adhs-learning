@@ -66,14 +66,14 @@ export function TrainingClient({ courses }: TrainingClientProps) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
       <AddCourseForm onAdd={handleAdd} />
 
       {courses.length === 0 ? (
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-gray-400 dark:text-gray-500">
           <p className="text-sm">No courses yet. Add one to start tracking!</p>
         </div>
       ) : (
