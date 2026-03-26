@@ -3,8 +3,10 @@
 // Run: node scripts/validate-curriculum.js
 // Used by .github/workflows/validate-curriculum.yml
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs")
 const path = require("path")
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 const TRACKS_DIR = path.join(__dirname, "../content/curriculum/tracks")
 const VALID_BLOCK_TYPES = ["theory", "practice", "project", "review"]
@@ -32,7 +34,7 @@ function validateMeta(file, data) {
   }
 }
 
-function validateBlock(file, block, trackId, monthNum, weekNum) {
+function validateBlock(file, block) {
   const ctx = `block "${block.id ?? "(no id)"}"`
 
   if (!block.id) {
@@ -89,7 +91,7 @@ function validateBlock(file, block, trackId, monthNum, weekNum) {
   }
 }
 
-function validateMonth(file, data, trackId) {
+function validateMonth(file, data) {
   const required = ["month", "title", "description", "projectTitle", "projectDescription", "alternativeProjects", "weeks"]
   for (const field of required) {
     if (data[field] === undefined || data[field] === null) {
@@ -126,7 +128,7 @@ function validateMonth(file, data, trackId) {
         }
         blockIds.add(block.id)
       }
-      validateBlock(file, block, trackId, data.month, week.week)
+      validateBlock(file, block)
     })
   })
 }
@@ -172,7 +174,7 @@ for (const trackId of trackDirs) {
     const relPath = `${trackId}/${monthFile}`
     try {
       const data = JSON.parse(fs.readFileSync(filePath, "utf8"))
-      validateMonth(relPath, data, trackId)
+      validateMonth(relPath, data)
       filesChecked++
 
       // Register block IDs for cross-track collision detection

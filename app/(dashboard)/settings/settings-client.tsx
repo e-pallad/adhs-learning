@@ -21,11 +21,13 @@ interface SettingsClientProps {
 
 export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
-  const freezeAvailable = !streakFreezeUsedAt ||
-    Math.floor((Date.now() - new Date(streakFreezeUsedAt).getTime()) / (1000 * 60 * 60 * 24)) >= 7
-  const daysUntilReset = streakFreezeUsedAt
-    ? Math.max(0, 7 - Math.floor((Date.now() - new Date(streakFreezeUsedAt).getTime()) / (1000 * 60 * 60 * 24)))
-    : 0
+  // Capture current time once at mount — avoids calling Date.now() during render
+  const [now] = useState<number>(() => Date.now())
+  const daysSinceFreeze = streakFreezeUsedAt
+    ? Math.floor((now - new Date(streakFreezeUsedAt).getTime()) / (1000 * 60 * 60 * 24))
+    : Infinity
+  const freezeAvailable = daysSinceFreeze >= 7
+  const daysUntilReset = daysSinceFreeze === Infinity ? 0 : Math.max(0, 7 - daysSinceFreeze)
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [name, setName] = useState(initialName ?? "")
