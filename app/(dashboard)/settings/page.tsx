@@ -23,6 +23,8 @@ export default async function SettingsPage() {
           streakFreezeUsedAt={user.streakFreezeUsedAt?.toISOString() ?? null}
           dailyGoalBlocks={user.dailyGoalBlocks}
           weeklyGoalBlocks={user.weeklyGoalBlocks}
+          githubUsername={user.githubUsername ?? null}
+          githubLastSyncAt={user.githubLastSyncAt?.toISOString() ?? null}
         />
       </div>
     </div>
