@@ -6,7 +6,8 @@ import { createTestUser, deleteTestUser } from "../helpers/test-user"
 
 // Mutable reference so each beforeEach can supply a fresh vi.fn() with its own call count.
 // The factory below captures this via closure and looks it up at call time (not factory time).
-let mockCreate: ReturnType<typeof vi.fn>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let mockCreate: any
 
 vi.mock("@anthropic-ai/sdk", () => ({
   // Must use `function` (not arrow) so `new Anthropic()` works correctly as a constructor mock.
@@ -14,7 +15,7 @@ vi.mock("@anthropic-ai/sdk", () => ({
     return {
       messages: {
         // Indirect call: looks up `mockCreate` at call time, not at mock-factory time.
-        create: (...args: Parameters<typeof mockCreate>) => mockCreate(...args),
+        create: (...args: unknown[]) => mockCreate(...args),
       },
     }
   }),
