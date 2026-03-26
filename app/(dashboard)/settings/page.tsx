@@ -19,6 +19,7 @@ export default async function SettingsPage() {
         <SettingsClient
           name={user.name}
           email={user.email}
+          track={user.track}
           streakFreezeUsedAt={user.streakFreezeUsedAt?.toISOString() ?? null}
         />
       </div>

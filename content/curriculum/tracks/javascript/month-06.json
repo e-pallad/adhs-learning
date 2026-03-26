@@ -1,0 +1,127 @@
+{
+  "month": 6,
+  "title": "Databases & APIs",
+  "description": "PostgreSQL, Prisma ORM, REST design, Supabase",
+  "projectTitle": "Expense Tracker API",
+  "projectDescription": "Full CRUD REST API with PostgreSQL, Prisma, auth-protected routes",
+  "alternativeProjects": [
+    {
+      "title": "Bookmark Manager API",
+      "description": "CRUD API for saving, tagging, and full-text searching URLs — user-scoped with Supabase auth and Zod-validated inputs"
+    },
+    {
+      "title": "Recipe Database",
+      "description": "Store, search, and rate recipes — full REST API with auth, paginated queries, and Prisma relations between recipes, ingredients, and tags"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "PostgreSQL & SQL",
+      "blocks": [
+        {
+          "id": "m6w1-b1",
+          "title": "Relational Database Concepts",
+          "description": "tables, rows, primary keys, foreign keys, normalization",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m6w1-b2",
+          "title": "SQL Queries",
+          "description": "SELECT, WHERE, JOIN, GROUP BY, ORDER BY — practical queries",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m6w1-b3",
+          "title": "Indexes & Performance",
+          "description": "what indexes are, when to add them, EXPLAIN ANALYZE",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Prisma ORM",
+      "blocks": [
+        {
+          "id": "m6w2-b1",
+          "title": "Prisma Schema",
+          "description": "models, relations, enums, migrations, prisma generate",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m6w2-b2",
+          "title": "Prisma Client Queries",
+          "description": "findMany, create, update, upsert, delete, transactions",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m6w2-b3",
+          "title": "Supabase as Database Host",
+          "description": "connection strings, row-level security, Supabase dashboard",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "REST API Design",
+      "blocks": [
+        {
+          "id": "m6w3-b1",
+          "title": "REST Principles",
+          "description": "resources, HTTP verbs, status codes, idempotency",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m6w3-b2",
+          "title": "Input Validation",
+          "description": "Zod schemas, error messages, type-safe API boundaries",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m6w3-b3",
+          "title": "Auth Middleware",
+          "description": "protecting routes with JWT, role checks, RLS policies",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m6w4-b1",
+          "title": "Error Handling Patterns",
+          "description": "global error handlers, typed errors, API error envelopes",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m6w4-b2",
+          "title": "Expense Tracker API Project",
+          "description": "Full CRUD API — categories, transactions, auth, validation",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m6w4-b3",
+          "title": "Month 6 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}

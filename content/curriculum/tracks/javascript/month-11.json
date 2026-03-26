@@ -1,0 +1,127 @@
+{
+  "month": 11,
+  "title": "Real-Time & Advanced Features",
+  "description": "WebSockets, Supabase Realtime, background jobs, file uploads, tRPC",
+  "projectTitle": "Real-Time Chat",
+  "projectDescription": "A real-time chat room with Supabase Realtime, auth, and file attachments",
+  "alternativeProjects": [
+    {
+      "title": "Collaborative Whiteboard",
+      "description": "Shared canvas with Supabase Realtime broadcast for stroke sync and Presence for showing who's online — export to PNG via Canvas API"
+    },
+    {
+      "title": "Live Auction App",
+      "description": "Real-time bidding with a countdown timer, instant bid updates via Supabase Realtime, and a winner announcement — tRPC for the REST of the API"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Real-Time",
+      "blocks": [
+        {
+          "id": "m11w1-b1",
+          "title": "WebSockets",
+          "description": "WebSocket protocol, ws library, connection lifecycle, reconnection",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m11w1-b2",
+          "title": "Supabase Realtime",
+          "description": "Realtime channels, broadcast, presence, postgres changes",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m11w1-b3",
+          "title": "Optimistic UI with Realtime",
+          "description": "local state + server sync, conflict resolution",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "File Uploads & Storage",
+      "blocks": [
+        {
+          "id": "m11w2-b1",
+          "title": "Supabase Storage",
+          "description": "buckets, policies, upload/download, signed URLs",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m11w2-b2",
+          "title": "Image Upload UI",
+          "description": "drag-and-drop, progress indicators, preview, validation",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m11w2-b3",
+          "title": "Background Jobs",
+          "description": "Vercel cron jobs, queue concepts, deferred work patterns",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Advanced Next.js",
+      "blocks": [
+        {
+          "id": "m11w3-b1",
+          "title": "Edge Runtime",
+          "description": "Edge vs Node.js runtime, middleware patterns, geolocation",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m11w3-b2",
+          "title": "Streaming & Suspense",
+          "description": "streaming SSR, Suspense boundaries, progressive loading",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m11w3-b3",
+          "title": "tRPC & Type-Safe APIs",
+          "description": "end-to-end type safety without code generation — routers, procedures, React Query integration; when tRPC beats REST in a Next.js monorepo",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m11w4-b1",
+          "title": "Push Notifications",
+          "description": "Web Push API, service workers, notification permissions",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m11w4-b2",
+          "title": "Real-Time Chat Project",
+          "description": "Chat with Supabase Realtime, auth, file uploads, presence",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m11w4-b3",
+          "title": "Month 11 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}

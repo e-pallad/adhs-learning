@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { MonthCard } from "@/components/learning/month-card"
 import { redirect } from "next/navigation"
 
@@ -10,8 +10,11 @@ export default async function LearningPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
 
+  const months = getTrackById(user.track)?.months ?? CURRICULUM
+  const trackBlockIds = months.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
+
   const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, blockId: { in: trackBlockIds } },
     select: { month: true, status: true },
   })
 
@@ -23,13 +26,13 @@ export default async function LearningPage() {
   }
 
   const totalByMonth: Record<number, number> = {}
-  for (const m of CURRICULUM) {
+  for (const m of months) {
     totalByMonth[m.month] = m.weeks.flatMap((w) => w.blocks).length
   }
 
   // Determine current month (first one not fully complete)
   let currentMonth = 1
-  for (const m of CURRICULUM) {
+  for (const m of months) {
     const done = completedByMonth[m.month] ?? 0
     const total = totalByMonth[m.month] ?? 1
     if (done < total) {
@@ -46,7 +49,7 @@ export default async function LearningPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {CURRICULUM.map((m) => {
+        {months.map((m) => {
           const done = completedByMonth[m.month] ?? 0
           const total = totalByMonth[m.month]
           const isCurrent = m.month === currentMonth
@@ -55,6 +58,8 @@ export default async function LearningPage() {
             <MonthCard
               key={m.month}
               month={m.month}
+              title={m.title}
+              description={m.description}
               completedBlocks={done}
               totalBlocks={total}
               isCurrent={isCurrent}

@@ -1,0 +1,127 @@
+{
+  "month": 7,
+  "title": "Advanced React & Patterns",
+  "description": "Advanced hooks, forms, data tables, component composition, accessibility",
+  "projectTitle": "Admin Dashboard",
+  "projectDescription": "An admin panel with a data table, filters, modals, form validation, and full keyboard accessibility",
+  "alternativeProjects": [
+    {
+      "title": "SaaS Settings Panel",
+      "description": "User profile, mock billing plan, team member management, and notification preferences — complex multi-step forms with React Hook Form and Zod"
+    },
+    {
+      "title": "Issue Tracker",
+      "description": "A GitHub Issues-inspired mini app with filters, labels, status board, and drag-to-reorder — focus on compound components and accessible interactions"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Advanced Patterns",
+      "blocks": [
+        {
+          "id": "m7w1-b1",
+          "title": "Advanced Custom Hooks",
+          "description": "useDebounce, useLocalStorage, useIntersectionObserver",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m7w1-b2",
+          "title": "Error Boundaries",
+          "description": "class-based error boundaries, react-error-boundary library",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m7w1-b3",
+          "title": "Component Composition",
+          "description": "compound components, render props, slot patterns — building flexible, reusable UI primitives",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Forms",
+      "blocks": [
+        {
+          "id": "m7w2-b1",
+          "title": "React Hook Form",
+          "description": "register, handleSubmit, errors, validation with Zod",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m7w2-b2",
+          "title": "Complex Form Patterns",
+          "description": "field arrays, conditional fields, multi-step forms",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m7w2-b3",
+          "title": "Optimistic UI",
+          "description": "optimistic updates, rollback on error, useOptimistic hook",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Accessibility",
+      "blocks": [
+        {
+          "id": "m7w3-b1",
+          "title": "TanStack Query",
+          "description": "useQuery, useMutation, cache invalidation, stale-while-revalidate",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m7w3-b2",
+          "title": "A11y Fundamentals",
+          "description": "WCAG 2.1 AA, ARIA roles and properties, semantic landmarks, colour contrast — what the spec actually requires",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m7w3-b3",
+          "title": "A11y in Practice",
+          "description": "keyboard navigation, focus traps in modals, skip links, axe DevTools audit — make an existing component fully accessible",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m7w4-b1",
+          "title": "Data Tables & Component Library",
+          "description": "TanStack Table — sorting, filtering, pagination; Shadcn/ui and Radix primitives, theming with CSS variables",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m7w4-b2",
+          "title": "Admin Dashboard Project",
+          "description": "Data table with sorting/filtering, modal forms, dashboard stats — pass an axe audit before submitting",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m7w4-b3",
+          "title": "Month 7 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}
