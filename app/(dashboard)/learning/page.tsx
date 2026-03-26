@@ -57,6 +57,8 @@ export default async function LearningPage() {
             <MonthCard
               key={m.month}
               month={m.month}
+              title={m.title}
+              description={m.description}
               completedBlocks={done}
               totalBlocks={total}
               isCurrent={isCurrent}
