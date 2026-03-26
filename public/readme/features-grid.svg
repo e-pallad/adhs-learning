@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f1a"/>
+      <stop offset="100%" style="stop-color:#1a1030"/>
+    </linearGradient>
+    <linearGradient id="card1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#312e81"/>
+      <stop offset="100%" style="stop-color:#1e1b4b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="320" fill="url(#bg2)" rx="16"/>
+
+  <!-- Title -->
+  <text x="600" y="44" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="#c7d2fe">Everything you need to stay on track</text>
+
+  <!-- Feature cards: 6 across -->
+  <!-- Card 1: Curriculum -->
+  <g transform="translate(28, 68)">
+    <rect width="180" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="180" height="4" rx="2" y="206" fill="#6366f1"/>
+    <text x="90" y="56" text-anchor="middle" font-size="36">📚</text>
+    <text x="90" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">Curriculum</text>
+    <text x="90" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">12-month structured</text>
+    <text x="90" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">weekly learning path</text>
+    <text x="90" y="150" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">with Pomodoro timer</text>
+    <!-- Mini badge -->
+    <rect x="45" y="168" width="90" height="22" rx="11" fill="#312e81"/>
+    <text x="90" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">⏱ Focus timer</text>
+  </g>
+
+  <!-- Card 2: Roadmap -->
+  <g transform="translate(224, 68)">
+    <rect width="180" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="180" height="4" rx="2" y="206" fill="#7c3aed"/>
+    <text x="90" y="56" text-anchor="middle" font-size="36">🗺️</text>
+    <text x="90" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">Roadmaps</text>
+    <text x="90" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">Browse roadmap.sh</text>
+    <text x="90" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">skill trees and track</text>
+    <text x="90" y="144" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">topic completion</text>
+    <rect x="45" y="168" width="90" height="22" rx="11" fill="#312e81"/>
+    <text x="90" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">🎯 XP per topic</text>
+  </g>
+
+  <!-- Card 3: Courses -->
+  <g transform="translate(420, 68)">
+    <rect width="180" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="180" height="4" rx="2" y="206" fill="#4f46e5"/>
+    <text x="90" y="56" text-anchor="middle" font-size="36">🎓</text>
+    <text x="90" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">Courses</text>
+    <text x="90" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">Log external courses</text>
+    <text x="90" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">from any platform</text>
+    <text x="90" y="144" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">with progress tracking</text>
+    <rect x="45" y="168" width="90" height="22" rx="11" fill="#312e81"/>
+    <text x="90" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">✅ 50 XP on finish</text>
+  </g>
+
+  <!-- Card 4: Projects -->
+  <g transform="translate(616, 68)">
+    <rect width="180" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="180" height="4" rx="2" y="206" fill="#6366f1"/>
+    <text x="90" y="56" text-anchor="middle" font-size="36">🛠️</text>
+    <text x="90" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">Projects</text>
+    <text x="90" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">Monthly build projects</text>
+    <text x="90" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">tied to each learning</text>
+    <text x="90" y="144" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">month's curriculum</text>
+    <rect x="45" y="168" width="90" height="22" rx="11" fill="#312e81"/>
+    <text x="90" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">🚀 100 XP reward</text>
+  </g>
+
+  <!-- Card 5: Progress -->
+  <g transform="translate(812, 68)">
+    <rect width="180" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="180" height="4" rx="2" y="206" fill="#8b5cf6"/>
+    <text x="90" y="56" text-anchor="middle" font-size="36">📊</text>
+    <text x="90" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">Progress</text>
+    <text x="90" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">XP history, levels,</text>
+    <text x="90" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">streaks, achievements,</text>
+    <text x="90" y="144" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">and activity calendar</text>
+    <rect x="30" y="168" width="120" height="22" rx="11" fill="#312e81"/>
+    <text x="90" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">🔥 Streak bonuses</text>
+  </g>
+
+  <!-- Card 6: AI -->
+  <g transform="translate(1008, 68)">
+    <rect width="164" height="210" rx="12" fill="#1e1b4b" stroke="#3730a3" stroke-width="1"/>
+    <rect width="164" height="4" rx="2" y="206" fill="#a855f7"/>
+    <text x="82" y="56" text-anchor="middle" font-size="36">🤖</text>
+    <text x="82" y="90" text-anchor="middle" font-family="system-ui" font-size="15" font-weight="700" fill="#e0e7ff">AI Coach</text>
+    <text x="82" y="112" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">Personalized learning</text>
+    <text x="82" y="128" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">recommendations</text>
+    <text x="82" y="144" text-anchor="middle" font-family="system-ui" font-size="11" fill="#94a3b8">powered by Claude</text>
+    <rect x="22" y="168" width="120" height="22" rx="11" fill="#312e81"/>
+    <text x="82" y="183" text-anchor="middle" font-family="system-ui" font-size="11" fill="#818cf8">✨ Anthropic SDK</text>
+  </g>
+</svg>
