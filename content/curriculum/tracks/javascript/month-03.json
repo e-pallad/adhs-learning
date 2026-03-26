@@ -1,0 +1,127 @@
+{
+  "month": 3,
+  "title": "TypeScript & Tooling",
+  "description": "TypeScript, advanced Git, Node.js runtime, npm/bun, ESLint, Prettier",
+  "projectTitle": "TypeScript CLI Quiz App",
+  "projectDescription": "A command-line quiz that reads questions from JSON — typed with TypeScript",
+  "alternativeProjects": [
+    {
+      "title": "Markdown Parser CLI",
+      "description": "Read .md files and output structured JSON representing headings, links, and code blocks — fully typed with TypeScript"
+    },
+    {
+      "title": "Budget Calculator CLI",
+      "description": "An interactive REPL for tracking income and expenses with file-based persistence and typed data models"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Advanced Git & Node.js Runtime",
+      "blocks": [
+        {
+          "id": "m3w1-b1",
+          "title": "Branching & Merging",
+          "description": "branch, checkout, merge, rebase — when to use each; resolving conflicts",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m3w1-b2",
+          "title": "GitHub Workflow",
+          "description": "push, pull, fork, PR, code review — team collaboration basics",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m3w1-b3",
+          "title": "Node.js Runtime",
+          "description": "event loop, CommonJS vs ESM modules, streams overview — how Next.js uses Node under the hood",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "TypeScript Basics",
+      "blocks": [
+        {
+          "id": "m3w2-b1",
+          "title": "Types & Interfaces",
+          "description": "primitive types, union, intersection, interface vs type",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m3w2-b2",
+          "title": "Generics",
+          "description": "generic functions, generic interfaces, utility types (Partial, Pick)",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m3w2-b3",
+          "title": "TypeScript Config",
+          "description": "tsconfig.json, strict mode, module resolution, path aliases",
+          "durationMinutes": 30,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Tooling",
+      "blocks": [
+        {
+          "id": "m3w3-b1",
+          "title": "Package Managers",
+          "description": "npm, bun — packages, scripts, semantic versioning, lock files",
+          "durationMinutes": 30,
+          "type": "theory"
+        },
+        {
+          "id": "m3w3-b2",
+          "title": "ESLint & Prettier",
+          "description": "linting rules, auto-format on save, shared configs",
+          "durationMinutes": 30,
+          "type": "practice"
+        },
+        {
+          "id": "m3w3-b3",
+          "title": "Vite & Bundlers",
+          "description": "what bundlers do, Vite config, dev vs prod builds",
+          "durationMinutes": 45,
+          "type": "theory"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m3w4-b1",
+          "title": "TypeScript Advanced Patterns",
+          "description": "discriminated unions, type guards, as const, satisfies",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m3w4-b2",
+          "title": "CLI Quiz Project",
+          "description": "Build a typed CLI quiz app — file I/O, JSON schema, TypeScript strict",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m3w4-b3",
+          "title": "Month 3 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}

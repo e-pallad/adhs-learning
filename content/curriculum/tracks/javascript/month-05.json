@@ -1,0 +1,127 @@
+{
+  "month": 5,
+  "title": "Next.js & Full-Stack Basics",
+  "description": "App Router, Server Components, data fetching, API routes",
+  "projectTitle": "Public Blog",
+  "projectDescription": "A statically generated blog with MDX posts and dynamic routes",
+  "alternativeProjects": [
+    {
+      "title": "Developer Portfolio v2",
+      "description": "Rebuild your Month 1 portfolio as a Next.js static site with MDX project case studies, animated page transitions, and a working contact form via Route Handlers"
+    },
+    {
+      "title": "Link-in-Bio Page",
+      "description": "A styled link aggregator with analytics tracking — page views stored via a Route Handler and displayed on an admin dashboard"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "Next.js App Router",
+      "blocks": [
+        {
+          "id": "m5w1-b1",
+          "title": "App Router Concepts",
+          "description": "file-based routing, layouts, pages, loading/error files",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m5w1-b2",
+          "title": "Server vs Client Components",
+          "description": "when to use each, the client boundary, serialization rules",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m5w1-b3",
+          "title": "Dynamic Routes",
+          "description": "params, generateStaticParams, catch-all segments",
+          "durationMinutes": 45,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 2,
+      "theme": "Data Fetching",
+      "blocks": [
+        {
+          "id": "m5w2-b1",
+          "title": "Async Server Components",
+          "description": "fetch in components, caching, revalidation strategies",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m5w2-b2",
+          "title": "Route Handlers",
+          "description": "GET/POST API routes, NextRequest/NextResponse, middleware",
+          "durationMinutes": 60,
+          "type": "practice"
+        },
+        {
+          "id": "m5w2-b3",
+          "title": "Server Actions",
+          "description": "form actions, mutation patterns, optimistic updates",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 3,
+      "theme": "Styling & Auth",
+      "blocks": [
+        {
+          "id": "m5w3-b1",
+          "title": "CSS Modules & Styling Approaches",
+          "description": "CSS Modules vs CSS-in-JS (styled-components/emotion) vs Tailwind — trade-offs, DX, bundle impact; how Tailwind v4 JIT works and when to reach for each approach",
+          "durationMinutes": 60,
+          "type": "theory"
+        },
+        {
+          "id": "m5w3-b2",
+          "title": "Authentication Concepts",
+          "description": "sessions, JWTs, cookies, OAuth flow overview",
+          "durationMinutes": 45,
+          "type": "theory"
+        },
+        {
+          "id": "m5w3-b3",
+          "title": "Supabase Auth",
+          "description": "magic link, session management, SSR client setup",
+          "durationMinutes": 60,
+          "type": "practice"
+        }
+      ]
+    },
+    {
+      "week": 4,
+      "theme": "Project",
+      "blocks": [
+        {
+          "id": "m5w4-b1",
+          "title": "MDX & Content",
+          "description": "next-mdx-remote, frontmatter, code highlighting",
+          "durationMinutes": 45,
+          "type": "practice"
+        },
+        {
+          "id": "m5w4-b2",
+          "title": "Blog Project",
+          "description": "Build a public blog with MDX posts, tags, and dynamic routes",
+          "durationMinutes": 120,
+          "type": "project"
+        },
+        {
+          "id": "m5w4-b3",
+          "title": "Month 5 Review",
+          "description": "Revisit gaps, fill in any skipped blocks",
+          "durationMinutes": 45,
+          "type": "review"
+        }
+      ]
+    }
+  ]
+}

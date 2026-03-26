@@ -7,13 +7,19 @@ import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/theme-provider"
 import { Moon, Sun } from "lucide-react"
 
+const TRACKS = [
+  { id: "javascript", label: "Full-Stack JavaScript", icon: "⚡" },
+  { id: "python", label: "Python Development", icon: "🐍" },
+]
+
 interface SettingsClientProps {
   name: string | null
   email: string
+  track: string
   streakFreezeUsedAt: string | null
 }
 
-export function SettingsClient({ name: initialName, email, streakFreezeUsedAt }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   const freezeAvailable = !streakFreezeUsedAt ||
     Math.floor((Date.now() - new Date(streakFreezeUsedAt).getTime()) / (1000 * 60 * 60 * 24)) >= 7
@@ -23,6 +29,7 @@ export function SettingsClient({ name: initialName, email, streakFreezeUsedAt }:
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [name, setName] = useState(initialName ?? "")
+  const [track, setTrack] = useState(initialTrack)
   const [saving, setSaving] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -35,7 +42,7 @@ export function SettingsClient({ name: initialName, email, streakFreezeUsedAt }:
     const res = await fetch("/api/user/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, track }),
     })
     setSaving(false)
     if (res.ok) {
@@ -74,6 +81,27 @@ export function SettingsClient({ name: initialName, email, streakFreezeUsedAt }:
             placeholder="Your name"
             className="w-full max-w-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
           />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Learning track</label>
+          <div className="flex flex-col gap-2 mt-1">
+            {TRACKS.map(t => (
+              <label key={t.id} className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="track"
+                  value={t.id}
+                  checked={track === t.id}
+                  onChange={() => setTrack(t.id)}
+                  className="accent-indigo-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  {t.icon} {t.label}
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <Button type="submit" size="sm" loading={saving}>
