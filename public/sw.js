@@ -21,17 +21,16 @@ self.addEventListener("activate", (event) => {
 })
 
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests for same-origin navigation
+  // Only intercept same-origin navigation GET requests
   if (event.request.method !== "GET") return
+  if (event.request.mode !== "navigate") return
   if (!event.request.url.startsWith(self.location.origin)) return
-
-  const isNavigation = event.request.mode === "navigate"
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
         // Cache successful navigation responses
-        if (isNavigation && response.ok) {
+        if (response.ok) {
           const clone = response.clone()
           caches.open(CACHE).then((cache) => cache.put(event.request, clone))
         }
