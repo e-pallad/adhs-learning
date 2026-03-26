@@ -1,8 +1,11 @@
 # Devfluent — Offene Aufgaben
 
-> Zuletzt aktualisiert: 2026-03-25
+> Zuletzt aktualisiert: 2026-03-26
 > Aktiver Branch: `claude/add-legal-pages-todo-PdxBj`
 > Zum Fortfahren: Branch auschecken, diese Datei lesen, erledigte Tasks abhaken.
+
+> **Branching-Regel:** Jede Phase / jedes größere Feature bekommt einen eigenen Branch und PR.
+> Niemals mehrere unabhängige Features in einen Branch bündeln.
 
 ---
 
@@ -46,34 +49,55 @@
 
 ## Content-Contribution-System
 
-> Aktuell ist das gesamte Curriculum statisch in `content/curriculum/index.ts` (1.541 Zeilen) hardcodiert.
-> Externe Entwickler können keine Inhalte einbringen. Ziel: PR-basierter und später DB-gestützter Beitrags-Workflow.
+> **Architektur-Entscheidung (2026-03-26):** GitHub-only Workflow — kein Admin-UI, keine ContentBlock-DB-Tabelle.
+> Review erfolgt ausschließlich über GitHub PRs. Merge = published.
+> Beiträge werden durch eine GitHub Action (JSON-Schema-Validierung) automatisch geprüft.
+> Mehrere Sprachen/Tracks werden unterstützt (JavaScript, Python, …).
+> **Branch-Regel:** Eigener Branch + PR pro Phase.
 
-- [ ] **Curriculum in separate JSON-Dateien pro Monat aufsplitten**
-  `content/curriculum/index.ts` → `content/curriculum/month-01.json` … `month-12.json`
-  Interfaces (`LearningBlock`, `QuizQuestion`, etc.) in eine separate `types.ts` auslagern.
-  Loader-Funktion in `index.ts` belassen, die alle JSON-Dateien importiert und zusammenführt.
-  → Externe Devs können per PR eine einzelne Monatsdatei ergänzen, ohne die gesamte TS-Datei anzufassen.
+### Phase A — Struktur (kein DB, kein UI) → Branch: `feature/curriculum-restructure`
 
-- [ ] **Prisma-Schema: `ContentBlock`-Tabelle ergänzen**
-  Neue Tabelle für DB-gestützte Lerninhalte mit Feldern:
-  `id`, `blockId` (stable ID), `title`, `description`, `type`, `durationMinutes`,
-  `status` (`draft | review | published`), `authorId`, `source` (z. B. `"community"`, `"core"`),
-  `createdAt`, `updatedAt`
-  Migration via `supabase_apply_migration` MCP-Tool (kein direktes `prisma migrate` aus WSL).
+- [ ] **Types auslagern**
+  `content/curriculum/types.ts` mit `LearningBlock`, `QuizQuestion`, `WeekData`, `MonthData`
 
-- [ ] **Admin/Contributor-UI erstellen**
-  Route: `app/(dashboard)/admin/content/page.tsx`
-  Funktionen: Lernblock einreichen, Liste aller `draft`/`review`-Blöcke, Status ändern (publish/reject).
-  Nur für Nutzer mit Admin-Flag zugänglich (User-Modell ggf. um `role`-Feld erweitern).
+- [ ] **Curriculum in Track-Verzeichnisse aufsplitten**
+  ```
+  content/curriculum/
+    tracks/
+      javascript/
+        meta.json          ← { id, title, description, language, level, icon }
+        month-01.json … month-12.json
+      python/
+        meta.json
+        month-01.json      ← zunächst stub/leer
+    types.ts
+    index.ts               ← lädt alle Tracks + Monate, merged
+  ```
+  Block-ID-Konvention: `{track}-m{month}w{week}-b{n}` → z.B. `js-m1w1-b1`, `py-m1w1-b1`
+
+- [ ] **User.track-Feld ergänzen**
+  `track String @default("javascript")` auf `User`-Model.
+  Migration via `supabase_apply_migration`.
+  Settings-Seite: Track-Auswahl (Dropdown).
+  Learning/Progress-Seiten: nach `user.track` filtern.
 
 - [ ] **CONTRIBUTING.md schreiben**
-  Erklärt externen Entwicklern:
-  - JSON-Dateistruktur und Pflichtfelder
-  - ID-Konvention (`m{month}w{week}-b{n}`)
-  - Quiz-Format (`QuizQuestion` mit 4 Optionen, `correctIndex`, `explanation`)
-  - Review-Prozess (PR → Admin-Review → published)
-  - Lokales Setup zum Testen neuer Blöcke
+  - Track-Struktur + `meta.json`-Format
+  - Block-ID-Konvention
+  - Quiz-Format (`QuizQuestion`, 4 Optionen, `correctIndex`, `explanation`)
+  - Lokales Setup (npm run dev + JSON editieren)
+  - PR-Prozess (Fork → JSON ergänzen → PR → CI grün → Merge)
+
+### Phase B — GitHub Infra → gleicher Branch wie Phase A
+
+- [ ] **GitHub Action: JSON-Schema-Validierung**
+  `.github/workflows/validate-curriculum.yml`
+  Läuft auf jedem PR der `content/curriculum/tracks/**` berührt.
+  Validiert Pflichtfelder, ID-Format, Quiz-Struktur.
+
+- [ ] **PR-Template für Curriculum-Beiträge**
+  `.github/PULL_REQUEST_TEMPLATE/curriculum_contribution.md`
+  Checkliste: Track, Monat, Block-IDs eindeutig, Quiz vorhanden, lokal getestet.
 
 ---
 
@@ -81,7 +105,7 @@
 
 ### Phase 1 — Kurzfristig
 
-- [ ] **Dark Mode**
+- [x] **Dark Mode**
   Tailwind `dark:`-Klassen + Theme-Toggle in Settings + `localStorage`-Persistenz.
   _ADHS: Reduziert visuelle Reizüberflutung und Augenermüdung bei langen Lernsessions._
 
@@ -100,7 +124,7 @@
   Entweder externe URLs (royalty-free) oder eingebetteter Audio-Player.
   _ADHS: Auditive Stimulation fördert Hyperfokus und blockiert ablenkende Umgebungsgeräusche._
 
-- [ ] **Streak Freeze**
+- [x] **Streak Freeze**
   1× pro Woche verwendbar. Button in Settings oder auf Dashboard.
   DB: `streakFreezeUsedAt`-Feld auf `User`, Prüfung in `updateStreak()` (`lib/user.ts`).
   _ADHS: Verhindert Alles-oder-nichts-Demotivation nach einem vergessenen Tag._
