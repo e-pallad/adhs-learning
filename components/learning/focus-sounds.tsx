@@ -97,18 +97,20 @@ export function FocusSounds({ playing }: FocusSoundsProps) {
       lpf.frequency.value = 800
       lpf.Q.value = 0.5
 
-      // LFO for rainfall variation
+      // LFO for rainfall variation — modulates a gain node in the signal path
+      const tremolo = ctx.createGain()
+      tremolo.gain.value = 1
       const lfoGain = ctx.createGain()
-      lfoGain.gain.value = 0.6
+      lfoGain.gain.value = 0.4
       const lfo = ctx.createOscillator()
       lfo.type = "sine"
       lfo.frequency.value = 0.3
       lfo.connect(lfoGain)
-      lfoGain.connect(lpf.gain)
-      lpf.gain.value = 1
+      lfoGain.connect(tremolo.gain)
 
       src.connect(lpf)
-      lpf.connect(gain)
+      lpf.connect(tremolo)
+      tremolo.connect(gain)
       src.start()
       lfo.start()
       nodesRef.current = [src, lfo]
