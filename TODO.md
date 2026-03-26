@@ -57,10 +57,10 @@
 
 ### Phase A — Struktur (kein DB, kein UI) → Branch: `feature/curriculum-restructure`
 
-- [ ] **Types auslagern**
+- [x] **Types auslagern**
   `content/curriculum/types.ts` mit `LearningBlock`, `QuizQuestion`, `WeekData`, `MonthData`
 
-- [ ] **Curriculum in Track-Verzeichnisse aufsplitten**
+- [x] **Curriculum in Track-Verzeichnisse aufsplitten**
   ```
   content/curriculum/
     tracks/
@@ -75,13 +75,13 @@
   ```
   Block-ID-Konvention: `{track}-m{month}w{week}-b{n}` → z.B. `js-m1w1-b1`, `py-m1w1-b1`
 
-- [ ] **User.track-Feld ergänzen**
+- [x] **User.track-Feld ergänzen**
   `track String @default("javascript")` auf `User`-Model.
   Migration via `supabase_apply_migration`.
   Settings-Seite: Track-Auswahl (Dropdown).
   Learning/Progress-Seiten: nach `user.track` filtern.
 
-- [ ] **CONTRIBUTING.md schreiben**
+- [x] **CONTRIBUTING.md schreiben**
   - Track-Struktur + `meta.json`-Format
   - Block-ID-Konvention
   - Quiz-Format (`QuizQuestion`, 4 Optionen, `correctIndex`, `explanation`)
@@ -90,12 +90,12 @@
 
 ### Phase B — GitHub Infra → gleicher Branch wie Phase A
 
-- [ ] **GitHub Action: JSON-Schema-Validierung**
+- [x] **GitHub Action: JSON-Schema-Validierung**
   `.github/workflows/validate-curriculum.yml`
   Läuft auf jedem PR der `content/curriculum/tracks/**` berührt.
   Validiert Pflichtfelder, ID-Format, Quiz-Struktur.
 
-- [ ] **PR-Template für Curriculum-Beiträge**
+- [x] **PR-Template für Curriculum-Beiträge**
   `.github/PULL_REQUEST_TEMPLATE/curriculum_contribution.md`
   Checkliste: Track, Monat, Block-IDs eindeutig, Quiz vorhanden, lokal getestet.
 
@@ -114,12 +114,12 @@
   Home-Screen-Installation, Offline-Fallback-Seite.
   _ADHS: Eliminiert Reibung beim App-Start — kein Browser-Tab öffnen nötig._
 
-- [ ] **Tages- und Wochenziele**
+- [x] **Tages- und Wochenziele**
   Nutzer setzt täglich X Blöcke / Y Minuten als Ziel. Fortschrittsbalken auf Dashboard.
   DB: neue `DailyGoal`-Tabelle oder Erweiterung des `User`-Modells.
   _ADHS: Kleine, klar definierte Ziele schaffen Struktur und sofortige Erfolgserlebnisse._
 
-- [ ] **Fokus-Sounds**
+- [x] **Fokus-Sounds**
   Auswahl aus White Noise, Rain, Lo-Fi, Café — abspielbar direkt im Pomodoro-Timer.
   Entweder externe URLs (royalty-free) oder eingebetteter Audio-Player.
   _ADHS: Auditive Stimulation fördert Hyperfokus und blockiert ablenkende Umgebungsgeräusche._
