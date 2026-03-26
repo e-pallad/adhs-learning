@@ -4,6 +4,7 @@ import { getXPProgress, LEVEL_THRESHOLDS } from "@/lib/xp"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
+import { BodyDoubleMode } from "@/components/body-double-mode"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
@@ -210,6 +211,13 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Body-Double Mode */}
+      <Card>
+        <CardContent className="p-5">
+          <BodyDoubleMode />
+        </CardContent>
+      </Card>
 
       {/* Current month */}
       <Card>
