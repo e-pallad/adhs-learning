@@ -13,7 +13,7 @@
     "test:ci": "vitest run --coverage",
     "review": "bash scripts/self-review.sh --staged",
     "review:branch": "bash scripts/self-review.sh --branch master",
-    "prepare": "cp scripts/pre-push-check.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push"
+    "prepare": "[ -d .git ] && cp scripts/pre-push-check.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push || true"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.80.0",
