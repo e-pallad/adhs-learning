@@ -75,6 +75,17 @@ export async function POST(req: NextRequest) {
       newXP = result.newXP
     }
 
+    // Increment blocksCompleted in DailyLog for today when completing a block
+    if (isCompleting && !alreadyCompleted) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      await tx.dailyLog.upsert({
+        where: { userId_date: { userId: user.id, date: today } },
+        create: { userId: user.id, date: today, blocksCompleted: 1 },
+        update: { blocksCompleted: { increment: 1 } },
+      })
+    }
+
     return { record, alreadyCompleted, leveledUp, newLevel, newXP }
   })
 
