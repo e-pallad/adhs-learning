@@ -8,7 +8,7 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await req.json()
-  const { name, track } = body
+  const { name, track, dailyGoalBlocks, weeklyGoalBlocks } = body
 
   if (name !== undefined && name !== null && (typeof name !== "string" || name.length > 100)) {
     return NextResponse.json({ error: "Name must be a string of 100 characters or fewer" }, { status: 400 })
@@ -19,13 +19,29 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Invalid track" }, { status: 400 })
   }
 
+  if (dailyGoalBlocks !== undefined && (!Number.isInteger(dailyGoalBlocks) || dailyGoalBlocks < 1 || dailyGoalBlocks > 20)) {
+    return NextResponse.json({ error: "dailyGoalBlocks must be an integer 1–20" }, { status: 400 })
+  }
+
+  if (weeklyGoalBlocks !== undefined && (!Number.isInteger(weeklyGoalBlocks) || weeklyGoalBlocks < 1 || weeklyGoalBlocks > 100)) {
+    return NextResponse.json({ error: "weeklyGoalBlocks must be an integer 1–100" }, { status: 400 })
+  }
+
   const updated = await prisma.user.update({
     where: { id: user.id },
     data: {
       ...(name !== undefined ? { name: name ?? null } : {}),
       ...(track !== undefined ? { track } : {}),
+      ...(dailyGoalBlocks !== undefined ? { dailyGoalBlocks } : {}),
+      ...(weeklyGoalBlocks !== undefined ? { weeklyGoalBlocks } : {}),
     },
   })
 
-  return NextResponse.json({ success: true, name: updated.name, track: updated.track })
+  return NextResponse.json({
+    success: true,
+    name: updated.name,
+    track: updated.track,
+    dailyGoalBlocks: updated.dailyGoalBlocks,
+    weeklyGoalBlocks: updated.weeklyGoalBlocks,
+  })
 }
