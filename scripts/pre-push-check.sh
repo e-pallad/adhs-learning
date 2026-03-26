@@ -143,6 +143,113 @@ else
   green "All monthlyProject queries include a track filter"
 fi
 
+# ── 4. Devil's advocate — logical flaw detection ────────────────────────────
+# These checks look for classes of bugs that static types won't catch.
+
+# 4a. API routes that call awardXP outside a $transaction
+UNTXN_XP=$(python3 - "$ROOT" <<'PYEOF'
+import sys, re
+from pathlib import Path
+
+root = Path(sys.argv[1])
+hits = []
+
+for f in (root / "app" / "api").rglob("route.ts"):
+    text = f.read_text(errors="replace")
+    if "awardXP" not in text:
+        continue
+    # awardXP must appear inside a $transaction block (either passing tx or being called within one)
+    if "prisma.$transaction" not in text and "prisma\\.\\$transaction" not in text:
+        hits.append(f"  {f.relative_to(root)}")
+
+print("\n".join(hits))
+PYEOF
+)
+if [ -n "$UNTXN_XP" ]; then
+  red "awardXP called outside prisma.\$transaction — risk of double-XP:"
+  echo "$UNTXN_XP" | sed 's/^/    /'
+  FAIL=1
+else
+  green "All awardXP calls are inside a transaction"
+fi
+
+# 4b. API routes that call getCurrentUser but never check for null/unauthorized
+UNGUARDED_ROUTES=$(python3 - "$ROOT" <<'PYEOF'
+import sys, re
+from pathlib import Path
+
+root = Path(sys.argv[1])
+hits = []
+
+for f in (root / "app" / "api").rglob("route.ts"):
+    text = f.read_text(errors="replace")
+    if "getCurrentUser" not in text:
+        continue
+    # Must have a 401 guard after getCurrentUser
+    if "401" not in text and "Unauthorized" not in text:
+        hits.append(f"  {f.relative_to(root)}")
+
+print("\n".join(hits))
+PYEOF
+)
+if [ -n "$UNGUARDED_ROUTES" ]; then
+  red "API route calls getCurrentUser but has no 401 guard:"
+  echo "$UNGUARDED_ROUTES" | sed 's/^/    /'
+  FAIL=1
+else
+  green "All getCurrentUser calls have a 401 guard"
+fi
+
+# 4c. Dynamic route params not awaited (Next.js 16: params is a Promise)
+UNAWAITED_PARAMS=$(grep -rn --include="*.tsx" --include="*.ts" \
+  "params\." "$ROOT/app" 2>/dev/null \
+  | grep -v "\.next" | grep -v "generated" \
+  | grep -v "await params" \
+  | grep -v "searchParams" \
+  | grep -v "//.*params\." \
+  | grep "params\.\(slug\|id\|month\|week\|track\)" \
+  || true)
+if [ -n "$UNAWAITED_PARAMS" ]; then
+  red "Route params accessed without await — use 'const { x } = await params' in Next.js 16:"
+  echo "$UNAWAITED_PARAMS" | sed 's/^/    /'
+  FAIL=1
+else
+  green "No unawaited route params"
+fi
+
+# 4d. DailyLog upserts that update xpEarned but not blocksCompleted
+DAILYLOG_XP_ONLY=$(python3 - "$ROOT" <<'PYEOF'
+import sys, re
+from pathlib import Path
+
+root = Path(sys.argv[1])
+hits = []
+
+for f in list((root / "app").rglob("*.ts")) + list((root / "lib").rglob("*.ts")):
+    if "generated" in str(f) or ".next" in str(f):
+        continue
+    text = f.read_text(errors="replace")
+    # Find dailyLog upsert blocks
+    for m in re.finditer(r"dailyLog\.upsert\(", text):
+        window = text[m.start():m.start()+600]
+        has_xp = "xpEarned" in window
+        has_blocks = "blocksCompleted" in window
+        has_minutes = "minutesSpent" in window
+        # Flag only if xpEarned is updated but neither blocksCompleted nor minutesSpent is touched
+        if has_xp and not has_blocks and not has_minutes:
+            line_no = text[:m.start()].count("\n") + 1
+            hits.append(f"  {f.relative_to(root)}:{line_no} — updates xpEarned but not blocksCompleted/minutesSpent")
+
+print("\n".join(hits))
+PYEOF
+)
+if [ -n "$DAILYLOG_XP_ONLY" ]; then
+  warn "DailyLog upsert updates xpEarned but not blocksCompleted — goal bars may stay at 0:"
+  echo "$DAILYLOG_XP_ONLY"
+else
+  green "DailyLog upserts keep xpEarned and blocksCompleted in sync"
+fi
+
 echo ""
 if [ "$FAIL" -eq 1 ]; then
   red "Pre-push checks FAILED — fix the issues above before pushing."
