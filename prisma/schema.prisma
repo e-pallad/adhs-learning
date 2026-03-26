@@ -43,6 +43,8 @@ model User {
   level      Int       @default(1)
   streak             Int       @default(0)
   track              String    @default("javascript")
+  dailyGoalBlocks    Int       @default(3)
+  weeklyGoalBlocks   Int       @default(10)
   lastSeenAt         DateTime?
   streakFreezeUsedAt DateTime?
   createdAt          DateTime  @default(now())
