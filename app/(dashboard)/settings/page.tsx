@@ -25,6 +25,7 @@ export default async function SettingsPage() {
           weeklyGoalBlocks={user.weeklyGoalBlocks}
           githubUsername={user.githubUsername ?? null}
           githubLastSyncAt={user.githubLastSyncAt?.toISOString() ?? null}
+          apiKey={user.apiKey ?? null}
         />
       </div>
     </div>

@@ -16,6 +16,7 @@
     "prepare": "cp scripts/pre-push-check.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@supabase/ssr": "^0.9.0",
