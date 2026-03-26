@@ -126,7 +126,7 @@
   DB: `streakFreezeUsedAt` field on `User`, checked inside `updateStreak()` (`lib/user.ts`).
   _ADHD: Prevents all-or-nothing demotivation after a missed day._
 
-- [ ] **Body-Double Mode**
+- [x] **Body-Double Mode**
   Shared anonymous focus session — user sees a real-time count of active learners.
   Implementation: Supabase Realtime channel + anonymous presence.
   _ADHD: A well-established ADHD technique — the perceived presence of others significantly increases productivity._
