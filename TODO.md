@@ -11,32 +11,32 @@
 > Die Seiten existieren bereits unter `app/(legal)/impressum/page.tsx` und `app/(legal)/datenschutz/page.tsx`.
 > Vor Go-Live müssen die `[Platzhalter]` in beiden Dateien mit echten Kontaktdaten befüllt werden.
 
-- [ ] **Impressum: `§ 55 Abs. 2 RStV` → `§ 18 Abs. 2 MStV` korrigieren**
+- [x] **Impressum: `§ 55 Abs. 2 RStV` → `§ 18 Abs. 2 MStV` korrigieren**
   Der Rundfunkstaatsvertrag wurde 2020 durch den Medienstaatsvertrag ersetzt.
   Datei: `app/(legal)/impressum/page.tsx` Zeile 39
 
-- [ ] **Impressum: EU-Streitschlichtungshinweis ergänzen**
+- [x] **Impressum: EU-Streitschlichtungshinweis ergänzen**
   Pflicht gemäß § 36 VSBG + EU-Verordnung Nr. 524/2013.
   Link zur OS-Plattform `https://ec.europa.eu/consumers/odr` einfügen
   + Erklärung, ob Teilnahme an Streitbeilegungsverfahren angeboten wird (auch Ablehnung muss schriftlich erklärt werden).
   Datei: `app/(legal)/impressum/page.tsx`
 
-- [ ] **Datenschutz: Netcup als Auftragsverarbeiter ergänzen**
+- [x] **Datenschutz: Netcup als Auftragsverarbeiter ergänzen**
   Netcup GmbH (Karlsruhe) verarbeitet als Hosting-Anbieter Server-Logs inkl. IP-Adressen.
   Muss als AVV-Partner gemäß Art. 28 DSGVO in Abschnitt 3 genannt werden.
   ⚠️ Falls Hosting-Anbieter wechselt (z. B. zu Vercel), diesen Eintrag aktualisieren.
   Datei: `app/(legal)/datenschutz/page.tsx`
 
-- [ ] **Datenschutz: Art. 21 DSGVO — Widerspruchsrecht als eigene hervorgehobene Section**
+- [x] **Datenschutz: Art. 21 DSGVO — Widerspruchsrecht als eigene hervorgehobene Section**
   Laut DSGVO Erwägungsgrund 70 muss das Widerspruchsrecht „ausdrücklich und getrennt von anderen Informationen" mitgeteilt werden — ein Listenpunkt reicht rechtlich nicht aus.
   Als eigene `<Section>` mit visueller Hervorhebung (z. B. Rahmen/Banner) ergänzen.
   Datei: `app/(legal)/datenschutz/page.tsx`
 
-- [ ] **Datenschutz: Art. 22 DSGVO — Kein Profiling / keine automatisierte Entscheidungsfindung**
+- [x] **Datenschutz: Art. 22 DSGVO — Kein Profiling / keine automatisierte Entscheidungsfindung**
   Pflichtangabe auch wenn keine stattfindet. Kurzen Abschnitt ergänzen.
   Datei: `app/(legal)/datenschutz/page.tsx`
 
-- [ ] **Platzhalter befüllen** (benötigt echte Anbieterdaten vom Nutzer)
+- [x] **Platzhalter befüllen** (benötigt echte Anbieterdaten vom Nutzer)
   - `[Vor- und Nachname / Firmenname]`
   - `[Straße und Hausnummer]`, `[PLZ]`, `[Stadt]`
   - `[E-Mail-Adresse]`
