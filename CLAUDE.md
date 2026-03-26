@@ -1,72 +1,62 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **This is NOT the Next.js you know.** This version has breaking changes — APIs, conventions, and file structure may differ from training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 
-@AGENTS.md
+---
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16.2.0 (Turbopack) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database | Supabase PostgreSQL (project: `phigbihrgojcyebymwcw`, region: `eu-west-1`) |
+| ORM | Prisma 7.5.0 |
+| Auth | Supabase magic link (passwordless email OTP) via `@supabase/ssr` |
+| Package manager | npm (Bun-compatible locally) |
+
+---
+
+## Breaking Changes
+
+### Next.js 16
+- `middleware.ts` is **deprecated** — use `proxy.ts` with `export function proxy(req)` instead
+- Dynamic route `params` are **Promises** — always `await params` before accessing fields
+- App Router only — no `pages/` directory
+
+### Prisma 7
+- `url`/`directUrl` are **NOT** in `prisma/schema.prisma` — they live in `prisma.config.ts` under `datasource.url`
+- `prisma.config.ts` uses `defineConfig` from `"prisma/config"`
+- Import generated client as `from "@/app/generated/prisma/client"` (not `from "@/app/generated/prisma"`)
+- `PrismaClient` **requires** a driver adapter: `new PrismaPg({ connectionString: process.env.DATABASE_URL! })` from `@prisma/adapter-pg`
+- Migrations cannot run from WSL against port 5432 — use the `supabase_apply_migration` MCP tool instead
+
+### Supabase DB
+- Project ref: `phigbihrgojcyebymwcw`
+- `DATABASE_URL` (runtime): pooler pgbouncer `aws-0-eu-west-1.pooler.supabase.com:6543`
+- `DIRECT_URL` (migrations): pooler session `aws-0-eu-west-1.pooler.supabase.com:5432`
+- DB password in `.env` as `DB_PASSWORD` — **never commit**
+
+---
 
 ## Development Commands
 
 ```bash
-npm run dev       # Start dev server (Turbopack) at http://localhost:3000
-npm run build     # Production build
-npm run lint      # ESLint
+npm run dev                  # Start dev server (Turbopack) at http://localhost:3000
+npm run build                # Production build
+npm run lint                 # ESLint
 npx prisma generate          # Regenerate Prisma client after schema changes
-npx prisma migrate dev       # Create + apply a new migration (requires DIRECT_URL)
+npx prisma migrate dev       # Create + apply migration (requires DIRECT_URL, not from WSL)
 ```
 
-> Migrations cannot run from WSL against port 5432 — use the `supabase_apply_migration` MCP tool instead.
-
-## Docker (local / TrueNAS)
-
-```bash
-docker compose build   # Build image (passes Supabase public keys as build args)
-docker compose up -d   # Run on port 30005 → container 3000, using .env.production
-```
-
-## Netcup vServer Deployment
-
-One-time setup on the server:
-
-```bash
-# Install Docker and certbot
-apt install -y docker.io docker-compose-plugin certbot
-systemctl enable --now docker
-
-# Clone repo & create env file
-git clone <repo-url> /opt/devfluent
-cd /opt/devfluent
-cp .env.production.example .env.production
-# → fill in all values in .env.production
-
-# Deploy (obtains TLS cert, builds image, starts app + nginx)
-./scripts/deploy-netcup.sh your.domain.com
-```
-
-Relevant files:
-- `compose.netcup.yml` — builds app + runs nginx reverse proxy on 80/443
-- `nginx/netcup.conf` — nginx config (HTTP→HTTPS redirect + proxy_pass to app:3000)
-- `scripts/deploy-netcup.sh` — full deploy script
-
-To update after a code push:
-
-```bash
-cd /opt/devfluent
-git pull
-docker compose -f compose.netcup.yml build
-docker compose -f compose.netcup.yml up -d
-```
-
-Certificate auto-renewal (add to crontab):
-
-```
-0 3 * * * certbot renew --quiet && docker compose -f /opt/devfluent/compose.netcup.yml restart nginx
-```
+---
 
 ## App Structure
 
 Route groups under `app/`:
-- `(auth)/` — unauthenticated pages: `/login`
-- `(dashboard)/` — protected pages: `/`, `/learning`, `/roadmap`, `/training`, `/projects`, `/progress`, `/settings`
+- `(auth)/` — unauthenticated: `/login`
+- `(dashboard)/` — protected: `/`, `/learning`, `/roadmap`, `/training`, `/projects`, `/progress`, `/settings`
 - `api/` — REST endpoints for progress tracking and user data
 
 Key library files:
@@ -75,7 +65,119 @@ Key library files:
 - `lib/xp.ts` — XP values, level thresholds, achievement definitions (single source of truth)
 - `lib/roadmap.ts` — roadmap.sh API integration with 24-hour cache + local JSON fallback
 - `lib/supabase/server.ts` / `client.ts` — Supabase SSR/client helpers
-- `content/curriculum/index.ts` — Static 12-month curriculum definition (all block data); Month 1 blocks include `quiz` questions and `practicalExample` fields
-- `proxy.ts` — Auth guard replacing `middleware.ts` (Next.js 16)
+- `content/curriculum/index.ts` — Static 12-month curriculum; Month 1 blocks include `quiz` and `practicalExample`
+- `proxy.ts` — Auth guard replacing `middleware.ts`
 
-Generated code: `app/generated/prisma/` — never edit directly.
+Generated code: `app/generated/prisma/` — **never edit directly.**
+
+### API Patterns
+- Course/project/profile: action-based POST `{ action: "create"|"update"|"delete", ...data }`
+- Quiz: direct POST `{ blockId: string, score: number, answers?: Record<string, number> }`
+
+---
+
+## XP System
+
+Defined in `lib/xp.ts` — single source of truth.
+
+| Action | XP |
+|---|---|
+| Complete block | 15 |
+| Complete block (with Pomodoro) | 20 |
+| Daily login | 5 |
+| 7-day streak bonus | 10 |
+| 30-day streak bonus | 25 |
+| Roadmap topic | 10 |
+| Roadmap subtopic | 5 |
+| Add course | 10 |
+| Complete course | 50 |
+| Complete project | 100 |
+| Skip block | 2 |
+| Quiz attempt (any score) | 5 |
+| Quiz pass (score ≥ 70%) | +15 (stacks) |
+| Quiz perfect (score 100%) | +30 (stacks) |
+
+### `lib/user.ts` Exports
+
+| Export | Description |
+|---|---|
+| `getCurrentUser()` | Upserts authenticated user on first login (race-safe) |
+| `awardDailyLoginXP(userId)` | Awards 5 XP at most once per calendar day |
+| `awardXP(userId, amount, { db? })` | Awards XP + updates level; accepts optional transaction client |
+| `updateStreak(userId)` | Updates streak; awards streak bonuses idempotently via achievement records |
+| `checkAchievements(userId)` | Unlocks achievements with `createMany({ skipDuplicates: true })` — concurrent-safe |
+
+### Concurrency & Data Integrity
+All XP-awarding routes wrap check → upsert → `awardXP` in a single `prisma.$transaction(...)`. `awardXP` accepts a `db` param (`Omit<PrismaClient, "$connect" | ...>`) to participate in the caller's transaction.
+
+---
+
+## Security Patterns
+
+- **Auth callback**: `next` redirect param validated as relative path (starts with `/`, not `//`) — prevents open redirect
+- **Block progress**: `status` validated against allowlist; `minutesSpent` sanitized to non-negative integer
+- **Roadmap route**: `nodeType` validated against allowlist; stored `nodeType` used on updates to prevent XP manipulation
+- **Profile PATCH**: `name` enforced as string ≤ 100 characters
+- **Streak bonuses**: awarded at most once per milestone via achievement record check
+- **Quiz route**: `score` validated as integer 0–100; XP stacks correctly; wrapped in `prisma.$transaction`
+
+---
+
+## Testing
+
+```bash
+docker compose -f compose.test.yml up -d   # Start test DB (port 5433)
+npm test                                    # Run all tests
+npm run test:watch                          # Watch mode
+npm run test:coverage                       # Coverage report
+docker compose -f compose.test.yml down    # Tear down test DB
+```
+
+- Test DB: `devfluent_test` on port **5433**; schema pushed via `prisma db push --force-reset` in `vitest.globalSetup.ts`
+- Connection string in `.env.test` (gitignored): `DATABASE_URL=postgresql://postgres:test@localhost:5433/devfluent_test`
+- **Isolation**: each test file owns a dedicated test user; `beforeEach` resets mutable fields and related records; `afterAll` deletes the user
+- **Auth mock**: `tests/setup.ts` mocks `@/lib/supabase/server`; use `setTestUserId(id)` / `null` (→ 401)
+
+---
+
+## Deployment
+
+### Docker (local / TrueNAS)
+
+```bash
+docker compose build   # Build image (passes Supabase public keys as build args)
+docker compose up -d   # Run on port 30005 → container 3000, using .env.production
+```
+
+### Netcup vServer
+
+One-time setup:
+
+```bash
+apt install -y docker.io docker-compose-plugin certbot
+systemctl enable --now docker
+git clone <repo-url> /opt/devfluent && cd /opt/devfluent
+cp .env.production.example .env.production  # fill in all values
+./scripts/deploy-netcup.sh your.domain.com  # obtains TLS cert, builds, starts app + nginx
+```
+
+Update after code push:
+
+```bash
+cd /opt/devfluent && git pull
+docker compose -f compose.netcup.yml build
+docker compose -f compose.netcup.yml up -d
+```
+
+Cert auto-renewal (crontab):
+```
+0 3 * * * certbot renew --quiet && docker compose -f /opt/devfluent/compose.netcup.yml restart nginx
+```
+
+Relevant files: `compose.netcup.yml`, `nginx/netcup.conf`, `scripts/deploy-netcup.sh`
+
+---
+
+## Known Non-Critical Warnings
+
+- `lib/roadmap.ts` dynamic import of `@/content/roadmaps/*.json` produces a Turbopack module-not-found warning — intentional, it's a try/catch fallback returning `[]` on failure
