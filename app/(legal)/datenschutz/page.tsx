@@ -23,13 +23,12 @@ export default function DatenschutzPage() {
         <p>
           Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:
         </p>
-        {/* TODO: Echte Angaben eintragen */}
         <address className="not-italic leading-7">
-          <strong>[Vor- und Nachname / Firmenname]</strong><br />
-          [Straße und Hausnummer]<br />
-          [PLZ] [Stadt]<br />
+          <strong>devfluent, Inh. Eric Pallad</strong><br />
+          Burgstädter Str. 17<br />
+          09212 Limbach-Oberfrohna<br />
           Deutschland<br />
-          E-Mail: [E-Mail-Adresse]
+          E-Mail: kontakt@devfluent.de
         </address>
       </Section>
 
@@ -101,6 +100,26 @@ export default function DatenschutzPage() {
           </a>
         </p>
 
+        <h3 className="font-semibold text-gray-700 mt-4 mb-2">Netcup (Hosting)</h3>
+        <p>
+          Unser Server wird betrieben von der <strong>netcup GmbH</strong> (Daimlerstraße 25,
+          76185 Karlsruhe, Deutschland). Netcup verarbeitet als Hosting-Anbieter technische
+          Verbindungsdaten (inkl. IP-Adressen) in unserem Auftrag auf Basis eines
+          Auftragsverarbeitungsvertrags (AVV) gemäß Art. 28 DSGVO. Server-Logfiles werden
+          nach spätestens 7 Tagen gelöscht.
+        </p>
+        <p>
+          Weitere Informationen:{" "}
+          <a
+            href="https://www.netcup.de/kontakt/datenschutzerklaerung.php"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-600 hover:underline"
+          >
+            netcup.de/kontakt/datenschutzerklaerung.php
+          </a>
+        </p>
+
         <h3 className="font-semibold text-gray-700 mt-4 mb-2">Google OAuth (optional)</h3>
         <p>
           Wenn Sie sich mit Google anmelden, werden Ihre Google-Kontodaten
@@ -138,20 +157,19 @@ export default function DatenschutzPage() {
         </p>
       </Section>
 
-      <Section title="6. Ihre Rechte (Art. 15–22 DSGVO)">
+      <Section title="6. Ihre Rechte (Art. 15–20, 22 DSGVO)">
         <p>Sie haben jederzeit das Recht auf:</p>
         <ul className="list-disc list-inside space-y-1 ml-2">
           <li><strong>Auskunft</strong> über die zu Ihrer Person gespeicherten Daten (Art. 15)</li>
           <li><strong>Berichtigung</strong> unrichtiger Daten (Art. 16)</li>
-          <li><strong>Löschung</strong> Ihrer Daten ("Recht auf Vergessenwerden") (Art. 17)</li>
+          <li><strong>Löschung</strong> Ihrer Daten (&ldquo;Recht auf Vergessenwerden&rdquo;) (Art. 17)</li>
           <li><strong>Einschränkung</strong> der Verarbeitung (Art. 18)</li>
           <li><strong>Datenübertragbarkeit</strong> in einem maschinenlesbaren Format (Art. 20)</li>
-          <li><strong>Widerspruch</strong> gegen die Verarbeitung (Art. 21)</li>
         </ul>
         <p>
           Zur Ausübung Ihrer Rechte wenden Sie sich bitte per E-Mail an:{" "}
-          <a href="mailto:[E-Mail-Adresse]" className="text-indigo-600 hover:underline">
-            [E-Mail-Adresse]
+          <a href="mailto:kontakt@devfluent.de" className="text-indigo-600 hover:underline">
+            kontakt@devfluent.de
           </a>
         </p>
         <p>
@@ -161,7 +179,45 @@ export default function DatenschutzPage() {
         </p>
       </Section>
 
-      <Section title="7. Datensicherheit">
+      <section className="mb-8">
+        <div className="border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg p-4">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">
+            Widerspruchsrecht (Art. 21 DSGVO)
+          </h2>
+          <div className="text-gray-700 text-sm leading-6 space-y-3">
+            <p>
+              <strong>Sie haben das Recht, jederzeit gegen die Verarbeitung Sie betreffender
+              personenbezogener Daten, die auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO
+              (berechtigtes Interesse) erfolgt, Widerspruch einzulegen.</strong>
+            </p>
+            <p>
+              Im Falle des Widerspruchs verarbeiten wir die betreffenden Daten nicht mehr,
+              es sei denn, wir können zwingende schutzwürdige Gründe für die Verarbeitung
+              nachweisen, die Ihre Interessen, Rechte und Freiheiten überwiegen, oder die
+              Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von
+              Rechtsansprüchen.
+            </p>
+            <p>
+              Den Widerspruch können Sie formlos per E-Mail einlegen:{" "}
+              <a href="mailto:[E-Mail-Adresse]" className="text-indigo-600 hover:underline">
+                [E-Mail-Adresse]
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Section title="7. Keine automatisierte Entscheidungsfindung (Art. 22 DSGVO)">
+        <p>
+          Wir setzen keine automatisierten Entscheidungsverfahren einschließlich Profiling
+          im Sinne von Art. 22 DSGVO ein. Es werden keine Entscheidungen getroffen, die
+          ausschließlich auf einer automatisierten Verarbeitung beruhen und die Ihnen
+          gegenüber rechtliche Wirkung entfalten oder Sie in ähnlicher Weise erheblich
+          beeinträchtigen.
+        </p>
+      </Section>
+
+      <Section title="9. Datensicherheit">
         <p>
           Die Übertragung von Daten zwischen Ihrem Browser und unseren Servern erfolgt
           ausschließlich über <strong>HTTPS</strong> (TLS-Verschlüsselung). Passwörter
@@ -170,7 +226,7 @@ export default function DatenschutzPage() {
         </p>
       </Section>
 
-      <Section title="8. Änderungen dieser Datenschutzerklärung">
+      <Section title="10. Änderungen dieser Datenschutzerklärung">
         <p>
           Wir behalten uns vor, diese Datenschutzerklärung bei Änderungen der
           Rechtslage oder der Datenverarbeitungsprozesse anzupassen. Die aktuelle
