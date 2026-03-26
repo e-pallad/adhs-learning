@@ -17,9 +17,11 @@ interface SettingsClientProps {
   email: string
   track: string
   streakFreezeUsedAt: string | null
+  dailyGoalBlocks: number
+  weeklyGoalBlocks: number
 }
 
-export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   // Capture current time once at mount — avoids calling Date.now() during render
   const [now] = useState<number>(() => Date.now())
@@ -32,6 +34,8 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [, startTransition] = useTransition()
   const [name, setName] = useState(initialName ?? "")
   const [track, setTrack] = useState(initialTrack)
+  const [dailyGoal, setDailyGoal] = useState(initialDailyGoal)
+  const [weeklyGoal, setWeeklyGoal] = useState(initialWeeklyGoal)
   const [saving, setSaving] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -44,7 +48,7 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
     const res = await fetch("/api/user/profile", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, track }),
+      body: JSON.stringify({ name, track, dailyGoalBlocks: dailyGoal, weeklyGoalBlocks: weeklyGoal }),
     })
     setSaving(false)
     if (res.ok) {
@@ -103,6 +107,37 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
                 </span>
               </label>
             ))}
+          </div>
+        </div>
+
+        {/* Learning goals */}
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Daily goal</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min={1}
+              max={20}
+              value={dailyGoal}
+              onChange={(e) => setDailyGoal(Math.max(1, Math.min(20, Number(e.target.value))))}
+              className="w-20 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+            />
+            <span className="text-sm text-gray-500 dark:text-gray-400">blocks per day</span>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Weekly goal</label>
+          <div className="flex items-center gap-3">
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={weeklyGoal}
+              onChange={(e) => setWeeklyGoal(Math.max(1, Math.min(100, Number(e.target.value))))}
+              className="w-20 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+            />
+            <span className="text-sm text-gray-500 dark:text-gray-400">blocks per week</span>
           </div>
         </div>
 
