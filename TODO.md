@@ -138,22 +138,22 @@
 
 ### Phase 2 — Mittelfristig
 
-- [ ] **GitHub Activity Sync**
+- [x] **GitHub Activity Sync**
   GitHub OAuth + API-Polling für Commits/PRs → automatische XP-Vergabe.
   XP-Wert für GitHub-Events in `lib/xp.ts` ergänzen.
   _ADHS: Koppelt Lernen an reale Handlungen, gibt sofortiges Feedback ohne manuellen Aufwand._
 
-- [ ] **VS Code Extension**
+- [ ] **VS Code Extension** *(API-Key-Foundation ✓ — separates Repo)*
   Separates Repo. Zeigt aktuellen Lernblock + Ressourcen direkt in der Sidebar an.
-  Kommuniziert mit Devfluent-API via API-Key (Settings-Seite).
+  Kommuniziert mit Devfluent-API via API-Key (Settings-Seite → bereits implementiert).
   _ADHS: Eliminiert den teuren Kontextwechsel zwischen Editor und Browser._
 
-- [ ] **KI-Empfehlungen**
+- [x] **KI-Empfehlungen**
   Basierend auf abgeschlossenen Blöcken, Schwächen (Quiz-Scores < 70 %), Streak-Verlauf.
   Claude API (`claude-sonnet-4-6`) als Backend, Ergebnisse gecacht in DB.
   _ADHS: Verhindert Entscheidungsparalyse — klare nächste Schritte werden vorgegeben._
 
-- [ ] **Accountability Partner**
+- [x] **Accountability Partner**
   Zwei Nutzer verknüpfen sich, sehen gegenseitig Streak und Wochenziel-Fortschritt.
   DB: `AccountabilityPair`-Tabelle, opt-in per Einladungslink.
   _ADHS: Soziale Verantwortlichkeit ist einer der effektivsten externen Motivatoren._
