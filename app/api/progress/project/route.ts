@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, checkAchievements } from "@/lib/user"
 import { XP_VALUES } from "@/lib/xp"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
@@ -15,7 +15,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing month" }, { status: 400 })
   }
 
-  const monthData = CURRICULUM.find((m) => m.month === month)
+  const months = getTrackById(user.track)?.months ?? CURRICULUM
+  const monthData = months.find((m) => m.month === month)
   if (!monthData) return NextResponse.json({ error: "Month not found" }, { status: 404 })
 
   if (action === "start") {

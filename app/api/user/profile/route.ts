@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
+import { TRACKS } from "@/content/curriculum"
 
 export async function PATCH(req: NextRequest) {
   const user = await getCurrentUser()
@@ -13,8 +14,8 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Name must be a string of 100 characters or fewer" }, { status: 400 })
   }
 
-  const VALID_TRACKS = ["javascript", "python"]
-  if (track !== undefined && !VALID_TRACKS.includes(track)) {
+  const validTracks = TRACKS.map((t) => t.meta.id)
+  if (track !== undefined && !validTracks.includes(track)) {
     return NextResponse.json({ error: "Invalid track" }, { status: 400 })
   }
 

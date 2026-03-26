@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProjectsClient } from "./projects-client"
 
 export const metadata = { title: "Projects — Devfluent" }
@@ -26,7 +26,7 @@ export default async function ProjectsPage() {
     xpEarned: p.xpEarned,
   }))
 
-  const curriculum = CURRICULUM.map((m) => ({
+  const curriculum = (getTrackById(user.track)?.months ?? CURRICULUM).map((m) => ({
     month: m.month,
     projectTitle: m.projectTitle,
     projectDescription: m.projectDescription,
