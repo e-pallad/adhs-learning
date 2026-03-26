@@ -21,9 +21,10 @@ interface SettingsClientProps {
   weeklyGoalBlocks: number
   githubUsername: string | null
   githubLastSyncAt: string | null
+  apiKey: string | null
 }
 
-export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt, apiKey: initialApiKey }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   // Capture current time once at mount — avoids calling Date.now() during render
   const [now] = useState<number>(() => Date.now())
@@ -42,6 +43,9 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [signingOut, setSigningOut] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [apiKey, setApiKey] = useState(initialApiKey)
+  const [generatingKey, setGeneratingKey] = useState(false)
+  const [keyCopied, setKeyCopied] = useState(false)
   const [githubUsername, setGithubUsername] = useState(initialGithubUsername)
   const [syncing, setSyncing] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)
@@ -89,6 +93,28 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
       const data = await res.json().catch(() => ({})) as { error?: string }
       setSyncError(data.error ?? "Sync failed. Please try again.")
     }
+  }
+
+  const handleGenerateKey = async () => {
+    setGeneratingKey(true)
+    const res = await fetch("/api/user/api-key", { method: "POST" })
+    setGeneratingKey(false)
+    if (res.ok) {
+      const data = await res.json() as { apiKey: string }
+      setApiKey(data.apiKey)
+    }
+  }
+
+  const handleRevokeKey = async () => {
+    const res = await fetch("/api/user/api-key", { method: "DELETE" })
+    if (res.ok) setApiKey(null)
+  }
+
+  const handleCopyKey = () => {
+    if (!apiKey) return
+    navigator.clipboard.writeText(apiKey)
+    setKeyCopied(true)
+    setTimeout(() => setKeyCopied(false), 2000)
   }
 
   const handleGithubDisconnect = async () => {
@@ -252,6 +278,43 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
             </svg>
             Connect GitHub
           </a>
+        )}
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 dark:border-gray-700" />
+
+      {/* API Key */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">API Key</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Use this key in the Devfluent VS Code Extension to sync your progress.
+        </p>
+        {apiKey ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 font-mono text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-2">
+              <span className="flex-1 text-gray-700 dark:text-gray-300 truncate">{apiKey.slice(0, 8)}…</span>
+              <button
+                type="button"
+                onClick={handleCopyKey}
+                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium transition-colors flex-shrink-0"
+              >
+                {keyCopied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button type="button" size="sm" loading={generatingKey} onClick={handleGenerateKey}>
+                Regenerate
+              </Button>
+              <Button type="button" variant="secondary" size="sm" onClick={handleRevokeKey}>
+                Revoke
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button type="button" size="sm" loading={generatingKey} onClick={handleGenerateKey}>
+            Generate API Key
+          </Button>
         )}
       </div>
 

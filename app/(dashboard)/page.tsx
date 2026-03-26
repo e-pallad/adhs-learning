@@ -5,6 +5,8 @@ import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { BodyDoubleMode } from "@/components/body-double-mode"
+import { AiRecommendations } from "@/components/ai-recommendations"
+import { AccountabilityPartner } from "@/components/accountability-partner"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
@@ -245,6 +247,20 @@ export default async function DashboardPage() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* AI Recommendations */}
+        <Card>
+          <CardContent className="p-5">
+            <AiRecommendations />
+          </CardContent>
+        </Card>
+
+        {/* Accountability Partner */}
+        <Card>
+          <CardContent className="p-5">
+            <AccountabilityPartner />
+          </CardContent>
+        </Card>
+
         {/* 7-day activity */}
         <Card>
           <CardContent className="p-5">
