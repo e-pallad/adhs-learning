@@ -109,7 +109,7 @@
   Tailwind `dark:`-Klassen + Theme-Toggle in Settings + `localStorage`-Persistenz.
   _ADHS: Reduziert visuelle Reizüberflutung und Augenermüdung bei langen Lernsessions._
 
-- [ ] **PWA (Progressive Web App)**
+- [x] **PWA (Progressive Web App)**
   `next-pwa` oder natives Next.js 16 App-Manifest + Service Worker.
   Home-Screen-Installation, Offline-Fallback-Seite.
   _ADHS: Eliminiert Reibung beim App-Start — kein Browser-Tab öffnen nötig._

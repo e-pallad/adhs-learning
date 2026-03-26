@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { ServiceWorkerRegister } from "@/components/service-worker-register"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -17,6 +18,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Devfluent",
   description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Devfluent",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
           <Toaster position="bottom-right" richColors />
+          <ServiceWorkerRegister />
         </ThemeProvider>
       </body>
     </html>
