@@ -19,9 +19,11 @@ interface SettingsClientProps {
   streakFreezeUsedAt: string | null
   dailyGoalBlocks: number
   weeklyGoalBlocks: number
+  githubUsername: string | null
+  githubLastSyncAt: string | null
 }
 
-export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   // Capture current time once at mount — avoids calling Date.now() during render
   const [now] = useState<number>(() => Date.now())
@@ -40,6 +42,11 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [signingOut, setSigningOut] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [githubUsername, setGithubUsername] = useState(initialGithubUsername)
+  const [syncing, setSyncing] = useState(false)
+  const [disconnecting, setDisconnecting] = useState(false)
+  const [syncResult, setSyncResult] = useState<{ newEvents: number; totalXPAwarded: number } | null>(null)
+  const [syncError, setSyncError] = useState<string | null>(null)
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,6 +73,36 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
     const supabase = createClient()
     await supabase.auth.signOut()
     router.push("/login")
+  }
+
+  const handleGithubSync = async () => {
+    setSyncing(true)
+    setSyncResult(null)
+    setSyncError(null)
+    const res = await fetch("/api/github/sync", { method: "POST" })
+    setSyncing(false)
+    if (res.ok) {
+      const data = await res.json() as { newEvents: number; totalXPAwarded: number }
+      setSyncResult(data)
+      startTransition(() => router.refresh())
+    } else {
+      const data = await res.json().catch(() => ({})) as { error?: string }
+      setSyncError(data.error ?? "Sync failed. Please try again.")
+    }
+  }
+
+  const handleGithubDisconnect = async () => {
+    setDisconnecting(true)
+    setSyncResult(null)
+    setSyncError(null)
+    const res = await fetch("/api/github/sync", { method: "DELETE" })
+    setDisconnecting(false)
+    if (res.ok) {
+      setGithubUsername(null)
+      startTransition(() => router.refresh())
+    } else {
+      setSyncError("Failed to disconnect GitHub.")
+    }
   }
 
   return (
@@ -166,6 +203,56 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
             <><Moon className="w-4 h-4 mr-2" /> Dark mode</>
           )}
         </Button>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 dark:border-gray-700" />
+
+      {/* GitHub */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">GitHub</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Connect your GitHub account to earn XP for push events and pull requests.
+        </p>
+        {githubUsername ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
+                Connected as <span className="font-semibold">@{githubUsername}</span>
+              </span>
+            </div>
+            {githubLastSyncAt && (
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                Last synced: {new Date(githubLastSyncAt).toLocaleString()}
+              </p>
+            )}
+            {syncResult && (
+              <p className="text-xs text-green-600 dark:text-green-400">
+                Synced {syncResult.newEvents} new event{syncResult.newEvents !== 1 ? "s" : ""} — +{syncResult.totalXPAwarded} XP awarded
+              </p>
+            )}
+            {syncError && <p className="text-xs text-red-600">{syncError}</p>}
+            <div className="flex items-center gap-2">
+              <Button type="button" size="sm" loading={syncing} onClick={handleGithubSync}>
+                Sync now
+              </Button>
+              <Button type="button" variant="secondary" size="sm" loading={disconnecting} onClick={handleGithubDisconnect}>
+                Disconnect
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <a
+            href="/api/auth/github"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current" aria-hidden="true">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" />
+            </svg>
+            Connect GitHub
+          </a>
+        )}
       </div>
 
       {/* Divider */}

@@ -16,6 +16,9 @@ export const XP_VALUES = {
   QUIZ_TRY: 5,     // any attempt
   QUIZ_PASS: 15,   // score >= 70%
   QUIZ_PERFECT: 30, // score 100%
+  GITHUB_PUSH: 5,           // per push event (not per commit)
+  GITHUB_PR_OPENED: 10,
+  GITHUB_PR_MERGED: 20,
 } as const
 
 export const LEVEL_THRESHOLDS: { level: number; xpRequired: number; label: string }[] = [
