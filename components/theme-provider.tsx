@@ -19,28 +19,25 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light")
+  // Lazy initializer reads localStorage once — avoids setState inside useEffect
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "light"
+    return localStorage.getItem("theme") === "dark" ? "dark" : "light"
+  })
 
+  // Apply class to <html> whenever theme changes
   useEffect(() => {
-    const stored = localStorage.getItem("theme") as Theme | null
-    const resolved = stored === "dark" ? "dark" : "light"
-    setTheme(resolved)
-    if (resolved === "dark") {
+    if (theme === "dark") {
       document.documentElement.classList.add("dark")
     } else {
       document.documentElement.classList.remove("dark")
     }
-  }, [])
+  }, [theme])
 
   const toggle = () => {
     setTheme((prev) => {
       const next: Theme = prev === "light" ? "dark" : "light"
       localStorage.setItem("theme", next)
-      if (next === "dark") {
-        document.documentElement.classList.add("dark")
-      } else {
-        document.documentElement.classList.remove("dark")
-      }
       return next
     })
   }

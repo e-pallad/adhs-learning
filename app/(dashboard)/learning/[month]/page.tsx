@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -14,7 +14,9 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { month } = await params
-  const data = CURRICULUM.find((m) => m.month === Number(month))
+  const user = await getCurrentUser()
+  const months = user ? (getTrackById(user.track)?.months ?? CURRICULUM) : CURRICULUM
+  const data = months.find((m) => m.month === Number(month))
   return { title: data ? `Month ${month}: ${data.title} — Devfluent` : "Learning — Devfluent" }
 }
 
@@ -25,7 +27,8 @@ export default async function MonthPage({ params }: Props) {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
 
-  const monthData = CURRICULUM.find((m) => m.month === monthNum)
+  const months = getTrackById(user.track)?.months ?? CURRICULUM
+  const monthData = months.find((m) => m.month === monthNum)
   if (!monthData) notFound()
 
   const allBlockIds = monthData.weeks.flatMap((w) => w.blocks.map((b) => b.id))

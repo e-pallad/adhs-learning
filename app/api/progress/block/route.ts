@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
   const block = getBlock(blockId)
   if (!block) return NextResponse.json({ error: "Block not found" }, { status: 404 })
 
-  // Extract month/week from blockId format: m{month}w{week}-b{n}
-  const match = blockId.match(/^m(\d+)w(\d+)-/)
+  // Extract month/week — supports "m{month}w{week}-b{n}" and "{track}-m{month}w{week}-b{n}"
+  const match = blockId.match(/m(\d+)w(\d+)-/)
   const month = match ? Number(match[1]) : 0
   const week = match ? Number(match[2]) : 0
 

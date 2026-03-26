@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
-import { CURRICULUM } from "@/content/curriculum"
+import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProjectsClient } from "./projects-client"
 
 export const metadata = { title: "Projects — Devfluent" }
@@ -11,7 +11,7 @@ export default async function ProjectsPage() {
   if (!user) redirect("/login")
 
   const dbProjects = await prisma.monthlyProject.findMany({
-    where: { userId: user.id },
+    where: { userId: user.id, track: user.track },
     orderBy: { month: "asc" },
   })
 
@@ -26,7 +26,7 @@ export default async function ProjectsPage() {
     xpEarned: p.xpEarned,
   }))
 
-  const curriculum = CURRICULUM.map((m) => ({
+  const curriculum = (getTrackById(user.track)?.months ?? CURRICULUM).map((m) => ({
     month: m.month,
     projectTitle: m.projectTitle,
     projectDescription: m.projectDescription,
@@ -46,7 +46,7 @@ export default async function ProjectsPage() {
         </div>
         {(completedCount > 0 || inProgressCount > 0) && (
           <div className="text-right flex-shrink-0">
-            <p className="text-xs text-gray-400">{completedCount} / 12 completed</p>
+            <p className="text-xs text-gray-400">{completedCount} / {curriculum.length} completed</p>
             {inProgressCount > 0 && (
               <p className="text-xs text-indigo-600">{inProgressCount} in progress</p>
             )}

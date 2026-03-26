@@ -42,6 +42,7 @@ model User {
   totalXP    Int       @default(0)
   level      Int       @default(1)
   streak             Int       @default(0)
+  track              String    @default("javascript")
   lastSeenAt         DateTime?
   streakFreezeUsedAt DateTime?
   createdAt          DateTime  @default(now())
@@ -144,6 +145,7 @@ model ExternalCourse {
 model MonthlyProject {
   id          String        @id @default(cuid())
   userId      String
+  track       String        @default("javascript")
   month       Int
   title       String
   description String?
@@ -157,7 +159,7 @@ model MonthlyProject {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, month])
+  @@unique([userId, track, month])
   @@map("monthly_projects")
 }
 
