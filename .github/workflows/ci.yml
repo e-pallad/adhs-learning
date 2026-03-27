@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -6,7 +6,37 @@ on:
   pull_request:
     branches: ["**"]
 
+# Cancel in-progress runs for feature branches; queue (never cancel) for master.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx tsc --noEmit
+
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -32,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
       - run: npm ci
       - run: npx prisma generate
@@ -45,30 +75,23 @@ jobs:
           path: coverage/
           retention-days: 7
 
-  lint:
-    name: Lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: placeholder
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+      # Prisma throws at module load without this; matches the Dockerfile placeholder
+      DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-      - run: npm ci
-      - run: npm run lint
-
-  typecheck:
-    name: Typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
       - run: npm ci
       - run: npx prisma generate
-      - run: npx tsc --noEmit
+      - run: npm run build
 
   audit:
     name: Audit (informational)
@@ -78,7 +101,75 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
       - run: npm ci
       - run: npm audit --audit-level=critical
+
+  deploy:
+    name: Deploy
+    needs: [lint, typecheck, test, build]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 188.68.57.27 >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          echo "$DEPLOY_KEY" | base64 -d > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh -i /tmp/deploy_key \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            "${DEPLOY_USER}@188.68.57.27" '
+            set -euo pipefail
+            cd /opt/devfluent
+            echo "==> Pulling latest code..."
+            git pull --ff-only origin master
+            echo "==> Building new image..."
+            docker compose -f compose.netcup.yml --env-file .env.production build
+            echo "==> Restarting services..."
+            docker compose -f compose.netcup.yml up -d --remove-orphans
+            echo "==> Pruning old images..."
+            docker image prune -f
+            echo "==> Deploy complete."
+          '
+
+      - name: Health check
+        run: curl -fsS --retry 5 --retry-delay 5 https://devfluent.de/ -o /dev/null
+
+  release:
+    name: Release
+    needs: [deploy]
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate CalVer tag
+        id: tag
+        run: |
+          BASE="v$(date +%Y.%m.%d)"
+          if gh release view "$BASE" > /dev/null 2>&1; then
+            TAG="${BASE}-${{ github.run_number }}"
+          else
+            TAG="$BASE"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "${{ steps.tag.outputs.tag }}" \
+            --generate-notes \
+            --title "Release ${{ steps.tag.outputs.tag }}"
