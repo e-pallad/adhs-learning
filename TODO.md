@@ -198,7 +198,7 @@
 
 ### QA & Deploy
 - [x] `npm run lint` — fix any TypeScript/ESLint errors across all modified files
-- [ ] End-to-end check: unauthenticated `/` → landing page → CTA → `/login` → sign in → `/dashboard`; authenticated `/` → redirects to `/dashboard`; all sidebar links work
+- [x] End-to-end check: unauthenticated `/` → landing page → CTA → `/login` → sign in → `/dashboard`; authenticated `/` → redirects to `/dashboard`; all sidebar links work
 - [x] Commit all changes with a descriptive message and pushed to `feature/landing-page`
 
 ---
