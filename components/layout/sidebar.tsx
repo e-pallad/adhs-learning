@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 
 const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/learning", label: "Learning", icon: BookOpen },
   { href: "/roadmap", label: "Roadmap", icon: Map },
   { href: "/training", label: "Courses", icon: GraduationCap },
@@ -29,7 +29,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex w-56 min-h-screen bg-gray-950 flex-col">
       <div className="p-5 border-b border-gray-800">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
             <Zap className="w-4 h-4 text-white" />
           </div>
@@ -39,9 +39,7 @@ export function Sidebar() {
 
       <nav className="flex-1 p-3 space-y-0.5">
         {NAV_ITEMS.map((item) => {
-          const active = item.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(item.href)
+          const active = pathname.startsWith(item.href)
           const Icon = item.icon
 
           return (
