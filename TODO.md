@@ -36,7 +36,7 @@
   Required disclosure even when no such processing takes place. Add a short paragraph.
   File: `app/(legal)/datenschutz/page.tsx`
 
-- [x] **Fill in placeholders** (requires real provider details from the user)
+- [x] **Fill in placeholders** ✓ real contact details filled in
   - `[Full name / company name]`
   - `[Street and house number]`, `[Postcode]`, `[City]`
   - `[Email address]`
