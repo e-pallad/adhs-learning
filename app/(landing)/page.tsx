@@ -1,5 +1,16 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { Zap, Timer, BookOpen, Bot, Github, Users } from "lucide-react"
+
+export const metadata: Metadata = {
+  title: "Devfluent — Learn to code. Actually finish.",
+  description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
+  openGraph: {
+    title: "Devfluent — Learn to code. Actually finish.",
+    description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
+    type: "website",
+  },
+}
 
 const FEATURES = [
   {
@@ -114,11 +125,11 @@ export default function LandingPage() {
             {PROBLEMS.map(({ bad, good }) => (
               <div key={bad} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4">
                 <div className="flex items-start gap-3">
-                  <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded mt-0.5 flex-shrink-0">❌</span>
+                  <span aria-hidden="true" className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded mt-0.5 flex-shrink-0">❌</span>
                   <p className="text-sm text-gray-500">{bad}</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="bg-green-100 text-green-600 text-xs font-semibold px-2 py-0.5 rounded mt-0.5 flex-shrink-0">✅</span>
+                  <span aria-hidden="true" className="bg-green-100 text-green-600 text-xs font-semibold px-2 py-0.5 rounded mt-0.5 flex-shrink-0">✅</span>
                   <p className="text-sm font-medium text-gray-900">{good}</p>
                 </div>
               </div>

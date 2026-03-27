@@ -39,9 +39,7 @@ export function Sidebar() {
 
       <nav className="flex-1 p-3 space-y-0.5">
         {NAV_ITEMS.map((item) => {
-          const active = item.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(item.href)
+          const active = pathname.startsWith(item.href)
           const Icon = item.icon
 
           return (

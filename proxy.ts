@@ -6,8 +6,8 @@ const PUBLIC_PATHS = ["/", "/login", "/api/auth", "/impressum", "/datenschutz", 
 export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  // Allow public paths
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  // Allow public paths (exact match for "/" to avoid bypassing all auth)
+  if (PUBLIC_PATHS.some((p) => p === "/" ? pathname === "/" : pathname.startsWith(p))) {
     return NextResponse.next()
   }
 
