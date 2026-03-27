@@ -19,7 +19,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const searchParams = useSearchParams()
-  const next = searchParams.get("next") ?? "/"
+  const next = searchParams.get("next") ?? "/dashboard"
   const authError = searchParams.get("error")
 
   const supabase = createClient()
