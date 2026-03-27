@@ -132,7 +132,8 @@ jobs:
             set -euo pipefail
             cd /opt/devfluent
             echo "==> Pulling latest code..."
-            git pull --ff-only origin master
+            git fetch origin master
+            git reset --hard origin/master
             echo "==> Building new image..."
             docker compose -f compose.netcup.yml --env-file .env.production build
             echo "==> Restarting services..."
