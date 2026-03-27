@@ -13,6 +13,12 @@ export async function GET() {
     state,
   })
   const res = NextResponse.redirect(`https://github.com/login/oauth/authorize?${params}`)
-  res.cookies.set("github_oauth_state", state, { httpOnly: true, maxAge: 300, path: "/" })
+  res.cookies.set("github_oauth_state", state, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    maxAge: 300,
+    path: "/",
+  })
   return res
 }

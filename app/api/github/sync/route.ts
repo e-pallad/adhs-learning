@@ -43,9 +43,13 @@ export async function POST() {
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - 30)
 
-  let totalXPAwarded = 0
-  let newEvents = 0
-
+  // Classify relevant events
+  interface RelevantEvent {
+    event: GithubApiEvent
+    occurredAt: Date
+    xpToAward: number
+  }
+  const relevant: RelevantEvent[] = []
   for (const event of events) {
     const occurredAt = new Date(event.created_at)
     if (occurredAt < cutoff) continue
@@ -63,27 +67,43 @@ export async function POST() {
     if (!xpKey) continue
     const xpToAward = XP_MAP[xpKey]
     if (!xpToAward) continue
+    relevant.push({ event, occurredAt, xpToAward })
+  }
 
-    // Idempotent — skip if already recorded
-    const existing = await prisma.githubEvent.findUnique({
-      where: { userId_eventId: { userId: user.id, eventId: event.id } },
-    })
-    if (existing) continue
+  let totalXPAwarded = 0
+  let newEvents = 0
 
-    await prisma.$transaction(async (tx) => {
-      await tx.githubEvent.create({
-        data: {
-          userId: user.id,
-          eventId: event.id,
-          eventType: event.type,
-          xpAwarded: xpToAward,
-          occurredAt,
-        },
+  if (relevant.length > 0) {
+    // Single query to find already-recorded events (avoids N+1 inside the loop)
+    const knownEventIds = new Set(
+      (await prisma.githubEvent.findMany({
+        where: { userId: user.id, eventId: { in: relevant.map((r) => r.event.id) } },
+        select: { eventId: true },
+      })).map((r) => r.eventId)
+    )
+
+    const toCreate = relevant.filter((r) => !knownEventIds.has(r.event.id))
+
+    if (toCreate.length > 0) {
+      const totalXP = toCreate.reduce((sum, r) => sum + r.xpToAward, 0)
+
+      await prisma.$transaction(async (tx) => {
+        await tx.githubEvent.createMany({
+          data: toCreate.map((r) => ({
+            userId: user.id,
+            eventId: r.event.id,
+            eventType: r.event.type,
+            xpAwarded: r.xpToAward,
+            occurredAt: r.occurredAt,
+          })),
+          skipDuplicates: true,
+        })
+        await awardXP(user.id, totalXP, { db: tx })
       })
-      await awardXP(user.id, xpToAward, { db: tx })
-    })
-    totalXPAwarded += xpToAward
-    newEvents++
+
+      totalXPAwarded = totalXP
+      newEvents = toCreate.length
+    }
   }
 
   await prisma.user.update({

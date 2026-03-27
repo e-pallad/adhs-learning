@@ -63,9 +63,12 @@ describe("Accountability routes", () => {
       expect(res.status).toBe(400)
     })
 
-    it("returns 404 when partner email does not exist", async () => {
+    it("returns 200 with generic message when partner email does not exist", async () => {
       const res = await POST(makePost("/api/accountability", { partnerEmail: "nobody@example.com" }))
-      expect(res.status).toBe(404)
+      // Generic response prevents email enumeration
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.error).toMatch(/registered/)
     })
 
     it("creates an accountability pair and returns partner name", async () => {

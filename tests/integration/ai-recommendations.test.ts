@@ -153,11 +153,12 @@ describe("AI recommendations routes", () => {
     })
 
     it("always calls Claude even when a valid cache exists", async () => {
-      // Seed a valid cache
+      // Seed a valid but old cache (generated 2 hours ago — bypasses the 1-hour rate limit)
       const expiresAt = new Date()
       expiresAt.setHours(expiresAt.getHours() + 25)
+      const generatedAt = new Date(Date.now() - 2 * 60 * 60 * 1000)
       await prisma.aiRecommendation.create({
-        data: { userId: ID, content: JSON.stringify(SAMPLE_RECS), expiresAt },
+        data: { userId: ID, content: JSON.stringify(SAMPLE_RECS), expiresAt, generatedAt },
       })
 
       const res = await POST()

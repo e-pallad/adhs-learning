@@ -39,11 +39,14 @@ export async function awardDailyLoginXP(userId: string): Promise<void> {
   const today = new Date()
   const dateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate())
 
-  // Only award if there is no log entry for today yet
-  const existing = await prisma.dailyLog.findUnique({
-    where: { userId_date: { userId, date: dateOnly } },
+  // Atomic: skipDuplicates ensures at most one record per (userId, date)
+  // count=1 means we just created it (first login today) → award XP
+  // count=0 means it already existed → skip
+  const { count } = await prisma.dailyLog.createMany({
+    data: [{ userId, date: dateOnly, xpEarned: 0 }],
+    skipDuplicates: true,
   })
-  if (!existing) {
+  if (count > 0) {
     await awardXP(userId, XP_VALUES.DAILY_LOGIN)
   }
 }
@@ -133,17 +136,21 @@ export async function updateStreak(userId: string): Promise<number> {
   })
 
   // Streak bonuses — only award once per streak cycle (exact milestone, not re-award on re-reach)
-  // Check via achievement record to prevent farming by breaking and rebuilding streak
+  // Wrapped in a transaction so the achievement record and XP are always consistent.
   if (newStreak === 7) {
-    const alreadyAwarded = await prisma.achievement.findFirst({ where: { userId, slug: "streak_bonus_7" } })
-    if (!alreadyAwarded) {
-      await prisma.achievement.create({ data: { userId, slug: "streak_bonus_7", label: "7-Day Streak Bonus", description: "Bonus XP for a 7-day streak", icon: "🔥", xpBonus: XP_VALUES.STREAK_BONUS_7 } })
+    const { count } = await prisma.achievement.createMany({
+      data: [{ userId, slug: "streak_bonus_7", label: "7-Day Streak Bonus", description: "Bonus XP for a 7-day streak", icon: "🔥", xpBonus: XP_VALUES.STREAK_BONUS_7 }],
+      skipDuplicates: true,
+    })
+    if (count > 0) {
       await awardXP(userId, XP_VALUES.STREAK_BONUS_7)
     }
   } else if (newStreak === 30) {
-    const alreadyAwarded = await prisma.achievement.findFirst({ where: { userId, slug: "streak_bonus_30" } })
-    if (!alreadyAwarded) {
-      await prisma.achievement.create({ data: { userId, slug: "streak_bonus_30", label: "30-Day Streak Bonus", description: "Bonus XP for a 30-day streak", icon: "⚡", xpBonus: XP_VALUES.STREAK_BONUS_30 } })
+    const { count } = await prisma.achievement.createMany({
+      data: [{ userId, slug: "streak_bonus_30", label: "30-Day Streak Bonus", description: "Bonus XP for a 30-day streak", icon: "⚡", xpBonus: XP_VALUES.STREAK_BONUS_30 }],
+      skipDuplicates: true,
+    })
+    if (count > 0) {
       await awardXP(userId, XP_VALUES.STREAK_BONUS_30)
     }
   }
@@ -198,10 +205,9 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     skipDuplicates: true,
   })
 
-  for (const def of toUnlock) {
-    if (def.xpBonus > 0) {
-      await awardXP(userId, def.xpBonus)
-    }
+  const totalXPBonus = toUnlock.reduce((sum, def) => sum + (def.xpBonus > 0 ? def.xpBonus : 0), 0)
+  if (totalXPBonus > 0) {
+    await awardXP(userId, totalXPBonus)
   }
 
   return toUnlock.map((d) => d.slug)

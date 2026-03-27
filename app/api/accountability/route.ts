@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
 
   const partner = await prisma.user.findUnique({ where: { email: partnerEmail.toLowerCase() } })
   if (!partner) {
-    return NextResponse.json({ error: "No user found with that email" }, { status: 404 })
+    // Generic message prevents email enumeration
+    return NextResponse.json({ error: "If that email is registered, an invitation has been sent." }, { status: 200 })
   }
 
   // Upsert both directions

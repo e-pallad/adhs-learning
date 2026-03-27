@@ -110,6 +110,15 @@ export async function POST() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  // Rate-limit forced regeneration to once per hour (prevents unbounded API cost)
+  const existing = await prisma.aiRecommendation.findUnique({ where: { userId: user.id } })
+  if (existing) {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    if (existing.generatedAt > oneHourAgo) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 })
+    }
+  }
+
   // Delete cache to force regeneration
   await prisma.aiRecommendation.deleteMany({ where: { userId: user.id } })
 
