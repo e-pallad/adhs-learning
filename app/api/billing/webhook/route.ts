@@ -6,18 +6,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text()
-  const sig = req.headers.get("stripe-signature")!
+  const sig = req.headers.get("stripe-signature")
+
+  if (!sig) {
+    return new Response("Missing stripe-signature header", { status: 400 })
+  }
+
+  const secret = process.env.STRIPE_WEBHOOK_SECRET
+  if (!secret) {
+    console.error("STRIPE_WEBHOOK_SECRET is not set")
+    return new Response("Webhook not configured", { status: 500 })
+  }
 
   let event: Stripe.Event
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = stripe.webhooks.constructEvent(rawBody, sig, secret)
   } catch {
     return new Response("Webhook signature verification failed", { status: 400 })
-  }
-
-  const getUser = async (customerId: string) => {
-    const user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } })
-    return user
   }
 
   if (event.type === "checkout.session.completed") {
@@ -27,35 +32,41 @@ export async function POST(req: NextRequest) {
     const customerId = session.customer as string
     const subscriptionId = session.subscription as string
 
-    await prisma.user.updateMany({
-      where: { stripeCustomerId: customerId },
-      data: { plan: "pro", stripeSubscriptionId: subscriptionId, planExpiresAt: null },
-    })
+    // Try to find user by customerId first (returning subscriber)
+    let user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } })
 
-    // First-time subscriber: store customerId by email
-    if (!await getUser(customerId)) {
+    if (!user) {
+      // First-time subscriber: find by the email they checked out with
       const customerEmail = session.customer_details?.email
-      if (customerEmail) {
-        await prisma.user.updateMany({
-          where: { email: customerEmail },
-          data: {
-            plan: "pro",
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            planExpiresAt: null,
-          },
-        })
-      }
+      if (!customerEmail) return new Response("OK", { status: 200 })
+
+      user = await prisma.user.findUnique({ where: { email: customerEmail } })
+      if (!user) return new Response("OK", { status: 200 })
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          plan: "pro",
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscriptionId,
+          planExpiresAt: null,
+        },
+      })
+    } else {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { plan: "pro", stripeSubscriptionId: subscriptionId, planExpiresAt: null },
+      })
     }
   }
 
   if (event.type === "customer.subscription.updated") {
     const sub = event.data.object as Stripe.Subscription
     const customerId = sub.customer as string
-    const user = await getUser(customerId)
+    const user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } })
     if (!user) return new Response("OK", { status: 200 })
 
-    // cancel_at is set by Stripe when cancel_at_period_end=true (it equals the period end date)
+    // cancel_at is set by Stripe when cancel_at_period_end=true
     const cancelAt = sub.cancel_at ? new Date(sub.cancel_at * 1000) : null
     await prisma.user.update({
       where: { id: user.id },
@@ -69,9 +80,10 @@ export async function POST(req: NextRequest) {
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription
     const customerId = sub.customer as string
-    const user = await getUser(customerId)
+    const user = await prisma.user.findUnique({ where: { stripeCustomerId: customerId } })
     if (!user) return new Response("OK", { status: 200 })
 
+    // Stripe fires this after the billing period ends — access has already lapsed
     await prisma.user.update({
       where: { id: user.id },
       data: { plan: "free", planExpiresAt: null, stripeSubscriptionId: null },
