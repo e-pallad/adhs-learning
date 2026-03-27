@@ -2,7 +2,8 @@ import { NextRequest } from "next/server"
 import Stripe from "stripe"
 import { prisma } from "@/lib/prisma"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+if (!process.env.STRIPE_SECRET_KEY) throw new Error("STRIPE_SECRET_KEY is not set")
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text()
