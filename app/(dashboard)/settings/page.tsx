@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/user"
 import { SettingsClient } from "./settings-client"
+import { isPro } from "@/lib/plans"
 
 export const metadata = { title: "Settings — Devfluent" }
 
-export default async function SettingsPage() {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ upgraded?: string }> }) {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+
+  const { upgraded } = await searchParams
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
@@ -26,6 +29,10 @@ export default async function SettingsPage() {
           githubUsername={user.githubUsername ?? null}
           githubLastSyncAt={user.githubLastSyncAt?.toISOString() ?? null}
           apiKey={user.apiKey ?? null}
+          isPro={isPro(user)}
+          planExpiresAt={user.planExpiresAt?.toISOString() ?? null}
+          stripePeriodEnd={user.stripePeriodEnd?.toISOString() ?? null}
+          showUpgradedBanner={upgraded === "1"}
         />
       </div>
     </div>

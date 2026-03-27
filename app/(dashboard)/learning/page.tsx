@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
-import { MonthCard } from "@/components/learning/month-card"
 import { redirect } from "next/navigation"
+import { canAccessMonth } from "@/lib/plans"
+import { LearningClient } from "./learning-client"
 
 export const metadata = { title: "Learning — Devfluent" }
 
@@ -30,7 +31,6 @@ export default async function LearningPage() {
     totalByMonth[m.month] = m.weeks.flatMap((w) => w.blocks).length
   }
 
-  // Determine current month (first one not fully complete)
   let currentMonth = 1
   for (const m of months) {
     const done = completedByMonth[m.month] ?? 0
@@ -41,32 +41,15 @@ export default async function LearningPage() {
     }
   }
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Learning Path</h1>
-        <p className="text-sm text-gray-500 mt-0.5">12-month curriculum — click a month to start studying</p>
-      </div>
+  const monthItems = months.map((m) => ({
+    month: m.month,
+    title: m.title,
+    description: m.description,
+    completedBlocks: completedByMonth[m.month] ?? 0,
+    totalBlocks: totalByMonth[m.month],
+    isCurrent: m.month === currentMonth,
+    isLocked: !canAccessMonth(user, m.month),
+  }))
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {months.map((m) => {
-          const done = completedByMonth[m.month] ?? 0
-          const total = totalByMonth[m.month]
-          const isCurrent = m.month === currentMonth
-
-          return (
-            <MonthCard
-              key={m.month}
-              month={m.month}
-              title={m.title}
-              description={m.description}
-              completedBlocks={done}
-              totalBlocks={total}
-              isCurrent={isCurrent}
-            />
-          )
-        })}
-      </div>
-    </div>
-  )
+  return <LearningClient months={monthItems} />
 }

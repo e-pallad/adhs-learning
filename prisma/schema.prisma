@@ -47,11 +47,16 @@ model User {
   weeklyGoalBlocks   Int       @default(10)
   lastSeenAt         DateTime?
   streakFreezeUsedAt DateTime?
-  githubUsername     String?
-  githubAccessToken  String?
-  githubLastSyncAt   DateTime?
-  apiKey             String?   @unique
-  createdAt          DateTime  @default(now())
+  githubUsername       String?
+  githubAccessToken    String?
+  githubLastSyncAt     DateTime?
+  apiKey               String?   @unique
+  plan                 String    @default("free")
+  planExpiresAt        DateTime?
+  stripePeriodEnd      DateTime?
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  createdAt            DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   dailyLogs          DailyLog[]

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
 import { TrainingClient } from "./training-client"
+import { isPro } from "@/lib/plans"
 
 export const metadata = { title: "Courses — Devfluent" }
 
@@ -34,7 +35,7 @@ export default async function TrainingPage() {
         )}
       </div>
 
-      <TrainingClient courses={courses} />
+      <TrainingClient courses={courses} isPro={isPro(user)} courseCount={courses.length} />
     </div>
   )
 }

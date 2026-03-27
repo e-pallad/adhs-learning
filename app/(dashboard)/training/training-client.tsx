@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 import { CourseCard } from "@/components/training/course-card"
 import { AddCourseForm } from "@/components/training/add-course-form"
+import { UpgradePrompt } from "@/components/ui/upgrade-prompt"
+import { PLAN_LIMITS } from "@/lib/plans"
 
 interface Course {
   id: string
@@ -18,12 +20,16 @@ interface Course {
 
 interface TrainingClientProps {
   courses: Course[]
+  isPro: boolean
+  courseCount: number
 }
 
-export function TrainingClient({ courses }: TrainingClientProps) {
+export function TrainingClient({ courses, isPro, courseCount }: TrainingClientProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+
+  const atLimit = !isPro && courseCount >= PLAN_LIMITS.free.maxCourses
 
   const post = async (body: object): Promise<boolean> => {
     setError(null)
@@ -65,12 +71,16 @@ export function TrainingClient({ courses }: TrainingClientProps) {
 
   return (
     <div className="space-y-6">
-      {error && (
+      {error && !atLimit && (
         <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
-      <AddCourseForm onAdd={handleAdd} />
+      {atLimit ? (
+        <UpgradePrompt feature="unlimited courses" />
+      ) : (
+        <AddCourseForm onAdd={handleAdd} />
+      )}
 
       {courses.length === 0 ? (
         <div className="text-center py-12 text-gray-400 dark:text-gray-500">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/theme-provider"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Zap } from "lucide-react"
 
 const TRACKS = [
   { id: "javascript", label: "Full-Stack JavaScript", icon: "⚡" },
@@ -22,9 +22,13 @@ interface SettingsClientProps {
   githubUsername: string | null
   githubLastSyncAt: string | null
   apiKey: string | null
+  isPro: boolean
+  planExpiresAt: string | null
+  stripePeriodEnd: string | null
+  showUpgradedBanner: boolean
 }
 
-export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt, apiKey: initialApiKey }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt, apiKey: initialApiKey, isPro, planExpiresAt, stripePeriodEnd, showUpgradedBanner }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   // Capture current time once at mount — avoids calling Date.now() during render
   const [now] = useState<number>(() => Date.now())
@@ -51,6 +55,7 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [disconnecting, setDisconnecting] = useState(false)
   const [syncResult, setSyncResult] = useState<{ newEvents: number; totalXPAwarded: number } | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
+  const [billingLoading, setBillingLoading] = useState<"month" | "year" | "portal" | null>(null)
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -117,6 +122,32 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
     setTimeout(() => setKeyCopied(false), 2000)
   }
 
+  const handleBillingCheckout = async (interval: "month" | "year") => {
+    setBillingLoading(interval)
+    const res = await fetch("/api/billing/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ interval }),
+    })
+    if (res.ok) {
+      const { url } = await res.json() as { url: string }
+      window.location.href = url
+    } else {
+      setBillingLoading(null)
+    }
+  }
+
+  const handleBillingPortal = async () => {
+    setBillingLoading("portal")
+    const res = await fetch("/api/billing/portal", { method: "POST" })
+    if (res.ok) {
+      const { url } = await res.json() as { url: string }
+      window.location.href = url
+    } else {
+      setBillingLoading(null)
+    }
+  }
+
   const handleGithubDisconnect = async () => {
     setDisconnecting(true)
     setSyncResult(null)
@@ -133,6 +164,13 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
 
   return (
     <div className="space-y-8">
+      {showUpgradedBanner && (
+        <div className="rounded-lg bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-700 px-4 py-3 flex items-center gap-2 text-sm text-indigo-700 dark:text-indigo-300">
+          <Zap className="w-4 h-4 shrink-0" />
+          Welcome to Pro! All 12 curriculum months and unlimited courses are now unlocked.
+        </div>
+      )}
+
       {/* Profile */}
       <form onSubmit={handleSaveName} className="space-y-4">
         <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Profile</h2>
@@ -339,6 +377,82 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
             <><span>⏳</span> Used — resets in {daysUntilReset} day{daysUntilReset !== 1 ? "s" : ""}</>
           )}
         </div>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 dark:border-gray-700" />
+
+      {/* Billing */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Plan</h2>
+        {isPro ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
+                <Zap className="w-3 h-3" />
+                Pro
+              </span>
+            </div>
+            {planExpiresAt ? (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Cancels on {new Date(planExpiresAt).toLocaleDateString()}
+              </p>
+            ) : stripePeriodEnd ? (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Renews on {new Date(stripePeriodEnd).toLocaleDateString()}
+              </p>
+            ) : null}
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              loading={billingLoading === "portal"}
+              disabled={!!billingLoading}
+              onClick={handleBillingPortal}
+            >
+              Manage subscription
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              You are on the <strong>Free</strong> plan — months 1–3 and up to 2 courses.
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-2">
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Monthly</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">$9</p>
+                <p className="text-xs text-gray-400">per month</p>
+                <Button
+                  size="sm"
+                  className="w-full"
+                  loading={billingLoading === "month"}
+                  disabled={!!billingLoading}
+                  onClick={() => handleBillingCheckout("month")}
+                >
+                  Upgrade to Pro
+                </Button>
+              </div>
+              <div className="rounded-lg border border-indigo-300 dark:border-indigo-600 p-4 space-y-2 relative">
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-indigo-600 text-white text-xs font-medium whitespace-nowrap">
+                  Save 35%
+                </span>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Annual</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">$70</p>
+                <p className="text-xs text-gray-400">per year</p>
+                <Button
+                  size="sm"
+                  className="w-full"
+                  loading={billingLoading === "year"}
+                  disabled={!!billingLoading}
+                  onClick={() => handleBillingCheckout("year")}
+                >
+                  Upgrade to Pro
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Divider */}

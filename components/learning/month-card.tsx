@@ -12,9 +12,10 @@ interface MonthCardProps {
   totalBlocks: number
   isLocked?: boolean
   isCurrent?: boolean
+  onLockedClick?: () => void
 }
 
-export function MonthCard({ month, title, description, completedBlocks, totalBlocks, isLocked, isCurrent }: MonthCardProps) {
+export function MonthCard({ month, title, description, completedBlocks, totalBlocks, isLocked, isCurrent, onLockedClick }: MonthCardProps) {
   const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0
   const isCompleted = completedBlocks === totalBlocks && totalBlocks > 0
 
@@ -46,7 +47,13 @@ export function MonthCard({ month, title, description, completedBlocks, totalBlo
     </Card>
   )
 
-  if (isLocked) return content
+  if (isLocked) {
+    return (
+      <button type="button" onClick={onLockedClick} className="block w-full text-left">
+        {content}
+      </button>
+    )
+  }
 
   return <Link href={`/learning/${month}`} className="block">{content}</Link>
 }

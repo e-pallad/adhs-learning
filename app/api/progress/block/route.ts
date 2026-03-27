@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, updateStreak, checkAchievements } from "@/lib/user"
 import { getBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
+import { canAccessMonth } from "@/lib/plans"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
@@ -29,6 +30,10 @@ export async function POST(req: NextRequest) {
   const match = blockId.match(/m(\d+)w(\d+)-/)
   const month = match ? Number(match[1]) : 0
   const week = match ? Number(match[2]) : 0
+
+  if (!canAccessMonth(user, month)) {
+    return NextResponse.json({ error: "Upgrade to Pro to access this month" }, { status: 402 })
+  }
 
   const isCompleting = status === "COMPLETED"
   const isSkipping = status === "SKIPPED"

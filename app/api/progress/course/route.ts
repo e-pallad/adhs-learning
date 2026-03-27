@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, checkAchievements } from "@/lib/user"
 import { XP_VALUES } from "@/lib/xp"
+import { canAddCourse } from "@/lib/plans"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
@@ -30,6 +31,8 @@ export async function POST(req: NextRequest) {
     }
 
     const course = await prisma.$transaction(async (tx) => {
+      const count = await tx.externalCourse.count({ where: { userId: user.id } })
+      if (!canAddCourse(user, count)) return null
       const created = await tx.externalCourse.create({
         data: {
           userId: user.id,
@@ -44,6 +47,7 @@ export async function POST(req: NextRequest) {
       return created
     })
 
+    if (!course) return NextResponse.json({ error: "Upgrade to Pro to add more courses" }, { status: 402 })
     return NextResponse.json({ success: true, course })
   }
 

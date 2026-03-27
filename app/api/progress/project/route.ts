@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, checkAchievements } from "@/lib/user"
 import { XP_VALUES } from "@/lib/xp"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
+import { canAccessMonth } from "@/lib/plans"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
@@ -34,6 +35,10 @@ export async function POST(req: NextRequest) {
   if (!monthData) return NextResponse.json({ error: "Month not found" }, { status: 404 })
 
   const track = user.track
+
+  if (!canAccessMonth(user, month)) {
+    return NextResponse.json({ error: "Upgrade to Pro to access this month" }, { status: 402 })
+  }
 
   if (action === "start") {
     const project = await prisma.monthlyProject.upsert({

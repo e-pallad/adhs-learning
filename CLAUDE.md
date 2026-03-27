@@ -52,6 +52,10 @@
 | `GITHUB_CLIENT_ID` | GitHub OAuth app client ID |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth app client secret |
 | `NEXT_PUBLIC_APP_URL` | Full app URL (e.g. `https://devfluent.de`) — used for GitHub OAuth callback |
+| `STRIPE_SECRET_KEY` | Stripe secret key (`sk_test_...` / `sk_live_...`) — server-only |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) — server-only |
+| `STRIPE_PRICE_MONTHLY_ID` | Stripe price ID for $9/month plan (`price_...`) |
+| `STRIPE_PRICE_ANNUAL_ID` | Stripe price ID for $70/year plan (`price_...`) |
 
 ---
 

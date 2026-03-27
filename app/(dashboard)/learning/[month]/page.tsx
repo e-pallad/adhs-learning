@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { WeekSection } from "./week-section"
 import { ChevronRight, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
+import { canAccessMonth } from "@/lib/plans"
 
 interface Props {
   params: Promise<{ month: string }>
@@ -26,6 +27,8 @@ export default async function MonthPage({ params }: Props) {
 
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+
+  if (!canAccessMonth(user, monthNum)) redirect("/learning")
 
   const months = getTrackById(user.track)?.months ?? CURRICULUM
   const monthData = months.find((m) => m.month === monthNum)
