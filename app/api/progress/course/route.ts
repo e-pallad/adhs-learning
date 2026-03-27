@@ -16,18 +16,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Title and platform are required" }, { status: 400 })
     }
 
-    const course = await prisma.externalCourse.create({
-      data: {
-        userId: user.id,
-        title,
-        platform,
-        url: url || null,
-        totalLessons: Number(totalLessons) || 0,
-        xpEarned: XP_VALUES.ADD_COURSE,
-      },
+    const course = await prisma.$transaction(async (tx) => {
+      const created = await tx.externalCourse.create({
+        data: {
+          userId: user.id,
+          title,
+          platform,
+          url: url || null,
+          totalLessons: Number(totalLessons) || 0,
+          xpEarned: XP_VALUES.ADD_COURSE,
+        },
+      })
+      await awardXP(user.id, XP_VALUES.ADD_COURSE, { db: tx })
+      return created
     })
 
-    await awardXP(user.id, XP_VALUES.ADD_COURSE)
     return NextResponse.json({ success: true, course })
   }
 
