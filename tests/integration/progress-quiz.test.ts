@@ -6,7 +6,7 @@ import { makePost } from "../helpers/make-request"
 import { createTestUser, deleteTestUser } from "../helpers/test-user"
 
 const ID = "test-user-quiz"
-const BLOCK = "quiz-block-1" // arbitrary blockId — quiz route does not validate against curriculum
+const BLOCK = "m1w1-b1" // real curriculum block ID — quiz route now validates against curriculum
 
 async function resetQuizUser() {
   await prisma.quizAttempt.deleteMany({ where: { userId: ID } })
