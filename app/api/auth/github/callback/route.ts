@@ -27,6 +27,9 @@ export async function GET(req: NextRequest) {
       redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback`,
     }),
   })
+  if (!tokenRes.ok) {
+    return NextResponse.redirect(new URL("/settings?error=github_token_failed", req.url))
+  }
   const tokenData = await tokenRes.json() as { access_token?: string }
   const accessToken = tokenData.access_token
   if (!accessToken) {
@@ -37,6 +40,9 @@ export async function GET(req: NextRequest) {
   const ghUserRes = await fetch("https://api.github.com/user", {
     headers: { Authorization: `Bearer ${accessToken}`, "User-Agent": "Devfluent" },
   })
+  if (!ghUserRes.ok) {
+    return NextResponse.redirect(new URL("/settings?error=github_user_failed", req.url))
+  }
   const ghUser = await ghUserRes.json() as { login?: string }
   const githubUsername = ghUser.login
   if (!githubUsername) {

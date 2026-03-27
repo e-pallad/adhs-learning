@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, checkAchievements } from "@/lib/user"
 import { XP_VALUES } from "@/lib/xp"
+import { getBlock } from "@/content/curriculum"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
@@ -13,6 +14,9 @@ export async function POST(req: NextRequest) {
   if (!blockId || typeof blockId !== "string") {
     return NextResponse.json({ error: "blockId must be a non-empty string" }, { status: 400 })
   }
+
+  const block = getBlock(blockId)
+  if (!block) return NextResponse.json({ error: "Block not found" }, { status: 404 })
 
   if (typeof score !== "number" || !Number.isInteger(score) || score < 0 || score > 100) {
     return NextResponse.json({ error: "score must be an integer between 0 and 100" }, { status: 400 })

@@ -81,7 +81,9 @@ export function QuizModal({
     const correctCount = updatedAnswers.filter(
       (ans, i) => ans === questions[i].correctIndex
     ).length
-    const score = correctCount / questions.length
+    const scoreRatio = correctCount / questions.length
+    // API expects an integer 0–100
+    const score = Math.round(scoreRatio * 100)
 
     try {
       const res = await fetch("/api/progress/quiz", {
@@ -98,8 +100,8 @@ export function QuizModal({
         // Fallback — show local result without server XP
         setResult({
           xpEarned: 0,
-          passed: score >= PASS_THRESHOLD,
-          perfect: score === 1,
+          passed: scoreRatio >= PASS_THRESHOLD,
+          perfect: scoreRatio === 1,
           achievements: [],
         })
         setPhase("completed")
@@ -107,8 +109,8 @@ export function QuizModal({
     } catch {
       setResult({
         xpEarned: 0,
-        passed: score >= PASS_THRESHOLD,
-        perfect: score === 1,
+        passed: scoreRatio >= PASS_THRESHOLD,
+        perfect: scoreRatio === 1,
         achievements: [],
       })
       setPhase("completed")
