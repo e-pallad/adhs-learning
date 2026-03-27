@@ -12,8 +12,21 @@ export async function POST(req: NextRequest) {
 
   if (action === "create") {
     const { title, platform, url, totalLessons } = data
-    if (!title || !platform) {
-      return NextResponse.json({ error: "Title and platform are required" }, { status: 400 })
+    if (typeof title !== "string" || title.length === 0 || title.length > 200) {
+      return NextResponse.json({ error: "Title must be 1–200 characters" }, { status: 400 })
+    }
+    if (typeof platform !== "string" || platform.length === 0 || platform.length > 100) {
+      return NextResponse.json({ error: "Platform must be 1–100 characters" }, { status: 400 })
+    }
+    if (url !== undefined && url !== null) {
+      try {
+        const u = new URL(url)
+        if (u.protocol !== "https:" && u.protocol !== "http:") {
+          return NextResponse.json({ error: "Invalid URL" }, { status: 400 })
+        }
+      } catch {
+        return NextResponse.json({ error: "Invalid URL" }, { status: 400 })
+      }
     }
 
     const course = await prisma.$transaction(async (tx) => {
