@@ -14,6 +14,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
   }
 
+  if (typeof roadmapId !== "string" || roadmapId.length > 100) {
+    return NextResponse.json({ error: "Invalid roadmapId" }, { status: 400 })
+  }
+  if (typeof nodeId !== "string" || nodeId.length > 100) {
+    return NextResponse.json({ error: "Invalid nodeId" }, { status: 400 })
+  }
+  if (nodeLabel !== undefined && (typeof nodeLabel !== "string" || nodeLabel.length > 200)) {
+    return NextResponse.json({ error: "Invalid nodeLabel" }, { status: 400 })
+  }
+
   const validStatuses = ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "SKIPPED"]
   if (!validStatuses.includes(status)) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 })

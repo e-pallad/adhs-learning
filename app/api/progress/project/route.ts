@@ -15,6 +15,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing month" }, { status: 400 })
   }
 
+  // Validate URLs — reject javascript: and other non-http(s) schemes
+  function isSafeUrl(value: unknown): boolean {
+    if (!value || typeof value !== "string") return true
+    try {
+      const u = new URL(value)
+      return u.protocol === "https:" || u.protocol === "http:"
+    } catch {
+      return false
+    }
+  }
+  if (!isSafeUrl(repoUrl) || !isSafeUrl(liveUrl)) {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 400 })
+  }
+
   const months = getTrackById(user.track)?.months ?? CURRICULUM
   const monthData = months.find((m) => m.month === month)
   if (!monthData) return NextResponse.json({ error: "Month not found" }, { status: 404 })
