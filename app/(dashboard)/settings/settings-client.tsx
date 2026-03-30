@@ -145,6 +145,7 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Display name</label>
           <input
+            autoComplete="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"

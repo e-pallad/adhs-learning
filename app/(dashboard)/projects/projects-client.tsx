@@ -140,6 +140,7 @@ export function ProjectsClient({ projects, curriculum }: ProjectsClientProps) {
                   <div className="space-y-2">
                     <input
                       type="url"
+                      autoComplete="url"
                       placeholder="GitHub repo URL"
                       value={form.repoUrl}
                       onChange={(e) => setForm((f) => ({ ...f, repoUrl: e.target.value }))}
@@ -147,6 +148,7 @@ export function ProjectsClient({ projects, curriculum }: ProjectsClientProps) {
                     />
                     <input
                       type="url"
+                      autoComplete="url"
                       placeholder="Live demo URL"
                       value={form.liveUrl}
                       onChange={(e) => setForm((f) => ({ ...f, liveUrl: e.target.value }))}
