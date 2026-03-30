@@ -49,6 +49,9 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   }) => {
     if (result.passed) {
       setQuizCelebration(result)
+      if (onComplete && !isCompleted) {
+        onComplete(block.id, timerUsed)
+      }
     }
   }
 
