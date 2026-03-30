@@ -71,6 +71,62 @@
               "correctIndex": 2,
               "explanation": "POST is used to submit data (forms, JSON payloads) that the server processes — typically creating a new record. Unlike GET, POST requests can have a body and are not considered idempotent."
             }
+          ],
+          "exercises": [
+            {
+              "id": "http-status-classifier",
+              "title": "HTTP Status Classifier",
+              "description": "Write a function `statusCategory(code)` that returns:\n- `'success'` for 2xx codes\n- `'redirect'` for 3xx codes\n- `'client-error'` for 4xx codes\n- `'server-error'` for 5xx codes",
+              "starterCode": "function statusCategory(code) {\n  // Your code here\n}",
+              "solution": "function statusCategory(code) {\n  if (code >= 200 && code < 300) return 'success'\n  if (code >= 300 && code < 400) return 'redirect'\n  if (code >= 400 && code < 500) return 'client-error'\n  return 'server-error'\n}",
+              "hints": [
+                "Use `if/else` with range comparisons: `code >= 200 && code < 300`",
+                "HTTP status codes are grouped by their hundreds digit: 2xx, 3xx, 4xx, 5xx"
+              ],
+              "tests": [
+                {
+                  "description": "200 → 'success'",
+                  "code": "statusCategory(200) === 'success'"
+                },
+                {
+                  "description": "301 → 'redirect'",
+                  "code": "statusCategory(301) === 'redirect'"
+                },
+                {
+                  "description": "404 → 'client-error'",
+                  "code": "statusCategory(404) === 'client-error'"
+                },
+                {
+                  "description": "500 → 'server-error'",
+                  "code": "statusCategory(500) === 'server-error'"
+                }
+              ]
+            },
+            {
+              "id": "url-parser",
+              "title": "URL Parser",
+              "description": "Write a function `getPathname(urlString)` that returns the pathname part of a URL (everything after the hostname, before the query string).\n\nExample: `getPathname('https://example.com/blog/post?q=1')` → `'/blog/post'`",
+              "starterCode": "function getPathname(urlString) {\n  // Hint: the browser has a built-in URL constructor\n}",
+              "solution": "function getPathname(urlString) {\n  return new URL(urlString).pathname\n}",
+              "hints": [
+                "The browser has a built-in `URL` constructor: `new URL('https://example.com/path')`",
+                "The resulting object has properties: `.hostname`, `.pathname`, `.searchParams`, `.hash`"
+              ],
+              "tests": [
+                {
+                  "description": "Root URL returns '/'",
+                  "code": "getPathname('https://example.com/') === '/'"
+                },
+                {
+                  "description": "Extracts /blog/post from full URL",
+                  "code": "getPathname('https://example.com/blog/post') === '/blog/post'"
+                },
+                {
+                  "description": "Strips query params",
+                  "code": "getPathname('https://example.com/search?q=test') === '/search'"
+                }
+              ]
+            }
           ]
         },
         {
@@ -113,6 +169,38 @@
               ],
               "correctIndex": 2,
               "explanation": "console.error() renders the message in red and, crucially, attaches a stack trace so you can see exactly which function called it. Filtering the Console to 'Errors' shows only these messages, helping you focus during debugging."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "create-list",
+              "title": "Build a DOM List",
+              "description": "Write a function `createList(items)` that takes an array of strings and returns a `<ul>` element containing a `<li>` for each string.",
+              "starterCode": "function createList(items) {\n  const ul = document.createElement('ul')\n  // Append an li for each item\n  return ul\n}",
+              "solution": "function createList(items) {\n  const ul = document.createElement('ul')\n  items.forEach(item => {\n    const li = document.createElement('li')\n    li.textContent = item\n    ul.appendChild(li)\n  })\n  return ul\n}",
+              "hints": [
+                "Use `document.createElement('li')` to create each list item",
+                "Set `li.textContent = item` to give it text content",
+                "Use `ul.appendChild(li)` to attach it to the list"
+              ],
+              "tests": [
+                {
+                  "description": "Returns a UL element",
+                  "code": "createList(['a','b']).tagName === 'UL'"
+                },
+                {
+                  "description": "Correct number of LI children",
+                  "code": "createList(['a','b','c']).querySelectorAll('li').length === 3"
+                },
+                {
+                  "description": "LI text matches input",
+                  "code": "createList(['hello']).querySelector('li').textContent === 'hello'"
+                },
+                {
+                  "description": "Empty array → empty UL",
+                  "code": "createList([]).children.length === 0"
+                }
+              ]
             }
           ]
         },
@@ -167,6 +255,37 @@
               ],
               "correctIndex": 1,
               "explanation": "The <head> contains machine-readable metadata: the document title (shown in browser tabs), character encoding, viewport settings, linked stylesheets, and scripts. None of this content is rendered directly on the page."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "page-layout",
+              "title": "Build a Page Layout",
+              "description": "Write a function `buildPageLayout()` that returns a `<div>` containing the three main structural sections of a web page: `<header>`, `<main>`, and `<footer>` — in that order.",
+              "starterCode": "function buildPageLayout() {\n  const page = document.createElement('div')\n  // Append header, main, and footer\n  return page\n}",
+              "solution": "function buildPageLayout() {\n  const page = document.createElement('div')\n  page.appendChild(document.createElement('header'))\n  page.appendChild(document.createElement('main'))\n  page.appendChild(document.createElement('footer'))\n  return page\n}",
+              "hints": [
+                "Create each semantic element with `document.createElement('header')`, etc.",
+                "Use `page.appendChild(element)` to add children in order"
+              ],
+              "tests": [
+                {
+                  "description": "Contains a <header>",
+                  "code": "buildPageLayout().querySelector('header') !== null"
+                },
+                {
+                  "description": "Contains a <main>",
+                  "code": "buildPageLayout().querySelector('main') !== null"
+                },
+                {
+                  "description": "Contains a <footer>",
+                  "code": "buildPageLayout().querySelector('footer') !== null"
+                },
+                {
+                  "description": "Header comes before main",
+                  "code": "buildPageLayout().children[0].tagName === 'HEADER'"
+                }
+              ]
             }
           ]
         }
@@ -228,6 +347,33 @@
               "correctIndex": 1,
               "explanation": "<aside> represents content that is related to but not essential to the surrounding content — sidebars, related links, or pull quotes. Its position on screen is a CSS concern; the semantic meaning is about content relationship, not visual placement."
             }
+          ],
+          "exercises": [
+            {
+              "id": "semantic-article",
+              "title": "Create a Semantic Article",
+              "description": "Write a function `createArticle(title, content)` that returns an `<article>` element with:\n- An `<h2>` containing the title\n- A `<p>` containing the content",
+              "starterCode": "function createArticle(title, content) {\n  const article = document.createElement('article')\n  // Add h2 and p children\n  return article\n}",
+              "solution": "function createArticle(title, content) {\n  const article = document.createElement('article')\n  const h2 = document.createElement('h2')\n  h2.textContent = title\n  const p = document.createElement('p')\n  p.textContent = content\n  article.appendChild(h2)\n  article.appendChild(p)\n  return article\n}",
+              "hints": [
+                "Use `document.createElement('h2')` and set `.textContent` for the title",
+                "The `<article>` element wraps self-contained content that could stand alone"
+              ],
+              "tests": [
+                {
+                  "description": "Returns an ARTICLE element",
+                  "code": "createArticle('Test', 'Body').tagName === 'ARTICLE'"
+                },
+                {
+                  "description": "H2 contains the title",
+                  "code": "createArticle('My Title', 'Body').querySelector('h2').textContent === 'My Title'"
+                },
+                {
+                  "description": "P contains the content",
+                  "code": "createArticle('Title', 'My Content').querySelector('p').textContent === 'My Content'"
+                }
+              ]
+            }
           ]
         },
         {
@@ -282,6 +428,37 @@
               "correctIndex": 2,
               "explanation": "type=\"tel\" triggers the telephone numeric keypad on iOS and Android, which includes symbols like +, *, and # alongside digits — useful for phone fields. type=\"number\" shows a numeric spinner but adds unwanted increment/decrement controls."
             }
+          ],
+          "exercises": [
+            {
+              "id": "login-form",
+              "title": "Build a Login Form",
+              "description": "Write a function `createLoginForm()` that returns a `<form>` element containing:\n- An `<input type=\"email\">` with `required`\n- An `<input type=\"password\">` with `required`\n- A `<button type=\"submit\">`",
+              "starterCode": "function createLoginForm() {\n  const form = document.createElement('form')\n  // Add email input, password input, and submit button\n  return form\n}",
+              "solution": "function createLoginForm() {\n  const form = document.createElement('form')\n\n  const email = document.createElement('input')\n  email.type = 'email'\n  email.required = true\n\n  const password = document.createElement('input')\n  password.type = 'password'\n  password.required = true\n\n  const submit = document.createElement('button')\n  submit.type = 'submit'\n  submit.textContent = 'Log in'\n\n  form.appendChild(email)\n  form.appendChild(password)\n  form.appendChild(submit)\n  return form\n}",
+              "hints": [
+                "Create an input then set `input.type = 'email'` and `input.required = true` as properties",
+                "Use `button.type = 'submit'` to make it a submit button"
+              ],
+              "tests": [
+                {
+                  "description": "Has an email input",
+                  "code": "createLoginForm().querySelector('input[type=\"email\"]') !== null"
+                },
+                {
+                  "description": "Email input is required",
+                  "code": "createLoginForm().querySelector('input[type=\"email\"]').required === true"
+                },
+                {
+                  "description": "Has a password input",
+                  "code": "createLoginForm().querySelector('input[type=\"password\"]') !== null"
+                },
+                {
+                  "description": "Has a submit button",
+                  "code": "createLoginForm().querySelector('button[type=\"submit\"]') !== null"
+                }
+              ]
+            }
           ]
         },
         {
@@ -335,6 +512,33 @@
               ],
               "correctIndex": 1,
               "explanation": "The <title> tag and <h1> heading are the strongest on-page signals for the page topic. Placing the primary keyword in both — naturally — helps crawlers and users immediately understand what the page is about. Keyword stuffing or hiding text violates Google's guidelines."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "page-title-formatter",
+              "title": "Format a Page Title",
+              "description": "Write a function `formatPageTitle(pageTitle, siteName)` that returns a browser title combining both with ` | `.\n\nExample: `formatPageTitle('About', 'Devfluent')` → `'About | Devfluent'`\n\nThe total title must be at most 60 characters. If it would exceed 60 chars, truncate `pageTitle` so the total is exactly 60.",
+              "starterCode": "function formatPageTitle(pageTitle, siteName) {\n  const separator = ' | '\n  // Combine and enforce 60-char limit\n}",
+              "solution": "function formatPageTitle(pageTitle, siteName) {\n  const separator = ' | '\n  const full = pageTitle + separator + siteName\n  if (full.length <= 60) return full\n  const maxLen = 60 - separator.length - siteName.length\n  return pageTitle.slice(0, maxLen) + separator + siteName\n}",
+              "hints": [
+                "Use `string.length` to check total characters",
+                "Use `string.slice(0, n)` to take the first n characters of a string"
+              ],
+              "tests": [
+                {
+                  "description": "Short titles combine correctly",
+                  "code": "formatPageTitle('Home', 'Devfluent') === 'Home | Devfluent'"
+                },
+                {
+                  "description": "Result is at most 60 chars",
+                  "code": "formatPageTitle('A very long page title that exceeds the limit', 'MySite').length <= 60"
+                },
+                {
+                  "description": "Site name is always preserved",
+                  "code": "formatPageTitle('Long Title', 'Devfluent').endsWith('| Devfluent')"
+                }
+              ]
             }
           ]
         }
@@ -396,6 +600,52 @@
               "correctIndex": 1,
               "explanation": "Vertical margins between adjacent block-level siblings (and sometimes parent-child) collapse into one margin equal to the larger of the two. This is intentional CSS behaviour, not a bug — it avoids double spacing between paragraphs."
             }
+          ],
+          "exercises": [
+            {
+              "id": "box-model-width",
+              "title": "Content-Box Width Calculator",
+              "description": "In the default CSS `content-box` model, padding and border are added **outside** the declared width.\n\nWrite a function `totalWidth(content, paddingL, paddingR, borderL, borderR)` that returns the total rendered width.",
+              "starterCode": "function totalWidth(content, paddingL, paddingR, borderL, borderR) {\n  // In content-box: total = content + all horizontal padding + all horizontal border\n}",
+              "solution": "function totalWidth(content, paddingL, paddingR, borderL, borderR) {\n  return content + paddingL + paddingR + borderL + borderR\n}",
+              "hints": [
+                "In content-box mode, everything adds together: content + left padding + right padding + left border + right border"
+              ],
+              "tests": [
+                {
+                  "description": "300px + 20px padding each side = 340px",
+                  "code": "totalWidth(300, 20, 20, 0, 0) === 340"
+                },
+                {
+                  "description": "Borders add to total",
+                  "code": "totalWidth(200, 10, 10, 2, 2) === 224"
+                },
+                {
+                  "description": "No extras = content width",
+                  "code": "totalWidth(150, 0, 0, 0, 0) === 150"
+                }
+              ]
+            },
+            {
+              "id": "border-box-content",
+              "title": "Border-Box Content Calculator",
+              "description": "With `box-sizing: border-box`, padding and border are **inside** the declared width, shrinking the content area.\n\nWrite a function `borderBoxContent(declared, paddingL, paddingR, borderL, borderR)` that returns the content area width.",
+              "starterCode": "function borderBoxContent(declared, paddingL, paddingR, borderL, borderR) {\n  // content = declared - padding - border\n}",
+              "solution": "function borderBoxContent(declared, paddingL, paddingR, borderL, borderR) {\n  return declared - paddingL - paddingR - borderL - borderR\n}",
+              "hints": [
+                "Subtract all horizontal padding and border from the declared width"
+              ],
+              "tests": [
+                {
+                  "description": "300px declared, 20px padding each side → 260px content",
+                  "code": "borderBoxContent(300, 20, 20, 0, 0) === 260"
+                },
+                {
+                  "description": "With borders too",
+                  "code": "borderBoxContent(200, 10, 10, 2, 2) === 176"
+                }
+              ]
+            }
           ]
         },
         {
@@ -450,6 +700,36 @@
               "correctIndex": 1,
               "explanation": "The child combinator `>` selects only direct (immediate) children. `.parent > .child` matches a .child whose parent element is exactly .parent, skipping any nested deeper descendants — unlike the descendant combinator (a space) which matches at any depth."
             }
+          ],
+          "exercises": [
+            {
+              "id": "specificity-calc",
+              "title": "CSS Specificity Calculator",
+              "description": "CSS specificity determines which rule wins when selectors conflict.\n\nThe score is: `(IDs × 100) + (classes × 10) + (elements × 1)`\n\nWrite a function `specificity(ids, classes, elements)` that returns this score.",
+              "starterCode": "function specificity(ids, classes, elements) {\n  // Return the weighted specificity score\n}",
+              "solution": "function specificity(ids, classes, elements) {\n  return ids * 100 + classes * 10 + elements\n}",
+              "hints": [
+                "IDs (#id) = 100 each, classes/attributes/pseudo-classes = 10 each, element/pseudo-element selectors = 1 each"
+              ],
+              "tests": [
+                {
+                  "description": "#nav .item a → (1,1,1) = 111",
+                  "code": "specificity(1, 1, 1) === 111"
+                },
+                {
+                  "description": ".btn.active → (0,2,0) = 20",
+                  "code": "specificity(0, 2, 0) === 20"
+                },
+                {
+                  "description": "h1 → (0,0,1) = 1",
+                  "code": "specificity(0, 0, 1) === 1"
+                },
+                {
+                  "description": "One ID beats 10 classes",
+                  "code": "specificity(1, 0, 0) > specificity(0, 10, 0)"
+                }
+              ]
+            }
           ]
         },
         {
@@ -503,6 +783,33 @@
               ],
               "correctIndex": 2,
               "explanation": "space-between distributes items so that the space is only between them — the first item is flush to the start and the last is flush to the end. space-around adds equal space on each side of every item (so there is half-space at the edges), and space-evenly makes all gaps identical including edges."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "flex-row",
+              "title": "Build a Flex Row",
+              "description": "Write a function `createFlexRow(items)` that returns a `<div>` styled as a horizontal flex container (`display: flex`, `gap: 8px`) with a `<span>` child for each item in the array.",
+              "starterCode": "function createFlexRow(items) {\n  const container = document.createElement('div')\n  // Set flex styles and create span children\n  return container\n}",
+              "solution": "function createFlexRow(items) {\n  const container = document.createElement('div')\n  container.style.display = 'flex'\n  container.style.gap = '8px'\n  items.forEach(text => {\n    const span = document.createElement('span')\n    span.textContent = text\n    container.appendChild(span)\n  })\n  return container\n}",
+              "hints": [
+                "Set `element.style.display = 'flex'` to apply the flex layout",
+                "Set `element.style.gap = '8px'` for spacing between children"
+              ],
+              "tests": [
+                {
+                  "description": "Container has display: flex",
+                  "code": "createFlexRow(['a']).style.display === 'flex'"
+                },
+                {
+                  "description": "Correct number of span children",
+                  "code": "createFlexRow(['x','y','z']).children.length === 3"
+                },
+                {
+                  "description": "Children are SPAN elements with correct text",
+                  "code": "createFlexRow(['hello']).querySelector('span').textContent === 'hello'"
+                }
+              ]
             }
           ]
         }
@@ -575,6 +882,57 @@
               "correctIndex": 2,
               "explanation": "clamp(min, preferred, max) lets a value grow with the viewport within a capped range. `font-size: clamp(1rem, 2.5vw, 2rem)` will never be smaller than 1rem or larger than 2rem, scaling smoothly in between — no media query needed."
             }
+          ],
+          "exercises": [
+            {
+              "id": "breakpoint-detector",
+              "title": "Responsive Breakpoint Detector",
+              "description": "Write a function `getBreakpoint(width)` that returns the responsive breakpoint name:\n- `< 640` → `'mobile'`\n- `640–1023` → `'tablet'`\n- `≥ 1024` → `'desktop'`",
+              "starterCode": "function getBreakpoint(width) {\n  // Return 'mobile', 'tablet', or 'desktop'\n}",
+              "solution": "function getBreakpoint(width) {\n  if (width < 640) return 'mobile'\n  if (width < 1024) return 'tablet'\n  return 'desktop'\n}",
+              "hints": [
+                "Use sequential `if` statements — if the first condition passes you don't need to recheck in the next",
+                "640 is a common mobile → tablet breakpoint (Tailwind's `sm:`)"
+              ],
+              "tests": [
+                {
+                  "description": "375px → 'mobile'",
+                  "code": "getBreakpoint(375) === 'mobile'"
+                },
+                {
+                  "description": "768px → 'tablet'",
+                  "code": "getBreakpoint(768) === 'tablet'"
+                },
+                {
+                  "description": "1440px → 'desktop'",
+                  "code": "getBreakpoint(1440) === 'desktop'"
+                },
+                {
+                  "description": "640 starts tablet range",
+                  "code": "getBreakpoint(640) === 'tablet'"
+                }
+              ]
+            },
+            {
+              "id": "grid-columns",
+              "title": "Grid Column Calculator",
+              "description": "When using CSS Grid with `grid-template-columns: repeat(auto-fill, minmax(minWidth, 1fr))`, the browser calculates how many columns fit.\n\nWrite `gridColumns(containerWidth, minItemWidth, gap)` using the formula:\n`Math.floor((containerWidth + gap) / (minItemWidth + gap))`",
+              "starterCode": "function gridColumns(containerWidth, minItemWidth, gap) {\n  // Use the formula: floor((containerWidth + gap) / (minItemWidth + gap))\n}",
+              "solution": "function gridColumns(containerWidth, minItemWidth, gap) {\n  return Math.floor((containerWidth + gap) / (minItemWidth + gap))\n}",
+              "hints": [
+                "Use `Math.floor()` to round down to a whole number of columns"
+              ],
+              "tests": [
+                {
+                  "description": "1200px, 300px items, 16px gap → 3 columns",
+                  "code": "gridColumns(1200, 300, 16) === 3"
+                },
+                {
+                  "description": "800px, 250px items, no gap → 3 columns",
+                  "code": "gridColumns(800, 250, 0) === 3"
+                }
+              ]
+            }
           ]
         },
         {
@@ -628,6 +986,33 @@
               ],
               "correctIndex": 1,
               "explanation": "Percentage values in translateX() are relative to the element's own width, not the parent. So translateX(100%) shifts the element exactly one full element-width to the right, making it useful for off-screen slide-in animations regardless of the element's actual pixel size."
+            }
+          ],
+          "exercises": [
+            {
+              "id": "apply-transition",
+              "title": "Apply CSS Transitions via JavaScript",
+              "description": "Write a function `makeTransitionCard(el)` that takes a DOM element, adds a CSS transition for `transform` and `background-color` (duration `0.3s`, easing `ease`), and returns the modified element.",
+              "starterCode": "function makeTransitionCard(el) {\n  // Set el.style.transition to animate transform and background-color\n  return el\n}",
+              "solution": "function makeTransitionCard(el) {\n  el.style.transition = 'transform 0.3s ease, background-color 0.3s ease'\n  return el\n}",
+              "hints": [
+                "Use `element.style.transition = '...'` — the value is the same CSS shorthand you'd write in a stylesheet",
+                "Multiple transitions are separated by commas: `'prop1 duration easing, prop2 duration easing'`"
+              ],
+              "tests": [
+                {
+                  "description": "Transition style is applied",
+                  "code": "makeTransitionCard(document.createElement('div')).style.transition.includes('0.3s')"
+                },
+                {
+                  "description": "Includes transform",
+                  "code": "makeTransitionCard(document.createElement('div')).style.transition.includes('transform')"
+                },
+                {
+                  "description": "Returns the same element",
+                  "code": "const el = document.createElement('div'); makeTransitionCard(el) === el"
+                }
+              ]
             }
           ]
         },

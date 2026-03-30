@@ -1,9 +1,14 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useTransition } from "react"
+import { useState, useTransition, lazy, Suspense } from "react"
 import { CourseCard } from "@/components/training/course-card"
 import { AddCourseForm } from "@/components/training/add-course-form"
+import { cn } from "@/lib/utils"
+
+const PracticeTab = lazy(() =>
+  import("@/components/training/practice-tab").then((m) => ({ default: m.PracticeTab }))
+)
 
 interface Course {
   id: string
@@ -18,12 +23,23 @@ interface Course {
 
 interface TrainingClientProps {
   courses: Course[]
+  defaultTab: "courses" | "practice"
+  userTrack: string
 }
 
-export function TrainingClient({ courses }: TrainingClientProps) {
+const TABS = [
+  { id: "courses", label: "External Courses" },
+  { id: "practice", label: "Practice" },
+] as const
+
+export function TrainingClient({ courses, defaultTab, userTrack }: TrainingClientProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
+  const [tab, setTab] = useState<"courses" | "practice">(defaultTab)
+
+  const completedCount = courses.filter((c) => c.isCompleted).length
+  const totalXP = courses.reduce((sum, c) => sum + c.xpEarned, 0)
 
   const post = async (body: object): Promise<boolean> => {
     setError(null)
@@ -65,28 +81,69 @@ export function TrainingClient({ courses }: TrainingClientProps) {
 
   return (
     <div className="space-y-6">
-      {error && (
-        <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
-          {error}
-        </div>
-      )}
-      <AddCourseForm onAdd={handleAdd} />
-
-      {courses.length === 0 ? (
-        <div className="text-center py-12 text-gray-400 dark:text-gray-500">
-          <p className="text-sm">No courses yet. Add one to start tracking!</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {courses.map((course) => (
-            <CourseCard
-              key={course.id}
-              course={course}
-              onUpdate={handleUpdate}
-              onDelete={handleDelete}
-            />
+      {/* Tab switcher + live stats */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={cn(
+                "px-4 py-1.5 text-sm font-medium rounded-md transition-colors",
+                tab === t.id
+                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              )}
+            >
+              {t.label}
+            </button>
           ))}
         </div>
+
+        {tab === "courses" && courses.length > 0 && (
+          <div className="text-right flex-shrink-0">
+            <p className="text-xs text-gray-400">{completedCount} / {courses.length} completed</p>
+            <p className="text-xs text-indigo-600">{totalXP} XP earned</p>
+          </div>
+        )}
+      </div>
+
+      {tab === "courses" && (
+        <>
+          {error && (
+            <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+              {error}
+            </div>
+          )}
+          <AddCourseForm onAdd={handleAdd} />
+
+          {courses.length === 0 ? (
+            <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+              <p className="text-sm">No courses yet. Add one to start tracking!</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {courses.map((course) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === "practice" && (
+        <Suspense fallback={
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+            <p className="text-sm">Loading exercises…</p>
+          </div>
+        }>
+          <PracticeTab userTrack={userTrack} />
+        </Suspense>
       )}
     </div>
   )

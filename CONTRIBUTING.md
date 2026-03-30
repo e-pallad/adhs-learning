@@ -139,6 +139,72 @@ Quizzes are optional but encouraged. Each quiz has 3–5 questions:
 
 ---
 
+## Exercises format
+
+Exercises add live, runnable coding challenges to the **Practice** tab in `/training`. They appear alongside (not instead of) the quiz.
+
+Each block can have an optional `exercises` array:
+
+```json
+"exercises": [
+  {
+    "id": "unique-exercise-id",
+    "title": "Short display title",
+    "description": "The exercise prompt shown to the learner. Markdown supported.\n\nExample: `myFunc('hello')` → `5`",
+    "starterCode": "function myFunc(str) {\n  // your code here\n}",
+    "solution": "function myFunc(str) {\n  return str.length\n}",
+    "hints": [
+      "Optional: one hint per string",
+      "Hints are revealed on demand — don't spoil the solution"
+    ],
+    "tests": [
+      {
+        "description": "Returns length of 'hello' → 5",
+        "code": "myFunc('hello') === 5"
+      },
+      {
+        "description": "Returns 0 for empty string",
+        "code": "myFunc('') === 0"
+      }
+    ]
+  }
+]
+```
+
+### Exercise field reference
+
+| Field | Required | Notes |
+|---|---|---|
+| `id` | yes | Unique within the block; kebab-case |
+| `title` | yes | Short label shown in the exercise list |
+| `description` | yes | The prompt — plain text or markdown, shown above the editor |
+| `starterCode` | yes | Code pre-loaded in the editor |
+| `solution` | yes | Revealed when the learner clicks "Show solution" |
+| `tests` | yes | Array of `{ description, code }` — see below |
+| `hints` | no | Array of hint strings, shown one by one |
+
+### Writing test cases
+
+Each test's `code` field is a **JavaScript expression that evaluates to `true` or `false`**. It runs in the same scope as the learner's code, so you can call any function they define:
+
+```json
+{ "description": "myFunc('hello') returns 5", "code": "myFunc('hello') === 5" }
+```
+
+The sandbox has access to the full browser DOM API (`document.createElement`, etc.), so DOM exercises work too:
+
+```json
+{ "description": "Returns a DIV element", "code": "buildCard().tagName === 'DIV'" }
+```
+
+**Guidelines:**
+- Write 2–4 tests per exercise — enough to verify correctness, not exhaustive
+- Test descriptions should read as facts: *"Returns 5 for 'hello'"*, not *"test 1"*
+- Test code must not rely on `console.log` or side effects — only the return value / property of the result matters
+- Exercises are optional — adding one good exercise per block is better than many mediocre ones
+
+---
+
 ## Adding a new language track
 
 1. Create a directory: `content/curriculum/tracks/{your-track}/`

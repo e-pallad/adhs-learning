@@ -82,6 +82,8 @@ export const BLOCK_TYPE_LABELS: Record<LearningBlock["type"], string> = {
 // Re-export types
 export type {
   QuizQuestion,
+  Exercise,
+  ExerciseTest,
   LearningBlock,
   Week,
   AlternativeProject,
