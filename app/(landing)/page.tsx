@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Zap, Timer, BookOpen, Bot, Github, Users, XCircle, CheckCircle2, Flame, Trophy, ArrowRight, Lock } from "lucide-react"
+import { Zap, Timer, BookOpen, Bot, Github, Users, XCircle, CheckCircle2, Flame, Trophy, ArrowRight, Lock, Bell } from "lucide-react"
+import WaitlistForm from "./WaitlistForm"
 
 export const metadata: Metadata = {
   title: "Devfluent — Learn to code. Actually finish.",
@@ -331,6 +332,22 @@ export default function LandingPage() {
           Create free account
           <ArrowRight className="w-5 h-5" aria-hidden="true" />
         </Link>
+      </section>
+
+      {/* Waitlist */}
+      <section id="waitlist" className="py-20 px-6 bg-gray-50">
+        <div className="max-w-xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-6">
+            <Bell className="w-3.5 h-3.5" aria-hidden="true" />
+            Early access
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Be the first to know</h2>
+          <p className="text-gray-500 mb-8">
+            Leave your email and we&apos;ll notify you when new features, tracks, and Pro plans go live. No spam — ever.
+          </p>
+          <WaitlistForm />
+          <p className="text-xs text-gray-400 mt-4">No credit card required. Unsubscribe any time.</p>
+        </div>
       </section>
 
       {/* Footer */}

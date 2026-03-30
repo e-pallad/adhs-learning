@@ -236,6 +236,16 @@ model AccountabilityPair {
   @@map("accountability_pairs")
 }
 
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("waitlist_entries")
+}
+
 // ─── GitHub Events ────────────────────────────────────────────────────────────
 
 model GithubEvent {
