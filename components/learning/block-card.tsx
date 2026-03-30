@@ -31,7 +31,7 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   const isSkipped = status === "SKIPPED"
 
   const handleComplete = async () => {
-    if (!onComplete) return
+    if (!onComplete || loading) return
     setLoading(true)
     try {
       const result = await onComplete(block.id, timerUsed)
@@ -49,6 +49,10 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   }) => {
     if (result.passed) {
       setQuizCelebration(result)
+      if (onComplete && !isCompleted && !loading) {
+        setLoading(true)
+        onComplete(block.id, timerUsed).finally(() => setLoading(false))
+      }
     }
   }
 
