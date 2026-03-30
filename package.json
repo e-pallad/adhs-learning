@@ -11,6 +11,8 @@
     "test:watch": "dotenv -e .env.test -- vitest",
     "test:coverage": "dotenv -e .env.test -- vitest run --coverage",
     "test:ci": "vitest run --coverage",
+    "test:e2e": "dotenv -e .env.test -- playwright test",
+    "test:e2e:ui": "dotenv -e .env.test -- playwright test --ui",
     "review": "bash scripts/self-review.sh --staged",
     "review:branch": "bash scripts/self-review.sh --branch master",
     "prepare": "[ -d .git ] && cp scripts/pre-push-check.sh .git/hooks/pre-push && chmod +x .git/hooks/pre-push || true"
@@ -32,6 +34,7 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.37",
     "@types/pg": "^8.18.0",
@@ -40,8 +43,8 @@
     "@vitest/coverage-v8": "^4.1.0",
     "dotenv-cli": "^11.0.0",
     "eslint": "^9",
-    "prisma": "^7.5.0",
     "eslint-config-next": "16.2.0",
+    "prisma": "^7.5.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
