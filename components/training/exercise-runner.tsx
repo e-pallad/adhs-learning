@@ -19,7 +19,8 @@ interface RunnerResult {
 }
 
 function buildSrcDoc(userCode: string, tests: { description: string; code: string }[]): string {
-  const testsJson = JSON.stringify(tests)
+  // Escape </script> so it can't break out of the script tag inside srcDoc
+  const testsJson = JSON.stringify(tests).replace(/<\/script>/gi, "<\\/script>")
   return `<!DOCTYPE html><html><body><script>
 (function () {
   var tests = ${testsJson};
@@ -81,10 +82,11 @@ export function ExerciseRunner({ exercise }: { exercise: Exercise }) {
     setResults(null)
     setRuntimeError(null)
     setShowSolution(false)
+    setRunning(false)
     setSrcDoc(null)
   }
 
-  const passed = results?.every((r) => r.passed) ?? false
+  const passed = results !== null && results.length > 0 && results.every((r) => r.passed)
 
   return (
     <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">

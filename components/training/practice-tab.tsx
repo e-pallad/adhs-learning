@@ -94,7 +94,7 @@ export function PracticeTab({ userTrack }: { userTrack: string }) {
                                 const key = `${block.id}-${ex.id}`
                                 const isExOpen = openExercise === key
                                 return (
-                                  <div key={ex.id}>
+                                  <div key={key}>
                                     {isExOpen ? (
                                       <div>
                                         <button
@@ -103,7 +103,7 @@ export function PracticeTab({ userTrack }: { userTrack: string }) {
                                         >
                                           ↑ Collapse
                                         </button>
-                                        <ExerciseRunner key={ex.id} exercise={ex} />
+                                        <ExerciseRunner key={key} exercise={ex} />
                                       </div>
                                     ) : (
                                       <button
