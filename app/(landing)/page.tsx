@@ -208,7 +208,7 @@ export default function LandingPage() {
               </div>
               <p className="text-xs text-gray-500 mb-1.5">2,840 / 3,000 XP to Level 8</p>
               <div className="bg-gray-800 rounded-full h-2 w-full mb-5">
-                <div className="bg-indigo-500 h-2 rounded-full" style={{ width: "94%" }} />
+                <div className="bg-indigo-500 h-2 rounded-full animate-xp-fill" />
               </div>
 
               {/* Current block */}
@@ -346,7 +346,7 @@ export default function LandingPage() {
             </div>
             <p className="text-sm text-gray-400 mb-2">2,840 / 3,000 XP to Level 8</p>
             <div className="bg-gray-800 rounded-full h-3 w-full mb-6">
-              <div className="bg-gradient-to-r from-indigo-500 to-violet-500 h-3 rounded-full" style={{ width: "94%" }} />
+              <div className="bg-gradient-to-r from-indigo-500 to-violet-500 h-3 rounded-full animate-xp-fill" />
             </div>
             <div className="flex flex-wrap gap-3">
               <div className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2">
