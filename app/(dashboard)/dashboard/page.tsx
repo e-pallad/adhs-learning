@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { BodyDoubleMode } from "@/components/body-double-mode"
 import { AiRecommendations } from "@/components/ai-recommendations"
+import { AppTour } from "@/components/tour/app-tour"
 import { AccountabilityPartner } from "@/components/accountability-partner"
 import Link from "next/link"
 import { redirect } from "next/navigation"
@@ -181,7 +182,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Daily & Weekly goals */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div data-tour="daily-goal" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -215,7 +216,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Body-Double Mode */}
-      <Card>
+      <Card data-tour="body-double">
         <CardContent className="p-5">
           <BodyDoubleMode />
         </CardContent>
@@ -319,6 +320,8 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <AppTour autoStart />
 
       {/* Quick navigation */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
