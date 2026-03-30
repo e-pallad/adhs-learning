@@ -55,6 +55,7 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
           <input
             required
+            autoComplete="off"
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             placeholder="The Complete JavaScript Course"
@@ -90,6 +91,7 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
           <input
             type="url"
+            autoComplete="url"
             value={form.url}
             onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
             placeholder="https://www.udemy.com/..."
