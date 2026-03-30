@@ -64,9 +64,12 @@ const STEPS = [
 ]
 
 function startTour() {
+  const activeSteps = STEPS.filter(
+    (s) => !s.element || document.querySelector(s.element)
+  )
   const d = driver({
     showProgress: true,
-    steps: STEPS,
+    steps: activeSteps,
     popoverClass: "devfluent-tour",
     onDestroyed: () => {
       localStorage.setItem("tour_seen", "1")

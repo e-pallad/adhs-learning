@@ -6,7 +6,6 @@ import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { BodyDoubleMode } from "@/components/body-double-mode"
 import { AiRecommendations } from "@/components/ai-recommendations"
-import { AppTour } from "@/components/tour/app-tour"
 import { AccountabilityPartner } from "@/components/accountability-partner"
 import Link from "next/link"
 import { redirect } from "next/navigation"
@@ -320,8 +319,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      <AppTour autoStart />
 
       {/* Quick navigation */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
