@@ -1,3 +1,18 @@
+export interface ExerciseTest {
+  description: string  // e.g. "getHostname('https://example.com') returns 'example.com'"
+  code: string         // executable expression that evaluates to true/false
+}
+
+export interface Exercise {
+  id: string
+  title: string
+  description: string  // markdown exercise prompt
+  starterCode: string
+  solution: string
+  tests: ExerciseTest[]
+  hints?: string[]
+}
+
 export interface QuizQuestion {
   question: string
   options: string[]   // 4 options
@@ -14,6 +29,7 @@ export interface LearningBlock {
   resources?: { label: string; url: string }[]
   quiz?: QuizQuestion[]       // 3-5 questions per block
   practicalExample?: string   // code or practical tip (markdown)
+  exercises?: Exercise[]      // live coding exercises for the Practice tab
 }
 
 export interface Week {
