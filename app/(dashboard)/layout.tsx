@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/layout/sidebar"
 import { TopBar } from "@/components/layout/top-bar"
 import { MobileNav } from "@/components/layout/mobile-nav"
+import { AppTour } from "@/components/tour/app-tour"
 import { getCurrentUser } from "@/lib/user"
 import { getXPProgress } from "@/lib/xp"
 
@@ -29,6 +30,7 @@ export default async function DashboardLayout({
         </main>
       </div>
       <MobileNav />
+      <AppTour autoStart />
     </div>
   )
 }

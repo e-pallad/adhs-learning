@@ -181,7 +181,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Daily & Weekly goals */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div data-tour="daily-goal" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
@@ -215,7 +215,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Body-Double Mode */}
-      <Card>
+      <Card data-tour="body-double">
         <CardContent className="p-5">
           <BodyDoubleMode />
         </CardContent>

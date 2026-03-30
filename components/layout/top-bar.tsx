@@ -15,9 +15,13 @@ export function TopBar({ totalXP, level, streak, title }: TopBarProps) {
       {!title && <div />}
 
       <div className="flex items-center gap-4">
-        <StreakCounter streak={streak} compact />
+        <div data-tour="streak">
+          <StreakCounter streak={streak} compact />
+        </div>
         <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
-        <XPDisplay totalXP={totalXP} level={level} compact />
+        <div data-tour="xp-display">
+          <XPDisplay totalXP={totalXP} level={level} compact />
+        </div>
       </div>
     </header>
   )

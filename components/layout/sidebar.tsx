@@ -12,15 +12,16 @@ import {
   TrendingUp,
   Zap,
   Settings,
+  Compass,
 } from "lucide-react"
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/learning", label: "Learning", icon: BookOpen },
-  { href: "/roadmap", label: "Roadmap", icon: Map },
-  { href: "/training", label: "Courses", icon: GraduationCap },
+  { href: "/learning", label: "Learning", icon: BookOpen, tourId: "nav-learning" },
+  { href: "/roadmap", label: "Roadmap", icon: Map, tourId: "nav-roadmap" },
+  { href: "/training", label: "Courses", icon: GraduationCap, tourId: "nav-training" },
   { href: "/projects", label: "Projects", icon: Rocket },
-  { href: "/progress", label: "Progress", icon: TrendingUp },
+  { href: "/progress", label: "Progress", icon: TrendingUp, tourId: "nav-progress" },
 ]
 
 export function Sidebar() {
@@ -47,6 +48,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
+              {...(item.tourId ? { "data-tour": item.tourId } : {})}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                 active
@@ -75,6 +77,13 @@ export function Sidebar() {
           <Settings className="w-4 h-4 flex-shrink-0" />
           <span>Settings</span>
         </Link>
+        <button
+          onClick={() => window.dispatchEvent(new Event("start-tour"))}
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors w-full"
+        >
+          <Compass className="w-4 h-4 flex-shrink-0" />
+          <span>Take a Tour</span>
+        </button>
         <div className="flex gap-3 px-3 py-2">
           <Link href="/impressum" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Impressum</Link>
           <Link href="/datenschutz" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Datenschutz</Link>
