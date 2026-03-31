@@ -106,6 +106,44 @@
 - [ ] **Remove Google login**
   Strip Google OAuth provider from the login page and any related config.
 
+- [ ] **Add more achievements**
+  Extend `ACHIEVEMENT_DEFINITIONS` in `lib/xp.ts`. Ideas:
+
+  *Blocks / progress*
+  - `blocks_10` — "Getting Started" — complete 10 blocks
+  - `blocks_50` — "On a Roll" — complete 50 blocks
+  - `blocks_100` — "Century" — complete 100 blocks
+  - `blocks_500` — "Grinder" — complete 500 blocks
+
+  *Streaks*
+  - `streak_14` — "Two Weeks Strong" — 14-day streak (gap between 7 and 30)
+  - `streak_100` — "Centurion" — 100-day streak
+
+  *Levels*
+  - `level_3` — "Apprentice" — reach level 3 (early win)
+  - `level_7` — "Craftsman" — reach level 7
+
+  *Quiz*
+  - `perfect_3` — "Perfectionist" — 3 perfect quiz scores
+  - `quiz_25` — "Study Machine" — pass 25 quizzes
+
+  *GitHub*
+  - `first_push` — "Shipped Code" — first GitHub push synced
+  - `pr_merged_5` — "Pull Request Pro" — 5 PRs merged
+  - `push_streak_7` — "Daily Committer" — pushes on 7 different days
+
+  *Pomodoro / focus*
+  - `first_pomodoro` — "Focus Mode" — complete first block using Pomodoro timer
+  - `pomodoro_10` — "Deep Work" — complete 10 blocks with Pomodoro timer
+
+  *Projects*
+  - `projects_6` — "Half Way There" — complete 6 monthly projects
+  - `projects_12` — "Full Stack" — complete all 12 monthly projects
+
+  *Social / misc*
+  - `accountability_linked` — "Better Together" — link an accountability partner
+  - `body_double_5` — "Not Alone" — join body-double mode 5 times
+
 - [ ] **Overhaul XP system**
   XP gains are too high and levels are reached too fast. Rebalance XP values in `lib/xp.ts` and review level thresholds to make progression feel meaningful and appropriately paced.
 
