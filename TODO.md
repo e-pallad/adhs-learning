@@ -107,7 +107,7 @@
   Strip Google OAuth provider from the login page and any related config.
 
 - [ ] **Add GitHub login**
-  Add GitHub as a sign-in method. Reuse the existing GitHub OAuth connection (already used for GitHub Activity Sync) where possible so users don't need to authorise twice.
+  Add GitHub as a sign-in method. When a user signs in with GitHub, that OAuth token should automatically be used for the GitHub Activity Sync — no separate "Connect GitHub" step needed.
 
 ---
 
