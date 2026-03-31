@@ -247,6 +247,9 @@
 - [ ] **Logout button & profile link in top bar**
   Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
 
+- [ ] **Demo mode with limited access**
+  Allow unauthenticated visitors to try the app without signing up. Show a fixed set of blocks (e.g. Month 1, Week 1), a mock XP/streak state, and a persistent banner prompting sign-up to save progress. No DB writes in demo mode.
+
 - [ ] **Profile images**
   Allow users to upload or link a profile picture. Show it in the top bar, on the accountability partner panel, and in body-double mode.
   Options: direct upload to Supabase Storage, or pull avatar from GitHub OAuth when signed in with GitHub.
