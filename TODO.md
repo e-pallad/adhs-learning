@@ -152,6 +152,60 @@
 
 ---
 
+## ADHD-Friendly Tools — Phase 4
+
+### Time Blindness
+
+- [ ] **Visual timer**
+  Replace (or complement) the Pomodoro digit countdown with a shrinking circle/pie visual. More intuitive for people with poor time perception.
+  _ADHD: Digits are abstract; a shrinking shape makes time passing viscerally visible._
+
+- [ ] **Transition warnings**
+  Show a gentle alert ~2 minutes before a Pomodoro session ends so the context switch isn't abrupt.
+  _ADHD: Sudden interruptions are jarring and cause frustration; a soft warning allows mental preparation._
+
+- [ ] **Time-blocking planner**
+  A simple daily schedule view where users anchor study sessions to existing habits (e.g. "09:00 — 1 block after morning coffee").
+  _ADHD: Attaching new behaviours to existing routines (habit stacking) dramatically improves follow-through._
+
+### Working Memory
+
+- [ ] **Block scratchpad**
+  A quick-notes field attached to each learning block — capture thoughts, questions, or code snippets without leaving the page.
+  _ADHD: Offloads working memory so the user can stay focused without losing stray thoughts._
+
+- [ ] **Brain dump**
+  A one-click notepad that appears before a session starts. User empties distracting thoughts into it, then begins studying with a clearer head.
+  _ADHD: Pre-session brain dumps reduce internal noise and improve on-task focus._
+
+- [ ] **Quick-start / resume**
+  A single prominent button on the dashboard that jumps straight back to the last open block — zero navigation friction.
+  _ADHD: Reduces the initiation barrier; the hardest part of studying is often just starting._
+
+### Motivation & Progress Visibility
+
+- [ ] **Progress replay**
+  A "look how far you've come" view showing all completed blocks, milestones, and achievements over time.
+  _ADHD: Combats imposter syndrome and RSD by making invisible progress visible and concrete._
+
+- [ ] **Celebration animations**
+  More visible dopamine hit on block/level/achievement completion — confetti, sound, or a brief full-screen moment.
+  _ADHD: Immediate positive reinforcement is essential; delayed rewards have little motivational effect._
+
+### Focus & Interest
+
+- [ ] **Interest spike mode**
+  Let users temporarily jump to a different topic or month when curiosity strikes, then return to their original position. Log the detour so they never get lost.
+  _ADHD: Fighting interest spikes causes frustration and avoidance; channelling them keeps momentum going._
+
+### Routine & Structure
+
+- [ ] **Habit stacking / study reminders**
+  User defines a trigger ("after my morning coffee", "at 09:00") and receives a push notification or in-app nudge to start their session.
+  _ADHD: Linking study to an existing anchor habit removes the need to remember or self-initiate._
+
+---
+
 ## Feature Roadmap
 
 ### Phase 1 — Short-term
