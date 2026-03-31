@@ -188,8 +188,9 @@
   A "look how far you've come" view showing all completed blocks, milestones, and achievements over time.
   _ADHD: Combats imposter syndrome and RSD by making invisible progress visible and concrete._
 
-- [ ] **Celebration animations**
+- [ ] **Celebration animations** *(opt-in)*
   More visible dopamine hit on block/level/achievement completion — confetti, sound, or a brief full-screen moment.
+  Add a toggle in Settings to enable/disable (some users find animations distracting).
   _ADHD: Immediate positive reinforcement is essential; delayed rewards have little motivational effect._
 
 ### Focus & Interest
@@ -238,6 +239,17 @@
   Shared anonymous focus session — user sees a real-time count of active learners.
   Implementation: Supabase Realtime channel + anonymous presence.
   _ADHD: A well-established ADHD technique — the perceived presence of others significantly increases productivity._
+
+---
+
+### UI / Navigation
+
+- [ ] **Logout button & profile link in top bar**
+  Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
+
+- [ ] **Profile images**
+  Allow users to upload or link a profile picture. Show it in the top bar, on the accountability partner panel, and in body-double mode.
+  Options: direct upload to Supabase Storage, or pull avatar from GitHub OAuth when signed in with GitHub.
 
 ---
 
