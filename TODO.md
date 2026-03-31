@@ -106,7 +106,10 @@
 - [ ] **Remove Google login**
   Strip Google OAuth provider from the login page and any related config.
 
-- [ ] **Add GitHub login**
+- [ ] **Overhaul XP system**
+  XP gains are too high and levels are reached too fast. Rebalance XP values in `lib/xp.ts` and review level thresholds to make progression feel meaningful and appropriately paced.
+
+
   Add GitHub as a sign-in method. When a user signs in with GitHub, that OAuth token should automatically be used for the GitHub Activity Sync — no separate "Connect GitHub" step needed.
 
 ---
