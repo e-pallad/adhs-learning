@@ -1,6 +1,6 @@
 # Devfluent — Open Tasks
 
-> Last updated: 2026-03-26
+> Last updated: 2026-03-31
 
 > **Branching rule:** Every phase / major feature gets its own branch and PR. Never bundle multiple independent features into a single branch.
 
@@ -95,6 +95,19 @@
 - [x] **PR template for curriculum contributions**
   `.github/PULL_REQUEST_TEMPLATE/curriculum_contribution.md`
   Checklist: track, month, block IDs unique, quiz present, tested locally.
+
+---
+
+## i18n & Auth → PR #44 (`add-i18n-github-login`)
+
+- [ ] **Multi-language support (i18n) for menus and legal pages**
+  Add internationalisation to navigation menus and legal pages (`/impressum`, `/datenschutz`).
+
+- [ ] **Remove Google login**
+  Strip Google OAuth provider from the login page and any related config.
+
+- [ ] **Add GitHub login**
+  Add GitHub as a sign-in method. Reuse the existing GitHub OAuth connection (already used for GitHub Activity Sync) where possible so users don't need to authorise twice.
 
 ---
 
