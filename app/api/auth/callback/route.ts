@@ -39,6 +39,12 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const code = url.searchParams.get("code")
   const nextParam = url.searchParams.get("next") ?? "/dashboard"
+  const envSnapshot = {
+    hasSupabaseUrl: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    hasSupabaseAnonKey: Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+    nodeEnv: process.env.NODE_ENV ?? "unknown",
+  }
   // Prevent open redirect: only allow relative paths
   const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard"
 
@@ -51,9 +57,12 @@ export async function GET(req: NextRequest) {
         // Validate provider_token via the GitHub API to confirm it is a GitHub token
         // (not a token from a different OAuth provider the user may also have linked).
         if (session?.provider_token) {
+          const abort = new AbortController()
+          const timeout = setTimeout(() => abort.abort(), 5000)
           const ghRes = await fetch("https://api.github.com/user", {
             headers: { Authorization: `Bearer ${session.provider_token}`, "User-Agent": "Devfluent" },
-          }).catch(() => null)
+            signal: abort.signal,
+          }).catch(() => null).finally(() => clearTimeout(timeout))
           if (ghRes?.ok) {
             const ghUser = await ghRes.json() as { login?: string }
             const githubUsername = ghUser.login
@@ -83,12 +92,18 @@ export async function GET(req: NextRequest) {
       console.error(`[auth/callback:${reqId}] exchangeCodeForSession failed`, {
         message: error.message,
         status: error.status,
+        env: envSnapshot,
       })
     } else {
       console.warn(`[auth/callback:${reqId}] Missing code query parameter`)
     }
   } catch (err) {
-    console.error(`[auth/callback:${reqId}] Unexpected callback failure`, err)
+    console.error(`[auth/callback:${reqId}] Unexpected callback failure`, {
+      error: err,
+      env: envSnapshot,
+      hasCode: Boolean(code),
+      next,
+    })
   }
 
   return NextResponse.redirect(new URL("/login?error=auth", req.url))
