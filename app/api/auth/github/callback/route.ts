@@ -12,9 +12,9 @@ function getAppOrigin(req: NextRequest): string {
     }
   }
 
-  const forwardedHost = req.headers.get("x-forwarded-host")
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
   if (forwardedHost) {
-    const forwardedProto = req.headers.get("x-forwarded-proto") ?? "https"
+    const forwardedProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https"
     return `${forwardedProto}://${forwardedHost}`
   }
 
