@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createServerClient } from "@supabase/ssr"
+
+// Resolve the canonical app origin so redirects always target the public
+// domain (https://devfluent.de) and never the Docker-internal binding
+// address (http://0.0.0.0:3000) that appears when Next.js standalone uses
+// HOSTNAME=0.0.0.0 and req.url is constructed from the plain-HTTP side of the
+// Nginx → container connection.
+function getAppOrigin(req: NextRequest): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (configured) {
+    try {
+      return new URL(configured).origin
+    } catch {
+      // Fall through to forwarded headers.
+    }
+  }
+  // Trust X-Forwarded-Proto/Host forwarded by Nginx.
+  const proto = req.headers.get("x-forwarded-proto") ?? "https"
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "localhost"
+  return `${proto}://${host}`
+}
 
 async function persistGithubCredentials(args: {
   userId: string
@@ -47,10 +67,33 @@ export async function GET(req: NextRequest) {
   }
   // Prevent open redirect: only allow relative paths
   const next = nextParam.startsWith("/") && !nextParam.startsWith("//") ? nextParam : "/dashboard"
+  const appOrigin = getAppOrigin(req)
 
   try {
     if (code) {
-      const supabase = await createClient()
+      // Collect cookies that Supabase wants to set so we can apply them
+      // directly to the NextResponse.redirect() below.  Relying on
+      // cookies() from next/headers is not reliable here because Next.js
+      // does not guarantee that mutations staged via that API are flushed
+      // into a manually-constructed NextResponse (as opposed to the
+      // framework's own response pipeline).
+      const pendingCookies: Array<{ name: string; value: string; options: Record<string, unknown> }> = []
+
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return req.cookies.getAll()
+            },
+            setAll(cookiesToSet) {
+              pendingCookies.push(...cookiesToSet as typeof pendingCookies)
+            },
+          },
+        }
+      )
+
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
       if (!error) {
         // Auto-wire GitHub token for Activity Sync when user signs in with GitHub.
@@ -81,12 +124,27 @@ export async function GET(req: NextRequest) {
             console.warn(`[auth/callback:${reqId}] provider_token did not resolve to GitHub user`)
           }
         }
+
+        const response = NextResponse.redirect(new URL(next, appOrigin))
+
+        // Write session cookies directly onto the redirect response so the
+        // browser receives them even though we return a custom NextResponse.
+        for (const { name, value, options } of pendingCookies) {
+          response.cookies.set(name, value, {
+            ...(options as Parameters<typeof response.cookies.set>[2]),
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+          })
+        }
+
         console.info(`[auth/callback:${reqId}] Auth callback success`, {
           hasSession: Boolean(session),
           hasProviderToken: Boolean(session?.provider_token),
+          cookiesSet: pendingCookies.length,
           next,
+          appOrigin,
         })
-        return NextResponse.redirect(new URL(next, req.url))
+        return response
       }
 
       console.error(`[auth/callback:${reqId}] exchangeCodeForSession failed`, {
@@ -106,5 +164,5 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  return NextResponse.redirect(new URL("/login?error=auth", req.url))
+  return NextResponse.redirect(new URL("/login?error=auth", appOrigin))
 }
