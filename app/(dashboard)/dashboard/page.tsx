@@ -15,7 +15,7 @@ import {
   Flame,
   CheckSquare,
   BookOpen,
-  Map,
+  Map as MapIcon,
   GraduationCap,
   Rocket,
   TrendingUp,
@@ -376,7 +376,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
           { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}`, icon: BookOpen, color: "text-indigo-600 bg-indigo-50" },
-          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: Map, color: "text-blue-600 bg-blue-50" },
+          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: MapIcon, color: "text-blue-600 bg-blue-50" },
           { href: "/training", label: "Courses", desc: "External resources", icon: GraduationCap, color: "text-violet-600 bg-violet-50" },
           { href: "/projects", label: "Projects", desc: "Monthly builds", icon: Rocket, color: "text-orange-600 bg-orange-50" },
           { href: "/progress", label: "Progress", desc: "XP & achievements", icon: TrendingUp, color: "text-green-600 bg-green-50" },
