@@ -14,28 +14,32 @@ export async function GET(req: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       // Auto-wire GitHub token for Activity Sync when user signs in with GitHub.
-      // Check `identities` (not `app_metadata.provider`) so users who originally
-      // signed up via email and later link GitHub are also handled correctly.
+      // Validate provider_token via the GitHub API to confirm it is a GitHub token
+      // (not a token from a different OAuth provider the user may also have linked).
       const { data: { session } } = await supabase.auth.getSession()
-      const identities = (session?.user.identities ?? []) as Array<{ provider: string }>
-      const hasGithubIdentity = identities.some((id) => id.provider === "github")
-      if (session?.provider_token && hasGithubIdentity) {
-        const githubUsername = session.user.user_metadata?.user_name as string | undefined
-        const email = session.user.email
-        if (githubUsername && email) {
-          // upsert: create the row on first-ever login, or update if it already exists
-          await prisma.user.upsert({
-            where: { id: session.user.id },
-            update: { githubUsername, githubAccessToken: session.provider_token },
-            create: {
-              id: session.user.id,
-              email,
-              name: (session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null) as string | null,
-              avatarUrl: (session.user.user_metadata?.avatar_url ?? null) as string | null,
-              githubUsername,
-              githubAccessToken: session.provider_token,
-            },
-          }).catch(() => { /* no-op — next authenticated request will retry via user upsert */ })
+      if (session?.provider_token) {
+        const ghRes = await fetch("https://api.github.com/user", {
+          headers: { Authorization: `Bearer ${session.provider_token}`, "User-Agent": "Devfluent" },
+        }).catch(() => null)
+        if (ghRes?.ok) {
+          const ghUser = await ghRes.json() as { login?: string }
+          const githubUsername = ghUser.login
+          const email = session.user.email
+          if (githubUsername && email) {
+            // upsert: create the row on first-ever login, or update if it already exists
+            await prisma.user.upsert({
+              where: { id: session.user.id },
+              update: { githubUsername, githubAccessToken: session.provider_token },
+              create: {
+                id: session.user.id,
+                email,
+                name: (session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null) as string | null,
+                avatarUrl: (session.user.user_metadata?.avatar_url ?? null) as string | null,
+                githubUsername,
+                githubAccessToken: session.provider_token,
+              },
+            }).catch(() => { /* no-op — next authenticated request will retry via user upsert */ })
+          }
         }
       }
       return NextResponse.redirect(new URL(next, req.url))

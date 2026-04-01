@@ -83,7 +83,7 @@ function LoginForm() {
       provider: "github",
       options: {
         redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next)}`,
-        scopes: "read:user",
+        scopes: "read:user user:email",
       },
     })
     if (error) {
