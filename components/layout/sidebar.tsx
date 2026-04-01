@@ -95,7 +95,7 @@ export function Sidebar({ locale, t }: SidebarProps) {
           <Link href="/datenschutz" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t.nav.datenschutz}</Link>
           <LanguageSwitcher
             current={locale}
-            label={t.locale.current}
+            label={t.locale.switchTo}
             className="text-xs text-gray-600 hover:text-gray-400 transition-colors ml-auto"
           />
         </div>

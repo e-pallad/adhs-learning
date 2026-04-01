@@ -164,7 +164,7 @@ const de: Dictionary = {
       },
       s4: {
         title: "4. Cookies und lokale Speicherung",
-        p1: "Die Anwendung verwendet funktionale Cookies ausschließlich für die Aufrechterhaltung der Anmeldesitzung (Session-Token von Supabase Auth). Diese Cookies sind technisch notwendig und erfordern keine gesonderte Einwilligung gemäß § 25 Abs. 2 TTDSG.",
+        p1: "Die Anwendung verwendet funktionale Cookies für die Aufrechterhaltung der Anmeldesitzung (Session-Token von Supabase Auth) sowie zur Speicherung Ihrer Spracheinstellung (NEXT_LOCALE). Diese Cookies sind technisch notwendig oder dienen einer funktionalen Präferenz und erfordern keine gesonderte Einwilligung gemäß § 25 Abs. 2 TTDSG.",
         p2: "Es werden keine Tracking-Cookies, Werbe-Cookies oder Cookies von Drittanbietern zu Analysezwecken gesetzt.",
       },
       s5: {

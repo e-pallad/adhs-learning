@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
+import { LOCALE_COOKIE, LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/config"
 
 const PUBLIC_PATHS = ["/", "/login", "/api/auth", "/impressum", "/datenschutz", "/offline", "/sw.js", "/manifest.webmanifest"]
-
-const LOCALE_COOKIE = "NEXT_LOCALE"
-const SUPPORTED_LOCALES = ["en", "de"]
 
 function detectLocale(req: NextRequest): string {
   const accept = req.headers.get("accept-language") ?? ""
   for (const part of accept.split(",")) {
     const lang = part.trim().split(";")[0].trim().split("-")[0].toLowerCase()
-    if (SUPPORTED_LOCALES.includes(lang)) return lang
+    if ((LOCALES as readonly string[]).includes(lang)) return lang
   }
-  return "en"
+  return DEFAULT_LOCALE
 }
 
 export async function proxy(req: NextRequest) {

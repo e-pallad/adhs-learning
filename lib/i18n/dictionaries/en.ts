@@ -162,7 +162,7 @@ const en = {
       },
       s4: {
         title: "4. Cookies and Local Storage",
-        p1: "The application uses functional cookies exclusively to maintain the login session (session token from Supabase Auth). These cookies are technically necessary and do not require separate consent under § 25(2) TTDSG.",
+        p1: "The application uses functional cookies to maintain the login session (session token from Supabase Auth) and to store your language preference (NEXT_LOCALE). These cookies are technically necessary or serve a functional preference purpose and do not require separate consent under § 25(2) TTDSG.",
         p2: "No tracking cookies, advertising cookies, or third-party analytics cookies are set.",
       },
       s5: {
