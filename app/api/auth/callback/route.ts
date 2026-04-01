@@ -13,9 +13,13 @@ export async function GET(req: NextRequest) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Auto-wire GitHub token for Activity Sync when user signs in with GitHub
+      // Auto-wire GitHub token for Activity Sync when user signs in with GitHub.
+      // Check `identities` (not `app_metadata.provider`) so users who originally
+      // signed up via email and later link GitHub are also handled correctly.
       const { data: { session } } = await supabase.auth.getSession()
-      if (session?.provider_token && session.user.app_metadata?.provider === "github") {
+      const identities = (session?.user.identities ?? []) as Array<{ provider: string }>
+      const hasGithubIdentity = identities.some((id) => id.provider === "github")
+      if (session?.provider_token && hasGithubIdentity) {
         const githubUsername = session.user.user_metadata?.user_name as string | undefined
         const email = session.user.email
         if (githubUsername && email) {
