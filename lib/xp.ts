@@ -2,8 +2,8 @@
 // Keep in sync with AGENTS.md
 
 export const XP_VALUES = {
-  COMPLETE_BLOCK: 15,
-  COMPLETE_BLOCK_POMODORO: 20, // bonus for using the timer
+  COMPLETE_BLOCK: 10,
+  COMPLETE_BLOCK_POMODORO: 15, // bonus for using the timer
   DAILY_LOGIN: 5,
   STREAK_BONUS_7: 10,
   STREAK_BONUS_30: 25,
@@ -12,26 +12,26 @@ export const XP_VALUES = {
   ADD_COURSE: 10,
   COMPLETE_COURSE: 50,
   COMPLETE_PROJECT: 100,
-  SKIP_BLOCK: 2,   // small XP even for skipping — keeps momentum
-  QUIZ_TRY: 5,     // any attempt
-  QUIZ_PASS: 15,   // score >= 70%
-  QUIZ_PERFECT: 30, // score 100%
+  SKIP_BLOCK: 1,   // small XP even for skipping — keeps momentum
+  QUIZ_TRY: 3,     // any attempt
+  QUIZ_PASS: 12,   // score >= 70%
+  QUIZ_PERFECT: 25, // score 100%
   GITHUB_PUSH: 5,           // per push event (not per commit)
   GITHUB_PR_OPENED: 10,
   GITHUB_PR_MERGED: 20,
 } as const
 
 export const LEVEL_THRESHOLDS: { level: number; xpRequired: number; label: string }[] = [
-  { level: 1,  xpRequired: 0,    label: "Newcomer" },
-  { level: 2,  xpRequired: 100,  label: "Explorer" },
-  { level: 3,  xpRequired: 250,  label: "Apprentice" },
-  { level: 4,  xpRequired: 500,  label: "Developer" },
-  { level: 5,  xpRequired: 1000, label: "Builder" },
-  { level: 6,  xpRequired: 2000, label: "Engineer" },
-  { level: 7,  xpRequired: 3500, label: "Craftsman" },
-  { level: 8,  xpRequired: 5000, label: "Architect" },
-  { level: 9,  xpRequired: 7500, label: "Expert" },
-  { level: 10, xpRequired: 10000, label: "Fluent Dev" },
+  { level: 1,  xpRequired: 0,     label: "Newcomer" },
+  { level: 2,  xpRequired: 150,   label: "Explorer" },
+  { level: 3,  xpRequired: 400,   label: "Apprentice" },
+  { level: 4,  xpRequired: 800,   label: "Developer" },
+  { level: 5,  xpRequired: 1500,  label: "Builder" },
+  { level: 6,  xpRequired: 3000,  label: "Engineer" },
+  { level: 7,  xpRequired: 5500,  label: "Craftsman" },
+  { level: 8,  xpRequired: 9000,  label: "Architect" },
+  { level: 9,  xpRequired: 13000, label: "Expert" },
+  { level: 10, xpRequired: 18000, label: "Fluent Dev" },
 ]
 
 export function getLevelFromXP(xp: number): number {

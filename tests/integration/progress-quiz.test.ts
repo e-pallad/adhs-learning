@@ -73,8 +73,8 @@ describe("POST /api/progress/quiz", () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 50 }))
     expect(res.status).toBe(200)
     const body = await res.json()
-    // QUIZ_TRY = 5
-    expect(body.xpEarned).toBe(5)
+    // QUIZ_TRY = 3
+    expect(body.xpEarned).toBe(3)
     expect(body.passed).toBe(false)
     expect(body.perfect).toBe(false)
   })
@@ -83,8 +83,8 @@ describe("POST /api/progress/quiz", () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 80 }))
     expect(res.status).toBe(200)
     const body = await res.json()
-    // QUIZ_TRY=5 + QUIZ_PASS=15 = 20
-    expect(body.xpEarned).toBe(20)
+    // QUIZ_TRY=3 + QUIZ_PASS=12 = 15
+    expect(body.xpEarned).toBe(15)
     expect(body.passed).toBe(true)
     expect(body.perfect).toBe(false)
   })
@@ -93,8 +93,8 @@ describe("POST /api/progress/quiz", () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 100 }))
     expect(res.status).toBe(200)
     const body = await res.json()
-    // QUIZ_TRY=5 + QUIZ_PASS=15 + QUIZ_PERFECT=30 = 50
-    expect(body.xpEarned).toBe(50)
+    // QUIZ_TRY=3 + QUIZ_PASS=12 + QUIZ_PERFECT=25 = 40
+    expect(body.xpEarned).toBe(40)
     expect(body.passed).toBe(true)
     expect(body.perfect).toBe(true)
   })
@@ -135,7 +135,7 @@ describe("POST /api/progress/quiz", () => {
     expect(record!.score).toBe(80)
     expect(record!.passed).toBe(true)
     expect(record!.perfect).toBe(false)
-    expect(record!.xpEarned).toBe(20)
+    expect(record!.xpEarned).toBe(15)
     expect(record!.id).toBe(body.attempt.id)
   })
 
@@ -149,7 +149,7 @@ describe("POST /api/progress/quiz", () => {
     expect(record!.score).toBe(100)
     expect(record!.passed).toBe(true)
     expect(record!.perfect).toBe(true)
-    expect(record!.xpEarned).toBe(50)
+    expect(record!.xpEarned).toBe(40)
   })
 
   // --- Achievements ---
@@ -184,25 +184,25 @@ describe("POST /api/progress/quiz", () => {
   // --- User XP reflected in database ---
 
   it("reflects QUIZ_TRY XP increase on the user record after a failed attempt", async () => {
-    // QUIZ_TRY=5, first-quiz achievement bonus=10 → totalXP=15
+    // QUIZ_TRY=3, first-quiz achievement bonus=10 → totalXP=13
     await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 50 }))
     const user = await prisma.user.findUnique({ where: { id: ID } })
-    expect(user!.totalXP).toBe(15) // 5 (quiz) + 10 (first-quiz achievement)
+    expect(user!.totalXP).toBe(13) // 3 (quiz) + 10 (first-quiz achievement)
   })
 
   it("reflects QUIZ_TRY + QUIZ_PASS XP on the user record after a passing attempt", async () => {
-    // QUIZ_TRY=5 + QUIZ_PASS=15 = 20, first-quiz achievement bonus=10 → totalXP=30
+    // QUIZ_TRY=3 + QUIZ_PASS=12 = 15, first-quiz achievement bonus=10 → totalXP=25
     await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 80 }))
     const user = await prisma.user.findUnique({ where: { id: ID } })
-    expect(user!.totalXP).toBe(30) // 20 (quiz) + 10 (first-quiz achievement)
+    expect(user!.totalXP).toBe(25) // 15 (quiz) + 10 (first-quiz achievement)
   })
 
   it("reflects full XP on the user record after a perfect attempt", async () => {
-    // QUIZ_TRY=5 + QUIZ_PASS=15 + QUIZ_PERFECT=30 = 50
-    // first-quiz achievement bonus=10, perfect-score achievement bonus=25 → totalXP=85
+    // QUIZ_TRY=3 + QUIZ_PASS=12 + QUIZ_PERFECT=25 = 40
+    // first-quiz achievement bonus=10, perfect-score achievement bonus=25 → totalXP=75
     await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 100 }))
     const user = await prisma.user.findUnique({ where: { id: ID } })
-    expect(user!.totalXP).toBe(85) // 50 (quiz) + 10 (first-quiz) + 25 (perfect-score)
+    expect(user!.totalXP).toBe(75) // 40 (quiz) + 10 (first-quiz) + 25 (perfect-score)
   })
 
   // --- Response shape ---

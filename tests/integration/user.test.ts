@@ -26,8 +26,8 @@ describe("lib/user.ts helpers", () => {
       expect(result.newLevel).toBe(1)
     })
 
-    it("returns leveledUp:true when crossing threshold (100 XP → level 2)", async () => {
-      const result = await awardXP(ID, 100)
+    it("returns leveledUp:true when crossing threshold (150 XP → level 2)", async () => {
+      const result = await awardXP(ID, 150)
       expect(result.leveledUp).toBe(true)
       expect(result.newLevel).toBe(2)
     })

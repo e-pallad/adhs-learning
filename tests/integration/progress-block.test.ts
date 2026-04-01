@@ -41,22 +41,22 @@ describe("POST /api/progress/block", () => {
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.success).toBe(true)
-    expect(body.xpAwarded).toBe(15) // XP_VALUES.COMPLETE_BLOCK
+    expect(body.xpAwarded).toBe(10) // XP_VALUES.COMPLETE_BLOCK
 
     const bp = await prisma.blockProgress.findUnique({
       where: { userId_blockId: { userId: ID, blockId: BLOCK } },
     })
     expect(bp!.status).toBe("COMPLETED")
 
-    // totalXP = 15 (block) + 10 (first_block achievement bonus)
+    // totalXP = 10 (block) + 10 (first_block achievement bonus)
     const user = await prisma.user.findUnique({ where: { id: ID } })
-    expect(user!.totalXP).toBe(25)
+    expect(user!.totalXP).toBe(20)
   })
 
   it("awards Pomodoro bonus XP when usedTimer is true", async () => {
     const res = await POST(makePost("/api/progress/block", { blockId: BLOCK, status: "COMPLETED", usedTimer: true }))
     const body = await res.json()
-    expect(body.xpAwarded).toBe(20) // XP_VALUES.COMPLETE_BLOCK_POMODORO
+    expect(body.xpAwarded).toBe(15) // XP_VALUES.COMPLETE_BLOCK_POMODORO
   })
 
   it("does NOT double-award XP when completing an already-completed block", async () => {
@@ -65,16 +65,16 @@ describe("POST /api/progress/block", () => {
     const body = await res.json()
     expect(body.xpAwarded).toBe(0)
 
-    // After first completion: 15 (block) + 10 (first_block achievement) = 25
-    // Second completion: xpAwarded=0, totalXP stays at 25
+    // After first completion: 10 (block) + 10 (first_block achievement) = 20
+    // Second completion: xpAwarded=0, totalXP stays at 20
     const user = await prisma.user.findUnique({ where: { id: ID } })
-    expect(user!.totalXP).toBe(25)
+    expect(user!.totalXP).toBe(20)
   })
 
-  it("awards SKIP_BLOCK XP (2) for skipped status", async () => {
+  it("awards SKIP_BLOCK XP (1) for skipped status", async () => {
     const res = await POST(makePost("/api/progress/block", { blockId: BLOCK, status: "SKIPPED" }))
     const body = await res.json()
-    expect(body.xpAwarded).toBe(2)
+    expect(body.xpAwarded).toBe(1)
   })
 
   it("sanitizes negative minutesSpent to 0", async () => {
