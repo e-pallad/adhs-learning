@@ -79,17 +79,7 @@ function LoginForm() {
   const handleGitHub = async () => {
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(next)}`,
-        scopes: "read:user user:email",
-      },
-    })
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-    }
+    window.location.href = `/api/auth/github/login?next=${encodeURIComponent(next)}`
   }
 
   return (
