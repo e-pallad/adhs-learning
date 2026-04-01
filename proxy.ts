@@ -16,12 +16,20 @@ function detectLocale(req: NextRequest): string {
 export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
+  // Ensure getLocale() sees the correct locale during this request.
+  // Writing to req.cookies propagates into the cookies() store used by server
+  // components, so first-time visitors get the right locale on the first render
+  // (not only after a subsequent request when the browser sends the cookie back).
+  const needsLocaleCookie = !req.cookies.get(LOCALE_COOKIE)
+  if (needsLocaleCookie) {
+    req.cookies.set(LOCALE_COOKIE, detectLocale(req))
+  }
+
   // Allow public paths (exact match for "/" to avoid bypassing all auth)
   if (PUBLIC_PATHS.some((p) => p === "/" ? pathname === "/" : pathname.startsWith(p))) {
     const res = NextResponse.next()
-    // Auto-set locale cookie on first visit if not already set
-    if (!req.cookies.get(LOCALE_COOKIE)) {
-      res.cookies.set(LOCALE_COOKIE, detectLocale(req), {
+    if (needsLocaleCookie) {
+      res.cookies.set(LOCALE_COOKIE, req.cookies.get(LOCALE_COOKIE)!.value, {
         path: "/",
         maxAge: 60 * 60 * 24 * 365,
         sameSite: "lax",
@@ -32,9 +40,8 @@ export async function proxy(req: NextRequest) {
 
   const res = NextResponse.next()
 
-  // Auto-set locale cookie if not already set
-  if (!req.cookies.get(LOCALE_COOKIE)) {
-    res.cookies.set(LOCALE_COOKIE, detectLocale(req), {
+  if (needsLocaleCookie) {
+    res.cookies.set(LOCALE_COOKIE, req.cookies.get(LOCALE_COOKIE)!.value, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
