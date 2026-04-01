@@ -1,6 +1,6 @@
 # Devfluent — Open Tasks
 
-> Last updated: 2026-03-26
+> Last updated: 2026-03-31
 
 > **Branching rule:** Every phase / major feature gets its own branch and PR. Never bundle multiple independent features into a single branch.
 
@@ -98,6 +98,115 @@
 
 ---
 
+## i18n & Auth → PR #44 (`add-i18n-github-login`)
+
+- [ ] **Multi-language support (i18n) for menus, landing page, and legal pages**
+  Add internationalisation to navigation menus, the landing page, and legal pages (`/impressum`, `/datenschutz`). Default language: English (`en`). Initially support `en` + `de`.
+
+- [ ] **Remove Google login**
+  Strip Google OAuth provider from the login page and any related config.
+
+- [ ] **Add more achievements**
+  Extend `ACHIEVEMENT_DEFINITIONS` in `lib/xp.ts`. Ideas:
+
+  *Blocks / progress*
+  - `blocks_10` — "Getting Started" — complete 10 blocks
+  - `blocks_50` — "On a Roll" — complete 50 blocks
+  - `blocks_100` — "Century" — complete 100 blocks
+  - `blocks_500` — "Grinder" — complete 500 blocks
+
+  *Streaks*
+  - `streak_14` — "Two Weeks Strong" — 14-day streak (gap between 7 and 30)
+  - `streak_100` — "Centurion" — 100-day streak
+
+  *Levels*
+  - `level_3` — "Apprentice" — reach level 3 (early win)
+  - `level_7` — "Craftsman" — reach level 7
+
+  *Quiz*
+  - `perfect_3` — "Perfectionist" — 3 perfect quiz scores
+  - `quiz_25` — "Study Machine" — pass 25 quizzes
+
+  *GitHub*
+  - `first_push` — "Shipped Code" — first GitHub push synced
+  - `pr_merged_5` — "Pull Request Pro" — 5 PRs merged
+  - `push_streak_7` — "Daily Committer" — pushes on 7 different days
+
+  *Pomodoro / focus*
+  - `first_pomodoro` — "Focus Mode" — complete first block using Pomodoro timer
+  - `pomodoro_10` — "Deep Work" — complete 10 blocks with Pomodoro timer
+
+  *Projects*
+  - `projects_6` — "Half Way There" — complete 6 monthly projects
+  - `projects_12` — "Full Stack" — complete all 12 monthly projects
+
+  *Social / misc*
+  - `accountability_linked` — "Better Together" — link an accountability partner
+  - `body_double_5` — "Not Alone" — join body-double mode 5 times
+
+- [ ] **Overhaul XP system**
+  XP gains are too high and levels are reached too fast. Rebalance XP values in `lib/xp.ts` and review level thresholds to make progression feel meaningful and appropriately paced.
+
+
+  Add GitHub as a sign-in method. When a user signs in with GitHub, that OAuth token should automatically be used for the GitHub Activity Sync — no separate "Connect GitHub" step needed.
+
+---
+
+## ADHD-Friendly Tools — Phase 4
+
+### Time Blindness
+
+- [ ] **Visual timer**
+  Replace (or complement) the Pomodoro digit countdown with a shrinking circle/pie visual. More intuitive for people with poor time perception.
+  _ADHD: Digits are abstract; a shrinking shape makes time passing viscerally visible._
+
+- [ ] **Transition warnings**
+  Show a gentle alert ~2 minutes before a Pomodoro session ends so the context switch isn't abrupt.
+  _ADHD: Sudden interruptions are jarring and cause frustration; a soft warning allows mental preparation._
+
+- [ ] **Time-blocking planner**
+  A simple daily schedule view where users anchor study sessions to existing habits (e.g. "09:00 — 1 block after morning coffee").
+  _ADHD: Attaching new behaviours to existing routines (habit stacking) dramatically improves follow-through._
+
+### Working Memory
+
+- [ ] **Block scratchpad**
+  A quick-notes field attached to each learning block — capture thoughts, questions, or code snippets without leaving the page.
+  _ADHD: Offloads working memory so the user can stay focused without losing stray thoughts._
+
+- [ ] **Brain dump**
+  A one-click notepad that appears before a session starts. User empties distracting thoughts into it, then begins studying with a clearer head.
+  _ADHD: Pre-session brain dumps reduce internal noise and improve on-task focus._
+
+- [ ] **Quick-start / resume**
+  A single prominent button on the dashboard that jumps straight back to the last open block — zero navigation friction.
+  _ADHD: Reduces the initiation barrier; the hardest part of studying is often just starting._
+
+### Motivation & Progress Visibility
+
+- [ ] **Progress replay**
+  A "look how far you've come" view showing all completed blocks, milestones, and achievements over time.
+  _ADHD: Combats imposter syndrome and RSD by making invisible progress visible and concrete._
+
+- [ ] **Celebration animations** *(opt-in)*
+  More visible dopamine hit on block/level/achievement completion — confetti, sound, or a brief full-screen moment.
+  Add a toggle in Settings to enable/disable (some users find animations distracting).
+  _ADHD: Immediate positive reinforcement is essential; delayed rewards have little motivational effect._
+
+### Focus & Interest
+
+- [ ] **Interest spike mode**
+  Let users temporarily jump to a different topic or month when curiosity strikes, then return to their original position. Log the detour so they never get lost.
+  _ADHD: Fighting interest spikes causes frustration and avoidance; channelling them keeps momentum going._
+
+### Routine & Structure
+
+- [ ] **Habit stacking / study reminders**
+  User defines a trigger ("after my morning coffee", "at 09:00") and receives a push notification or in-app nudge to start their session.
+  _ADHD: Linking study to an existing anchor habit removes the need to remember or self-initiate._
+
+---
+
 ## Feature Roadmap
 
 ### Phase 1 — Short-term
@@ -130,6 +239,26 @@
   Shared anonymous focus session — user sees a real-time count of active learners.
   Implementation: Supabase Realtime channel + anonymous presence.
   _ADHD: A well-established ADHD technique — the perceived presence of others significantly increases productivity._
+
+---
+
+### UI / Navigation
+
+- [ ] **Logout button & profile link in top bar**
+  Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
+
+- [ ] **Fix 502 Bad Gateway**
+  Fix the Problem where if the Session timed out a error 502 is thrown on the page. The User should get redirected to the Login. 
+
+- [ ] **Data privacy & user tracking transparency page**
+  Add a dedicated page where users can see exactly what data is collected and stored about them (XP history, quiz scores, GitHub tokens, etc.), download their data (GDPR Art. 20 portability), and permanently delete their account + all associated data (GDPR Art. 17 right to erasure). Link from Settings and the Datenschutz page.
+
+- [ ] **Demo mode with limited access**
+  Allow unauthenticated visitors to try the app without signing up. Show a fixed set of blocks (e.g. Month 1, Week 1), a mock XP/streak state, and a persistent banner prompting sign-up to save progress. No DB writes in demo mode.
+
+- [ ] **Profile images**
+  Allow users to upload or link a profile picture. Show it in the top bar, on the accountability partner panel, and in body-double mode.
+  Options: direct upload to Supabase Storage, or pull avatar from GitHub OAuth when signed in with GitHub.
 
 ---
 
