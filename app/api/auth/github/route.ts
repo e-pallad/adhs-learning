@@ -1,14 +1,34 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/user"
 
-export async function GET() {
+function getAppOrigin(req: NextRequest): string {
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim()
+  if (configured) {
+    try {
+      return new URL(configured).origin
+    } catch {
+      // Fall through to forwarded/request origin when env is invalid.
+    }
+  }
+
+  const forwardedHost = req.headers.get("x-forwarded-host")
+  if (forwardedHost) {
+    const forwardedProto = req.headers.get("x-forwarded-proto") ?? "https"
+    return `${forwardedProto}://${forwardedHost}`
+  }
+
+  return req.nextUrl.origin
+}
+
+export async function GET(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const appOrigin = getAppOrigin(req)
   const state = crypto.randomUUID()
   const params = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID!,
-    redirect_uri: `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/github/callback`,
+    redirect_uri: `${appOrigin}/api/auth/github/callback`,
     scope: "read:user",
     state,
   })
