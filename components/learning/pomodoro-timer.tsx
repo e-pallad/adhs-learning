@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { FocusSounds } from "./focus-sounds"
+import { toast } from "sonner"
 
 type TimerState = "idle" | "running" | "break" | "done"
 
@@ -23,6 +24,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const onCompleteRef = useRef(onComplete)
   const secondsLeftRef = useRef(FOCUS_MINUTES * 60)
   const tickRef = useRef<() => void>(() => {})
+  const warnedRef = useRef(false)
 
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -31,6 +33,14 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const tick = useCallback(() => {
     secondsLeftRef.current -= 1
     setSecondsLeft(secondsLeftRef.current)
+
+    if (stateRef.current === "running" && secondsLeftRef.current === 120 && !warnedRef.current) {
+      warnedRef.current = true
+      toast("2-minute heads-up", {
+        description: "Session ending soon. Wrap up your current thought.",
+      })
+    }
+
     if (secondsLeftRef.current > 0) return
     clear()
     if (stateRef.current === "running") {
@@ -51,6 +61,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   useEffect(() => () => clear(), [clear])
 
   const start = () => {
+    warnedRef.current = false
     secondsLeftRef.current = FOCUS_MINUTES * 60
     setState("running")
     setSecondsLeft(FOCUS_MINUTES * 60)
@@ -65,6 +76,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
 
   const reset = () => {
     clear()
+    warnedRef.current = false
     setState("idle")
     secondsLeftRef.current = FOCUS_MINUTES * 60
     setSecondsLeft(FOCUS_MINUTES * 60)
