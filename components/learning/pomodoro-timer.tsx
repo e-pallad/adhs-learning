@@ -88,6 +88,8 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
 
   const totalSeconds = state === "break" ? BREAK_MINUTES * 60 : FOCUS_MINUTES * 60
   const progress = ((totalSeconds - secondsLeft) / totalSeconds) * 100
+  const remainingPercent = Math.max(0, Math.min(100, (secondsLeft / totalSeconds) * 100))
+  const timerColor = state === "break" ? "#10b981" : "#6366f1"
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -95,13 +97,21 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
         <p className="text-sm text-gray-500 text-center max-w-xs truncate">{blockTitle}</p>
       )}
 
-      {/* Timer ring */}
-      <div className="relative w-36 h-36">
+      {/* Timer ring + shrinking pie */}
+      <div className="relative w-40 h-40">
+        <div
+          className="absolute inset-5 rounded-full border border-gray-200 dark:border-gray-700"
+          style={{
+            background: `conic-gradient(${timerColor} ${remainingPercent}%, #e5e7eb ${remainingPercent}% 100%)`,
+          }}
+          aria-hidden="true"
+        />
+        <div className="absolute inset-[32px] rounded-full bg-white dark:bg-gray-900" aria-hidden="true" />
         <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
           <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" strokeWidth="8" />
           <circle
             cx="60" cy="60" r="54" fill="none"
-            stroke={state === "break" ? "#10b981" : "#6366f1"}
+            stroke={timerColor}
             strokeWidth="8"
             strokeDasharray={`${2 * Math.PI * 54}`}
             strokeDashoffset={`${2 * Math.PI * 54 * (1 - progress / 100)}`}
