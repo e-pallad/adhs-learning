@@ -53,8 +53,8 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [syncResult, setSyncResult] = useState<{ newEvents: number; totalXPAwarded: number } | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
   const [celebrationsEnabled, setCelebrationsEnabled] = useState(() => {
-    if (typeof window === "undefined") return true
-    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) !== "false"
+    if (typeof window === "undefined") return false
+    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
   })
 
   const handleSaveName = async (e: React.FormEvent) => {

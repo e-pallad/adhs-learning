@@ -28,8 +28,8 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   const [showQuiz, setShowQuiz] = useState(false)
   const [quizCelebration, setQuizCelebration] = useState<{ xpEarned: number; passed: boolean; perfect: boolean } | null>(null)
   const [celebrationsEnabled] = useState(() => {
-    if (typeof window === "undefined") return true
-    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) !== "false"
+    if (typeof window === "undefined") return false
+    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
   })
 
   const isCompleted = status === "COMPLETED"
