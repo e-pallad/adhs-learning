@@ -8,16 +8,11 @@ function getAppOrigin(req: NextRequest): string {
     try {
       return new URL(configured).origin
     } catch {
-      // Fall through to forwarded/request origin when env is invalid.
+      // Fall through to request origin when env is invalid.
     }
   }
-
-  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim()
-  if (forwardedHost) {
-    const forwardedProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || "https"
-    return `${forwardedProto}://${forwardedHost}`
-  }
-
+  // Do not trust forwarded headers — they can be client-influenced in pass-through
+  // proxy configurations. NEXT_PUBLIC_APP_URL must be set in production.
   return req.nextUrl.origin
 }
 
