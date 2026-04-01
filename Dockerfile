@@ -18,8 +18,10 @@ WORKDIR /app
 # into the client bundle. Pass them via --build-arg / compose build.args.
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 # Prisma generate does not need a live DB connection
 ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
