@@ -5,20 +5,21 @@ import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppTour } from "@/components/tour/app-tour"
 import { getCurrentUser } from "@/lib/user"
 import { getXPProgress } from "@/lib/xp"
+import { getLocale, getDictionary } from "@/lib/i18n"
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const user = await getCurrentUser()
+  const [user, locale] = await Promise.all([getCurrentUser(), getLocale()])
   if (!user) redirect("/login")
 
-  const xpProgress = getXPProgress(user.totalXP)
+  const [xpProgress, t] = [getXPProgress(user.totalXP), await getDictionary(locale)]
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Sidebar />
+      <Sidebar locale={locale} t={t} />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar
           totalXP={user.totalXP}
@@ -29,7 +30,7 @@ export default async function DashboardLayout({
           {children}
         </main>
       </div>
-      <MobileNav />
+      <MobileNav t={t} />
       <AppTour autoStart />
     </div>
   )
