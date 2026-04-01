@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach, vi } 
 import { GET } from "@/app/api/auth/callback/route"
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { createClient } from "@/lib/supabase/server"
+import { createCallbackClient } from "@/lib/supabase/server"
 import { createTestUser, deleteTestUser } from "../helpers/test-user"
 
 const ID = "test-user-auth-callback"
@@ -86,8 +86,8 @@ describe("GET /api/auth/callback", () => {
   })
 
   it("redirects to /login?error=auth when code exchange fails", async () => {
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({ exchangeError: true }) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({ exchangeError: true }) as unknown as ReturnType<typeof createCallbackClient>
     )
     const res = await GET(makeGET("bad-code"))
     expect(res.status).toBe(307)
@@ -95,8 +95,8 @@ describe("GET /api/auth/callback", () => {
   })
 
   it("redirects to /dashboard by default on success", async () => {
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({}) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({}) as unknown as ReturnType<typeof createCallbackClient>
     )
     const res = await GET(makeGET("valid-code"))
     expect(res.status).toBe(307)
@@ -104,16 +104,16 @@ describe("GET /api/auth/callback", () => {
   })
 
   it("honours a safe relative `next` param", async () => {
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({}) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({}) as unknown as ReturnType<typeof createCallbackClient>
     )
     const res = await GET(makeGET("valid-code", "/learning"))
     expect(res.headers.get("location")).toContain("/learning")
   })
 
   it("blocks open redirect: //evil.com falls back to /dashboard", async () => {
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({}) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({}) as unknown as ReturnType<typeof createCallbackClient>
     )
     const res = await GET(makeGET("valid-code", "//evil.com"))
     expect(res.headers.get("location")).toMatch(/\/dashboard$/)
@@ -122,8 +122,8 @@ describe("GET /api/auth/callback", () => {
   // ─── GitHub credential upsert ──────────────────────────────────────────────
 
   it("does NOT upsert credentials when provider_token is absent (email login)", async () => {
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({ providerToken: null }) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({ providerToken: null }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
@@ -132,8 +132,8 @@ describe("GET /api/auth/callback", () => {
 
   it("does NOT upsert credentials when GitHub API rejects the token (non-GitHub provider)", async () => {
     stubNonGitHubToken()
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({ providerToken: "non-github-token" }) as unknown as ReturnType<typeof createClient>
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({ providerToken: "non-github-token" }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
@@ -142,10 +142,10 @@ describe("GET /api/auth/callback", () => {
 
   it("upserts credentials when GitHub API confirms the token (first-time signup)", async () => {
     stubGitHubAPI("octocat")
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({
         providerToken: "gh-token-signup",
-      }) as unknown as ReturnType<typeof createClient>
+      }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
@@ -155,10 +155,10 @@ describe("GET /api/auth/callback", () => {
 
   it("upserts credentials for email user who linked GitHub (GitHub API confirms token)", async () => {
     stubGitHubAPI("octocat-linked")
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({
         providerToken: "gh-token-linked",
-      }) as unknown as ReturnType<typeof createClient>
+      }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
@@ -170,12 +170,12 @@ describe("GET /api/auth/callback", () => {
     const NEW_ID = "test-user-auth-callback-new"
     try {
       stubGitHubAPI("newdev")
-      vi.mocked(createClient).mockImplementationOnce(
-        async () => mockSupabaseClient({
+      vi.mocked(createCallbackClient).mockImplementationOnce(
+        () => mockSupabaseClient({
           userId: NEW_ID,
           email: `${NEW_ID}@test.devfluent`,
           providerToken: "gh-new-token",
-        }) as unknown as ReturnType<typeof createClient>
+        }) as unknown as ReturnType<typeof createCallbackClient>
       )
       await GET(makeGET("valid-code"))
       const user = await prisma.user.findUnique({ where: { id: NEW_ID } })
@@ -192,10 +192,10 @@ describe("GET /api/auth/callback", () => {
       "fetch",
       vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) // no `login` field
     )
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({
         providerToken: "gh-token-no-name",
-      }) as unknown as ReturnType<typeof createClient>
+      }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
@@ -204,10 +204,10 @@ describe("GET /api/auth/callback", () => {
 
   it("does NOT upsert when fetch throws (network error)", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network error")))
-    vi.mocked(createClient).mockImplementationOnce(
-      async () => mockSupabaseClient({
+    vi.mocked(createCallbackClient).mockImplementationOnce(
+      () => mockSupabaseClient({
         providerToken: "gh-token-network-fail",
-      }) as unknown as ReturnType<typeof createClient>
+      }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
     const user = await prisma.user.findUnique({ where: { id: ID } })
