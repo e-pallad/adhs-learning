@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/theme-provider"
+import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { Moon, Sun } from "lucide-react"
 
 const TRACKS = [
@@ -51,6 +52,10 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
   const [disconnecting, setDisconnecting] = useState(false)
   const [syncResult, setSyncResult] = useState<{ newEvents: number; totalXPAwarded: number } | null>(null)
   const [syncError, setSyncError] = useState<string | null>(null)
+  const [celebrationsEnabled, setCelebrationsEnabled] = useState(() => {
+    if (typeof window === "undefined") return false
+    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
+  })
 
   const handleSaveName = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,6 +134,12 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
     } else {
       setSyncError("Failed to disconnect GitHub.")
     }
+  }
+
+  const handleCelebrationToggle = () => {
+    const nextValue = !celebrationsEnabled
+    setCelebrationsEnabled(nextValue)
+    window.localStorage.setItem(CELEBRATION_ANIMATIONS_KEY, String(nextValue))
   }
 
   return (
@@ -229,6 +240,23 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
           ) : (
             <><Moon className="w-4 h-4 mr-2" /> Dark mode</>
           )}
+        </Button>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-gray-100 dark:border-gray-700" />
+
+      {/* Learning experience */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Learning experience</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400">Choose whether completion celebrations are shown after blocks and quizzes.</p>
+        <Button
+          type="button"
+          variant={celebrationsEnabled ? "secondary" : "ghost"}
+          size="sm"
+          onClick={handleCelebrationToggle}
+        >
+          Celebration animations: {celebrationsEnabled ? "On" : "Off"}
         </Button>
       </div>
 

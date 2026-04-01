@@ -9,6 +9,7 @@ import { CelebrationModal } from "@/components/gamification/celebration-modal"
 import { QuizModal } from "@/components/learning/quiz-modal"
 import { BLOCK_TYPE_COLORS, BLOCK_TYPE_LABELS, type LearningBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
+import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { cn } from "@/lib/utils"
 import { ChevronDown, Check } from "lucide-react"
 
@@ -26,6 +27,10 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   const [timerUsed, setTimerUsed] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
   const [quizCelebration, setQuizCelebration] = useState<{ xpEarned: number; passed: boolean; perfect: boolean } | null>(null)
+  const [celebrationsEnabled] = useState(() => {
+    if (typeof window === "undefined") return false
+    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
+  })
 
   const isCompleted = status === "COMPLETED"
   const isSkipped = status === "SKIPPED"
@@ -35,7 +40,9 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
     setLoading(true)
     try {
       const result = await onComplete(block.id, timerUsed)
-      setCelebration(result)
+      if (celebrationsEnabled) {
+        setCelebration(result)
+      }
     } finally {
       setLoading(false)
     }
@@ -48,7 +55,9 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
     achievements: unknown[]
   }) => {
     if (result.passed) {
-      setQuizCelebration(result)
+      if (celebrationsEnabled) {
+        setQuizCelebration(result)
+      }
       if (onComplete && !isCompleted && !loading) {
         setLoading(true)
         onComplete(block.id, timerUsed).finally(() => setLoading(false))
