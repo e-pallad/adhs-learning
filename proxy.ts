@@ -16,20 +16,22 @@ function detectLocale(req: NextRequest): string {
 export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  // Ensure getLocale() sees the correct locale during this request.
-  // Writing to req.cookies propagates into the cookies() store used by server
-  // components, so first-time visitors get the right locale on the first render
-  // (not only after a subsequent request when the browser sends the cookie back).
-  const needsLocaleCookie = !req.cookies.get(LOCALE_COOKIE)
+  // Detect locale once; use the value directly rather than reading back from
+  // req.cookies (which may not reflect the set() call in all runtimes).
+  const existingLocale = req.cookies.get(LOCALE_COOKIE)
+  const needsLocaleCookie = !existingLocale
+  const localeValue = existingLocale?.value ?? detectLocale(req)
+
   if (needsLocaleCookie) {
-    req.cookies.set(LOCALE_COOKIE, detectLocale(req))
+    // Propagate into req.cookies so server components see it on this request.
+    req.cookies.set(LOCALE_COOKIE, localeValue)
   }
 
   // Allow public paths (exact match for "/" to avoid bypassing all auth)
   if (PUBLIC_PATHS.some((p) => p === "/" ? pathname === "/" : pathname.startsWith(p))) {
     const res = NextResponse.next()
     if (needsLocaleCookie) {
-      res.cookies.set(LOCALE_COOKIE, req.cookies.get(LOCALE_COOKIE)!.value, {
+      res.cookies.set(LOCALE_COOKIE, localeValue, {
         path: "/",
         maxAge: 60 * 60 * 24 * 365,
         sameSite: "lax",
@@ -41,7 +43,7 @@ export async function proxy(req: NextRequest) {
   const res = NextResponse.next()
 
   if (needsLocaleCookie) {
-    res.cookies.set(LOCALE_COOKIE, req.cookies.get(LOCALE_COOKIE)!.value, {
+    res.cookies.set(LOCALE_COOKIE, localeValue, {
       path: "/",
       maxAge: 60 * 60 * 24 * 365,
       sameSite: "lax",
@@ -57,14 +59,23 @@ export async function proxy(req: NextRequest) {
           return req.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            req.cookies.set(name, value)
-            res.cookies.set(name, value, {
-              ...options,
-              secure: process.env.NODE_ENV === "production",
-              sameSite: "lax",
+          // Supabase may call setAll asynchronously via onAuthStateChange after
+          // the proxy function has already returned a redirect. Wrap in try/catch
+          // so a stale request/response object cannot cause an unhandled rejection
+          // that crashes the Node.js process (502).
+          try {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              req.cookies.set(name, value)
+              res.cookies.set(name, value, {
+                ...options,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "lax",
+              })
             })
-          })
+          } catch {
+            // Intentionally swallowed — called from an async onAuthStateChange
+            // callback that fires after the proxy has returned; nothing to update.
+          }
         },
       },
     }
