@@ -35,14 +35,13 @@ function mockSupabaseClient(opts: MockOpts) {
     auth: {
       getUser: vi.fn(async () => ({ data: { user } })),
       exchangeCodeForSession: vi.fn(async () => ({
-        error: opts.exchangeError ? { message: "invalid_grant" } : null,
-      })),
-      getSession: vi.fn(async () => ({
         data: {
           session: opts.exchangeError
             ? null
             : { provider_token: opts.providerToken ?? null, user },
+          user: opts.exchangeError ? null : user,
         },
+        error: opts.exchangeError ? { message: "invalid_grant" } : null,
       })),
     },
   }

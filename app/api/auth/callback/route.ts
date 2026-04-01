@@ -11,12 +11,11 @@ export async function GET(req: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       // Auto-wire GitHub token for Activity Sync when user signs in with GitHub.
       // Validate provider_token via the GitHub API to confirm it is a GitHub token
       // (not a token from a different OAuth provider the user may also have linked).
-      const { data: { session } } = await supabase.auth.getSession()
       if (session?.provider_token) {
         const ghRes = await fetch("https://api.github.com/user", {
           headers: { Authorization: `Bearer ${session.provider_token}`, "User-Agent": "Devfluent" },
@@ -38,7 +37,7 @@ export async function GET(req: NextRequest) {
                 githubUsername,
                 githubAccessToken: session.provider_token,
               },
-            }).catch(() => { /* no-op — next authenticated request will retry via user upsert */ })
+            }).catch((err) => { console.error("[auth/callback] Failed to persist GitHub credentials:", err) })
           }
         }
       }
