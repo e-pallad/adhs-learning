@@ -18,4 +18,16 @@ vi.mock("@/lib/supabase/server", () => ({
       })),
     },
   })),
+  createCallbackClient: vi.fn(() => ({
+    auth: {
+      getUser: vi.fn(async () => ({
+        data: {
+          user: _testUserId
+            ? { id: _testUserId, email: `${_testUserId}@test.devfluent` }
+            : null,
+        },
+      })),
+      exchangeCodeForSession: vi.fn(async () => ({ data: { session: null }, error: null })),
+    },
+  })),
 }))
