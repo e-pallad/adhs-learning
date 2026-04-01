@@ -1,17 +1,22 @@
 import type { Metadata } from "next"
+import { getLocale, getDictionary } from "@/lib/i18n"
 
 export const metadata: Metadata = {
   title: "Impressum — Devfluent",
 }
 
-export default function ImpressumPage() {
+export default async function ImpressumPage() {
+  const locale = await getLocale()
+  const t = await getDictionary(locale)
+  const i = t.impressum
+
   return (
     <article className="prose prose-gray max-w-none">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Impressum</h1>
-      <p className="text-sm text-gray-500 mb-8">Angaben gemäß § 5 TMG</p>
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">{i.title}</h1>
+      <p className="text-sm text-gray-500 mb-8">{i.subtitle}</p>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">Anbieter</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">{i.provider.heading}</h2>
         <address className="not-italic text-gray-700 leading-7">
           <strong>devfluent, Inh. Eric Pallad</strong><br />
           Burgstädter Str. 17<br />
@@ -21,9 +26,9 @@ export default function ImpressumPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">Kontakt</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">{i.contact.heading}</h2>
         <p className="text-gray-700">
-          E-Mail:{" "}
+          {i.contact.emailLabel}:{" "}
           <a
             href="mailto:kontakt@devfluent.de"
             className="text-indigo-600 hover:underline"
@@ -35,7 +40,7 @@ export default function ImpressumPage() {
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">
-          Verantwortlich für den Inhalt (§ 18 Abs. 2 MStV)
+          {i.responsible.heading}
         </h2>
         <address className="not-italic text-gray-700 leading-7">
           Eric Pallad<br />
@@ -46,10 +51,10 @@ export default function ImpressumPage() {
 
       <section className="mb-8">
         <h2 className="text-xl font-semibold text-gray-800 mb-3">
-          Streitschlichtung (§ 36 VSBG)
+          {i.dispute.heading}
         </h2>
         <p className="text-gray-600 text-sm leading-6">
-          Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
+          {i.dispute.odrText}{" "}
           <a
             href="https://ec.europa.eu/consumers/odr"
             target="_blank"
@@ -60,36 +65,26 @@ export default function ImpressumPage() {
           </a>
         </p>
         <p className="text-gray-600 text-sm leading-6 mt-2">
-          Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
-          Verbraucherschlichtungsstelle teilzunehmen.
+          {i.dispute.noParticipation}
         </p>
       </section>
 
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-3">Haftungsausschluss</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-3">{i.liability.heading}</h2>
 
-        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">Haftung für Inhalte</h3>
+        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">{i.liability.contentHeading}</h3>
         <p className="text-gray-600 text-sm leading-6">
-          Als Diensteanbieter sind wir gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten nach
-          den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter
-          jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen
-          oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
+          {i.liability.contentText}
         </p>
 
-        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">Haftung für Links</h3>
+        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">{i.liability.linksHeading}</h3>
         <p className="text-gray-600 text-sm leading-6">
-          Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir keinen
-          Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen.
-          Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der
-          Seiten verantwortlich.
+          {i.liability.linksText}
         </p>
 
-        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">Urheberrecht</h3>
+        <h3 className="text-base font-semibold text-gray-700 mt-4 mb-2">{i.liability.copyrightHeading}</h3>
         <p className="text-gray-600 text-sm leading-6">
-          Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen
-          dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der
-          Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung
-          des jeweiligen Autors bzw. Erstellers.
+          {i.liability.copyrightText}
         </p>
       </section>
     </article>

@@ -14,18 +14,23 @@ import {
   Settings,
   Compass,
 } from "lucide-react"
+import type { Dictionary } from "@/lib/i18n/dictionaries/en"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import type { Locale } from "@/lib/i18n/config"
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/learning", label: "Learning", icon: BookOpen, tourId: "nav-learning" },
-  { href: "/roadmap", label: "Roadmap", icon: Map, tourId: "nav-roadmap" },
-  { href: "/training", label: "Courses", icon: GraduationCap, tourId: "nav-training" },
-  { href: "/projects", label: "Projects", icon: Rocket },
-  { href: "/progress", label: "Progress", icon: TrendingUp, tourId: "nav-progress" },
-]
+const NAV_ICONS = [LayoutDashboard, BookOpen, Map, GraduationCap, Rocket, TrendingUp] as const
+const NAV_HREFS = ["/dashboard", "/learning", "/roadmap", "/training", "/projects", "/progress"] as const
+const NAV_TOUR_IDS: (string | undefined)[] = [undefined, "nav-learning", "nav-roadmap", "nav-training", undefined, "nav-progress"]
 
-export function Sidebar() {
+interface SidebarProps {
+  locale: Locale
+  t: Dictionary
+}
+
+export function Sidebar({ locale, t }: SidebarProps) {
   const pathname = usePathname()
+
+  const navLabels = [t.nav.dashboard, t.nav.learning, t.nav.roadmap, t.nav.courses, t.nav.projects, t.nav.progress]
 
   return (
     <aside className="hidden md:flex w-56 min-h-screen bg-gray-950 flex-col">
@@ -39,16 +44,17 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 p-3 space-y-0.5">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname.startsWith(item.href)
-          const Icon = item.icon
+        {NAV_HREFS.map((href, i) => {
+          const active = pathname.startsWith(href)
+          const Icon = NAV_ICONS[i]
+          const tourId = NAV_TOUR_IDS[i]
 
           return (
             <Link
-              key={item.href}
-              href={item.href}
+              key={href}
+              href={href}
               aria-current={active ? "page" : undefined}
-              {...(item.tourId ? { "data-tour": item.tourId } : {})}
+              {...(tourId ? { "data-tour": tourId } : {})}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                 active
@@ -57,7 +63,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
-              <span>{item.label}</span>
+              <span>{navLabels[i]}</span>
             </Link>
           )
         })}
@@ -75,18 +81,23 @@ export function Sidebar() {
           )}
         >
           <Settings className="w-4 h-4 flex-shrink-0" />
-          <span>Settings</span>
+          <span>{t.nav.settings}</span>
         </Link>
         <button
           onClick={() => window.dispatchEvent(new Event("start-tour"))}
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors w-full"
         >
           <Compass className="w-4 h-4 flex-shrink-0" />
-          <span>Take a Tour</span>
+          <span>{t.nav.tour}</span>
         </button>
-        <div className="flex gap-3 px-3 py-2">
-          <Link href="/impressum" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Impressum</Link>
-          <Link href="/datenschutz" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Datenschutz</Link>
+        <div className="flex items-center gap-3 px-3 py-2">
+          <Link href="/impressum" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t.nav.impressum}</Link>
+          <Link href="/datenschutz" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">{t.nav.datenschutz}</Link>
+          <LanguageSwitcher
+            current={locale}
+            label={t.locale.switchTo}
+            className="text-xs text-gray-600 hover:text-gray-400 transition-colors ml-auto"
+          />
         </div>
       </div>
     </aside>

@@ -100,10 +100,10 @@
 
 ## i18n & Auth → PR #44 (`add-i18n-github-login`)
 
-- [ ] **Multi-language support (i18n) for menus, landing page, and legal pages**
+- [x] **Multi-language support (i18n) for menus, landing page, and legal pages**
   Add internationalisation to navigation menus, the landing page, and legal pages (`/impressum`, `/datenschutz`). Default language: English (`en`). Initially support `en` + `de`.
 
-- [ ] **Remove Google login**
+- [x] **Remove Google login**
   Strip Google OAuth provider from the login page and any related config.
 
 - [ ] **Add more achievements**
@@ -144,11 +144,11 @@
   - `accountability_linked` — "Better Together" — link an accountability partner
   - `body_double_5` — "Not Alone" — join body-double mode 5 times
 
-- [ ] **Overhaul XP system**
+- [x] **Overhaul XP system**
   XP gains are too high and levels are reached too fast. Rebalance XP values in `lib/xp.ts` and review level thresholds to make progression feel meaningful and appropriately paced.
 
-
-  Add GitHub as a sign-in method. When a user signs in with GitHub, that OAuth token should automatically be used for the GitHub Activity Sync — no separate "Connect GitHub" step needed.
+- [x] **Add GitHub as a sign-in method**
+  When a user signs in with GitHub, that OAuth token should automatically be used for the GitHub Activity Sync — no separate "Connect GitHub" step needed.
 
 ---
 
@@ -247,8 +247,8 @@
 - [ ] **Logout button & profile link in top bar**
   Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
 
-- [ ] **Fix 502 Bad Gateway**
-  Fix the Problem where if the Session timed out a error 502 is thrown on the page. The User should get redirected to the Login. 
+- [x] **Fix 502 Bad Gateway**
+  Fix the Problem where if the Session timed out a error 502 is thrown on the page. The User should get redirected to the Login.
 
 - [ ] **Data privacy & user tracking transparency page**
   Add a dedicated page where users can see exactly what data is collected and stored about them (XP history, quiz scores, GitHub tokens, etc.), download their data (GDPR Art. 20 portability), and permanently delete their account + all associated data (GDPR Art. 17 right to erasure). Link from Settings and the Datenschutz page.
