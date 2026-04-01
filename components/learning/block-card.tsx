@@ -71,10 +71,11 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
   return (
     <>
       <Card className={cn(
+        "scroll-mt-20",
         "transition-all",
         isCompleted && "border-green-300 bg-green-50",
         isSkipped && "opacity-60"
-      )}>
+      )} id={block.id}>
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 flex-1 min-w-0">

@@ -15,7 +15,7 @@ import {
   Flame,
   CheckSquare,
   BookOpen,
-  Map,
+  Map as MapIcon,
   GraduationCap,
   Rocket,
   TrendingUp,
@@ -41,6 +41,39 @@ export default async function DashboardPage() {
     where: { userId: user.id, blockId: { in: trackBlockIds } },
     select: { blockId: true, month: true, status: true },
   })
+
+  const progressByBlockId = new Map(blockProgress.map((bp) => [bp.blockId, bp.status]))
+  let resumeTarget: { month: number; blockId: string } | null = null
+
+  for (const month of curriculum) {
+    for (const week of month.weeks) {
+      for (const block of week.blocks) {
+        const status = progressByBlockId.get(block.id)
+        if (status === "IN_PROGRESS") {
+          resumeTarget = { month: month.month, blockId: block.id }
+          break
+        }
+      }
+      if (resumeTarget) break
+    }
+    if (resumeTarget) break
+  }
+
+  if (!resumeTarget) {
+    for (const month of curriculum) {
+      for (const week of month.weeks) {
+        for (const block of week.blocks) {
+          const status = progressByBlockId.get(block.id)
+          if (status !== "COMPLETED") {
+            resumeTarget = { month: month.month, blockId: block.id }
+            break
+          }
+        }
+        if (resumeTarget) break
+      }
+      if (resumeTarget) break
+    }
+  }
 
   const completedByMonth: Record<number, number> = {}
   for (const bp of blockProgress) {
@@ -214,6 +247,25 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
+      {/* Quick resume */}
+      {resumeTarget && (
+        <Card className="border-indigo-200 bg-indigo-50/60 dark:bg-indigo-950/20">
+          <CardContent className="p-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-indigo-600">Quick Start</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">Jump straight back into your next learning block.</p>
+            </div>
+            <Link
+              href={`/learning/${resumeTarget.month}#${resumeTarget.blockId}`}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors whitespace-nowrap"
+            >
+              Resume now
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Body-Double Mode */}
       <Card data-tour="body-double">
         <CardContent className="p-5">
@@ -324,7 +376,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[
           { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}`, icon: BookOpen, color: "text-indigo-600 bg-indigo-50" },
-          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: Map, color: "text-blue-600 bg-blue-50" },
+          { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: MapIcon, color: "text-blue-600 bg-blue-50" },
           { href: "/training", label: "Courses", desc: "External resources", icon: GraduationCap, color: "text-violet-600 bg-violet-50" },
           { href: "/projects", label: "Projects", desc: "Monthly builds", icon: Rocket, color: "text-orange-600 bg-orange-50" },
           { href: "/progress", label: "Progress", desc: "XP & achievements", icon: TrendingUp, color: "text-green-600 bg-green-50" },
