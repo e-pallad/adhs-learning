@@ -17,11 +17,21 @@ export async function GET(req: NextRequest) {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.provider_token && session.user.app_metadata?.provider === "github") {
         const githubUsername = session.user.user_metadata?.user_name as string | undefined
-        if (githubUsername) {
-          await prisma.user.update({
+        const email = session.user.email
+        if (githubUsername && email) {
+          // upsert: create the row on first-ever login, or update if it already exists
+          await prisma.user.upsert({
             where: { id: session.user.id },
-            data: { githubUsername, githubAccessToken: session.provider_token },
-          }).catch(() => { /* user row may not exist yet on very first login — the next request will upsert it */ })
+            update: { githubUsername, githubAccessToken: session.provider_token },
+            create: {
+              id: session.user.id,
+              email,
+              name: (session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null) as string | null,
+              avatarUrl: (session.user.user_metadata?.avatar_url ?? null) as string | null,
+              githubUsername,
+              githubAccessToken: session.provider_token,
+            },
+          }).catch(() => { /* no-op — next authenticated request will retry via user upsert */ })
         }
       }
       return NextResponse.redirect(new URL(next, req.url))
