@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Zap, Timer, BookOpen, Bot, Github, Users } from "lucide-react"
+import { getLocale, getDictionary } from "@/lib/i18n"
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 export const metadata: Metadata = {
   title: "Devfluent — Learn to code. Actually finish.",
@@ -12,64 +14,21 @@ export const metadata: Metadata = {
   },
 }
 
-const FEATURES = [
-  {
-    icon: Zap,
-    color: "text-indigo-600",
-    bg: "bg-indigo-50",
-    title: "XP & Levels",
-    desc: "Earn XP for every block completed. Level up as you progress.",
-  },
-  {
-    icon: Timer,
-    color: "text-violet-600",
-    bg: "bg-violet-50",
-    title: "Pomodoro Focus",
-    desc: "Built-in focus timer with ambient sounds to stay in the zone.",
-  },
-  {
-    icon: BookOpen,
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-    title: "12-Month Curriculum",
-    desc: "A structured path from JavaScript basics to job-ready projects.",
-  },
-  {
-    icon: Bot,
-    color: "text-green-600",
-    bg: "bg-green-50",
-    title: "AI Coaching",
-    desc: "Personalised recommendations based on your quiz scores and pace.",
-  },
-  {
-    icon: Github,
-    color: "text-orange-600",
-    bg: "bg-orange-50",
-    title: "GitHub Sync",
-    desc: "Earn XP for real commits and pull requests. Code counts.",
-  },
-  {
-    icon: Users,
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    title: "Body-Double Mode",
-    desc: "See how many others are studying right now. Focus together.",
-  },
+const FEATURE_ICONS = [Zap, Timer, BookOpen, Bot, Github, Users]
+const FEATURE_COLORS = [
+  { color: "text-indigo-600", bg: "bg-indigo-50" },
+  { color: "text-violet-600", bg: "bg-violet-50" },
+  { color: "text-blue-600", bg: "bg-blue-50" },
+  { color: "text-green-600", bg: "bg-green-50" },
+  { color: "text-orange-600", bg: "bg-orange-50" },
+  { color: "text-amber-600", bg: "bg-amber-50" },
 ]
 
-const PROBLEMS = [
-  { bad: "Endless video playlists", good: "Bite-sized learning blocks" },
-  { bad: "No feedback loop", good: "XP, streaks & achievements" },
-  { bad: "Easy to quit alone", good: "Body-double & accountability partner" },
-]
+export default async function LandingPage() {
+  const locale = await getLocale()
+  const t = await getDictionary(locale)
+  const l = t.landing
 
-const MONTHS = [
-  "JS Basics", "Functions & DOM", "Async & APIs", "Projects I",
-  "Month 5", "Month 6", "Month 7", "Month 8",
-  "Month 9", "Month 10", "Month 11", "Month 12",
-]
-
-export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
 
@@ -82,34 +41,41 @@ export default function LandingPage() {
             </div>
             <span className="text-lg font-bold text-gray-900">Devfluent</span>
           </div>
-          <Link
-            href="/login"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-          >
-            Sign In
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher
+              current={locale}
+              label={t.locale.switchTo}
+              className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            />
+            <Link
+              href="/login"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+            >
+              {l.signIn}
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-24 px-6 text-center">
         <span className="bg-indigo-100 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full inline-block mb-6">
-          ⚡ Built for ADHD minds
+          {l.hero.badge}
         </span>
         <h1 className="text-5xl font-bold text-gray-900 mb-4 leading-tight">
-          Learn to code.<br />Actually finish.
+          {l.hero.headline1}<br />{l.hero.headline2}
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-          A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.
+          {l.hero.subheadline}
         </p>
         <Link
           href="/login"
           className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
         >
-          Start Learning Free
+          {l.hero.cta}
         </Link>
         <div className="mt-12 flex gap-4 justify-center flex-wrap">
-          {["12-month curriculum", "XP & achievement system", "Free to use"].map((s) => (
+          {l.hero.trust.map((s) => (
             <span key={s} className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600 shadow-sm">
               {s}
             </span>
@@ -120,9 +86,9 @@ export default function LandingPage() {
       {/* Problem → Solution */}
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Traditional courses weren&apos;t built for you</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{l.problem.headline}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {PROBLEMS.map(({ bad, good }) => (
+            {l.problem.items.map(({ bad, good }) => (
               <div key={bad} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm space-y-4">
                 <div className="flex items-start gap-3">
                   <span aria-hidden="true" className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded mt-0.5 flex-shrink-0">❌</span>
@@ -141,17 +107,21 @@ export default function LandingPage() {
       {/* Features Grid */}
       <section className="bg-gray-50 py-20 px-6">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Everything you need to stay on track</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{l.features.headline}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map(({ icon: Icon, color, bg, title, desc }) => (
-              <div key={title} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-                <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center mb-4`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
+            {l.features.items.map(({ title, desc }, i) => {
+              const Icon = FEATURE_ICONS[i]
+              const { color, bg } = FEATURE_COLORS[i]
+              return (
+                <div key={title} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                  <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center mb-4`}>
+                    <Icon className={`w-5 h-5 ${color}`} />
+                  </div>
+                  <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
+                  <p className="text-sm text-gray-500">{desc}</p>
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
-                <p className="text-sm text-gray-500">{desc}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -159,18 +129,18 @@ export default function LandingPage() {
       {/* Gamification Showcase */}
       <section className="py-20 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-12">Progress that keeps you coming back</h2>
+          <h2 className="text-3xl font-bold mb-12">{l.gamification.headline}</h2>
           <div className="bg-gray-950 rounded-2xl p-8 text-left">
             <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-              Level 7
+              {l.gamification.level}
             </span>
-            <p className="text-sm text-gray-400 mt-4 mb-2">2,840 / 3,000 XP to Level 8</p>
+            <p className="text-sm text-gray-400 mt-4 mb-2">{l.gamification.xpLabel}</p>
             <div className="bg-gray-800 rounded-full h-2 w-full">
               <div className="bg-indigo-500 h-2 rounded-full" style={{ width: "94%" }} />
             </div>
-            <p className="text-white font-semibold mt-4">🔥 23-day streak</p>
+            <p className="text-white font-semibold mt-4">{l.gamification.streak}</p>
             <span className="bg-yellow-900/30 text-yellow-400 text-xs px-3 py-1.5 rounded-lg inline-block mt-3">
-              🏆 Quiz Master — 10 perfect scores
+              {l.gamification.achievement}
             </span>
           </div>
         </div>
@@ -178,10 +148,10 @@ export default function LandingPage() {
 
       {/* Curriculum Path Preview */}
       <section className="bg-indigo-50 py-20 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-4">A clear path from beginner to job-ready</h2>
-        <p className="text-gray-600 mb-10">12 structured months. No guesswork.</p>
+        <h2 className="text-3xl font-bold mb-4">{l.curriculum.headline}</h2>
+        <p className="text-gray-600 mb-10">{l.curriculum.subheadline}</p>
         <div className="flex flex-wrap justify-center gap-2 mb-10 max-w-3xl mx-auto">
-          {MONTHS.map((label, i) => (
+          {l.curriculum.months.map((label, i) => (
             <span
               key={i}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
@@ -190,7 +160,7 @@ export default function LandingPage() {
                   : "bg-white border border-gray-200 text-gray-600"
               }`}
             >
-              {i < 4 ? `Month ${i + 1}: ${label}` : label}
+              {i < 4 ? `${l.curriculum.monthLabel} ${i + 1}: ${label}` : label}
             </span>
           ))}
         </div>
@@ -198,19 +168,19 @@ export default function LandingPage() {
           href="/login"
           className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors inline-block"
         >
-          Start with Month 1 →
+          {l.curriculum.cta}
         </Link>
       </section>
 
       {/* Final CTA */}
       <section className="bg-indigo-600 py-20 px-6 text-center">
-        <h2 className="text-3xl font-bold text-white mb-4">Ready to start your dev journey?</h2>
-        <p className="text-indigo-200 mb-8">Join developers learning with a system built for focus.</p>
+        <h2 className="text-3xl font-bold text-white mb-4">{l.cta.headline}</h2>
+        <p className="text-indigo-200 mb-8">{l.cta.subheadline}</p>
         <Link
           href="/login"
           className="bg-white text-indigo-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-50 transition-colors inline-block"
         >
-          Create free account
+          {l.cta.button}
         </Link>
       </section>
 
@@ -220,11 +190,11 @@ export default function LandingPage() {
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-indigo-400" />
             <span className="text-white font-semibold">Devfluent</span>
-            <span className="text-gray-400 text-sm ml-1">— Built for ADHD minds</span>
+            <span className="text-gray-400 text-sm ml-1">{l.footer.tagline}</span>
           </div>
           <div className="flex gap-4">
-            <Link href="/impressum" className="text-gray-400 text-sm hover:text-white transition-colors">Impressum</Link>
-            <Link href="/datenschutz" className="text-gray-400 text-sm hover:text-white transition-colors">Datenschutz</Link>
+            <Link href="/impressum" className="text-gray-400 text-sm hover:text-white transition-colors">{t.nav.impressum}</Link>
+            <Link href="/datenschutz" className="text-gray-400 text-sm hover:text-white transition-colors">{t.nav.datenschutz}</Link>
           </div>
         </div>
       </footer>
