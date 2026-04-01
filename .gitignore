@@ -50,3 +50,5 @@ next-env.d.ts
 
 # Generated nginx config (created by scripts/deploy-netcup.sh)
 nginx/netcup-active.conf
+
+.vscode
