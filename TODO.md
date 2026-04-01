@@ -247,6 +247,9 @@
 - [ ] **Logout button & profile link in top bar**
   Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
 
+- [ ] **Fix 502 Bad Gateway**
+  Fix the Problem where if the Session timed out a error 502 is thrown on the page. The User should get redirected to the Login. 
+
 - [ ] **Data privacy & user tracking transparency page**
   Add a dedicated page where users can see exactly what data is collected and stored about them (XP history, quiz scores, GitHub tokens, etc.), download their data (GDPR Art. 20 portability), and permanently delete their account + all associated data (GDPR Art. 17 right to erasure). Link from Settings and the Datenschutz page.
 
