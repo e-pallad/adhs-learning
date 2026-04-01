@@ -12,19 +12,19 @@ describe("getLevelFromXP", () => {
   })
 
   it("stays at level 1 just below threshold", () => {
-    expect(getLevelFromXP(99)).toBe(1)
+    expect(getLevelFromXP(149)).toBe(1)
   })
 
-  it("advances to level 2 at exactly 100 XP", () => {
-    expect(getLevelFromXP(100)).toBe(2)
+  it("advances to level 2 at exactly 150 XP", () => {
+    expect(getLevelFromXP(150)).toBe(2)
   })
 
-  it("advances to level 3 at exactly 250 XP", () => {
-    expect(getLevelFromXP(250)).toBe(3)
+  it("advances to level 3 at exactly 400 XP", () => {
+    expect(getLevelFromXP(400)).toBe(3)
   })
 
-  it("returns max level 10 at 10000 XP", () => {
-    expect(getLevelFromXP(10000)).toBe(10)
+  it("returns max level 10 at 18000 XP", () => {
+    expect(getLevelFromXP(18000)).toBe(10)
   })
 
   it("returns max level 10 above the max threshold", () => {
@@ -44,25 +44,25 @@ describe("getXPProgress", () => {
     expect(result.level).toBe(1)
     expect(result.progress).toBe(0)
     expect(result.currentLevelXP).toBe(0)
-    expect(result.nextLevelXP).toBe(100)
+    expect(result.nextLevelXP).toBe(150)
   })
 
   it("calculates 50% progress at midpoint of level 1", () => {
-    const result = getXPProgress(50)
+    const result = getXPProgress(75)
     expect(result.level).toBe(1)
     expect(result.progress).toBe(50)
   })
 
   it("returns null nextLevelXP and 100% progress at max level", () => {
-    const result = getXPProgress(10000)
+    const result = getXPProgress(18000)
     expect(result.level).toBe(10)
     expect(result.nextLevelXP).toBeNull()
     expect(result.progress).toBe(100)
   })
 
   it("calculates currentLevelXP relative to current level start", () => {
-    // Level 2 starts at 100 XP; at 150 XP we're 50 into level 2
-    const result = getXPProgress(150)
+    // Level 2 starts at 150 XP; at 200 XP we're 50 into level 2
+    const result = getXPProgress(200)
     expect(result.level).toBe(2)
     expect(result.currentLevelXP).toBe(50)
   })
