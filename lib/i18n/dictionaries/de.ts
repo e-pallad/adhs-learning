@@ -73,6 +73,26 @@ const de: Dictionary = {
       monthLabel: "Monat",
       cta: "Mit Monat 1 starten →",
     },
+    testimonials: {
+      headline: "Was Entwickler sagen",
+      items: [
+        {
+          quote: "Endlich ein Curriculum, das nicht davon ausgeht, dass ich 40 Stunden Video schaue. Das XP-System bringt mich täglich zurück.",
+          name: "Alex M.",
+          role: "Quereinsteiger, seit 3 Monaten dabei",
+        },
+        {
+          quote: "Ich habe Udemy, freeCodeCamp, The Odin Project ausprobiert. Nichts hat sich festgesetzt. Das ist das Erste, das sich anfühlt, als wäre es für mein Gehirn gemacht.",
+          name: "Sam R.",
+          role: "Autodidaktischer Entwickler",
+        },
+        {
+          quote: "Der Body-Double-Modus ist überraschend effektiv. Zu wissen, dass andere gleichzeitig online sind, hilft mir, die App wirklich zu öffnen.",
+          name: "Jordan K.",
+          role: "ADHS-Entwickler, seit 6 Monaten dabei",
+        },
+      ],
+    },
     cta: {
       headline: "Bereit, deine Entwickler-Reise zu starten?",
       subheadline: "Lerne mit einem System, das für Fokus entwickelt wurde.",
