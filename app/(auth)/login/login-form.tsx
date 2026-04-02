@@ -16,12 +16,12 @@ const SOCIAL_PROOF = [
 ]
 
 interface LoginFormProps {
-  dict: Dictionary
+  dict?: Dictionary
   next: string
   error?: string
 }
 
-export function LoginForm({ dict, next, error: authError }: LoginFormProps) {
+export function LoginForm({ next, error: authError }: LoginFormProps) {
   const [mode, setMode] = useState<Mode>("signin")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -93,18 +93,6 @@ export function LoginForm({ dict, next, error: authError }: LoginFormProps) {
     setError(null)
     await fetch("/api/auth/demo", { method: "DELETE" })
     window.location.href = `/api/auth/github/login?next=${encodeURIComponent(validatedNext)}`
-  }
-
-  const handleDemo = async () => {
-    setLoading(true)
-    setError(null)
-    const response = await fetch("/api/auth/demo", { method: "POST" })
-    if (!response.ok) {
-      setError("Failed to start demo mode. Please try again.")
-      setLoading(false)
-      return
-    }
-    window.location.href = "/dashboard"
   }
 
   return (
@@ -203,18 +191,10 @@ export function LoginForm({ dict, next, error: authError }: LoginFormProps) {
             <button
               onClick={handleGitHub}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-3 bg-gray-900 text-white rounded-xl px-4 py-3 text-sm font-semibold hover:bg-gray-800 transition-all disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg hover:scale-105 transform duration-200"
             >
-              <Github className="w-4 h-4 shrink-0" />
+              <Github className="w-5 h-5 shrink-0" />
               Continue with GitHub
-            </button>
-
-            <button
-              onClick={handleDemo}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 border border-amber-300 bg-amber-50 rounded-xl px-4 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100 transition-all disabled:opacity-50 cursor-pointer"
-            >
-              {dict.demo.button}
             </button>
 
             <div className="flex items-center gap-3">
