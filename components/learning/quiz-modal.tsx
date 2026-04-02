@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { QuizQuestion } from "@/content/curriculum"
@@ -45,46 +45,16 @@ export function QuizModal({
 
   const dialogRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    dialogRef.current?.focus()
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-
-      // Keyboard navigation for quiz options: A/B/C/D or 1/2/3/4
-      if (phase === "answering" && selectedIndex === null) {
-        const keyMap: Record<string, number> = {
-          "a": 0, "1": 0,
-          "b": 1, "2": 1,
-          "c": 2, "3": 2,
-          "d": 3, "4": 3,
-        }
-        const option = keyMap[e.key.toLowerCase()]
-        if (option !== undefined && option < currentQuestion.options?.length) {
-          e.preventDefault()
-          handleSelect(option)
-        }
-      }
-
-      // Space or Enter to confirm selection when reviewing
-      if (phase === "reviewing" && (e.key === " " || e.key === "Enter")) {
-        e.preventDefault()
-        handleNext()
-      }
-    }
-    window.addEventListener("keydown", handler)
-    return () => window.removeEventListener("keydown", handler)
-  }, [onClose, phase, selectedIndex, currentQuestion, handleSelect, handleNext])
-
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
 
-  const handleSelect = (optionIndex: number) => {
+  const handleSelect = useCallback((optionIndex: number) => {
     if (phase !== "answering") return
     setSelectedIndex(optionIndex)
     setPhase("reviewing")
-  }
+  }, [phase])
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     if (selectedIndex === null) return
     if (submitting) return  // Prevent double-submission
 
@@ -139,7 +109,37 @@ export function QuizModal({
     } finally {
       setSubmitting(false)
     }
-  }
+  }, [selectedIndex, submitting, answers, isLastQuestion, questions, blockId])
+
+  useEffect(() => {
+    dialogRef.current?.focus()
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
+
+      // Keyboard navigation for quiz options: A/B/C/D or 1/2/3/4
+      if (phase === "answering" && selectedIndex === null) {
+        const keyMap: Record<string, number> = {
+          "a": 0, "1": 0,
+          "b": 1, "2": 1,
+          "c": 2, "3": 2,
+          "d": 3, "4": 3,
+        }
+        const option = keyMap[e.key.toLowerCase()]
+        if (option !== undefined && option < currentQuestion.options?.length) {
+          e.preventDefault()
+          handleSelect(option)
+        }
+      }
+
+      // Space or Enter to confirm selection when reviewing
+      if (phase === "reviewing" && (e.key === " " || e.key === "Enter")) {
+        e.preventDefault()
+        handleNext()
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [onClose, phase, selectedIndex, currentQuestion, handleSelect, handleNext])
 
   const handleFinish = () => {
     if (result) {
