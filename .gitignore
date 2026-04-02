@@ -1,21 +1,11 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+node_modules/
+.pnp
+.pnp.js
+bun.lockb
 
 # testing
-/coverage
-/test-results
-/playwright-report
-.env.test
-.env.production
+coverage/
 
 # next.js
 /.next/
@@ -27,31 +17,25 @@
 # misc
 .DS_Store
 *.pem
+*.log
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
-# env files — secrets stay off git; example templates are committed
-.env*
-!.env.production.example
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# vercel
-.vercel
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-/app/generated/prisma
-
-.claude
-.claude*
-.mcp.json
-
-# Generated nginx config (created by scripts/deploy-netcup.sh)
-nginx/netcup-active.conf
-
-.vscode
+# UI audit artifacts
+artifacts/
