@@ -1,6 +1,6 @@
 # Devfluent — Open Tasks
 
-> Last updated: 2026-03-31
+> Last updated: 2026-04-02
 
 > **Branching rule:** Every phase / major feature gets its own branch and PR. Never bundle multiple independent features into a single branch.
 
@@ -156,11 +156,11 @@
 
 ### Time Blindness
 
-- [ ] **Visual timer**
+- [x] **Visual timer**
   Replace (or complement) the Pomodoro digit countdown with a shrinking circle/pie visual. More intuitive for people with poor time perception.
   _ADHD: Digits are abstract; a shrinking shape makes time passing viscerally visible._
 
-- [ ] **Transition warnings**
+- [x] **Transition warnings**
   Show a gentle alert ~2 minutes before a Pomodoro session ends so the context switch isn't abrupt.
   _ADHD: Sudden interruptions are jarring and cause frustration; a soft warning allows mental preparation._
 
@@ -178,7 +178,7 @@
   A one-click notepad that appears before a session starts. User empties distracting thoughts into it, then begins studying with a clearer head.
   _ADHD: Pre-session brain dumps reduce internal noise and improve on-task focus._
 
-- [ ] **Quick-start / resume**
+- [x] **Quick-start / resume**
   A single prominent button on the dashboard that jumps straight back to the last open block — zero navigation friction.
   _ADHD: Reduces the initiation barrier; the hardest part of studying is often just starting._
 
@@ -188,7 +188,7 @@
   A "look how far you've come" view showing all completed blocks, milestones, and achievements over time.
   _ADHD: Combats imposter syndrome and RSD by making invisible progress visible and concrete._
 
-- [ ] **Celebration animations** *(opt-in)*
+- [x] **Celebration animations** *(opt-in)*
   More visible dopamine hit on block/level/achievement completion — confetti, sound, or a brief full-screen moment.
   Add a toggle in Settings to enable/disable (some users find animations distracting).
   _ADHD: Immediate positive reinforcement is essential; delayed rewards have little motivational effect._
@@ -244,7 +244,7 @@
 
 ### UI / Navigation
 
-- [ ] **Logout button & profile link in top bar**
+- [x] **Logout button & profile link in top bar**
   Add a user menu (avatar/name) to the top bar with quick access to the profile/settings page and a logout button. Keeps navigation consistent and reduces friction.
 
 - [x] **Fix 502 Bad Gateway**

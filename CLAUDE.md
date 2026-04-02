@@ -12,7 +12,7 @@
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
 | Database | Supabase PostgreSQL (project: `phigbihrgojcyebymwcw`, region: `eu-west-1`) |
-| ORM | Prisma 7.5.0 |
+| ORM | Prisma 7.6.0 |
 | Auth | Supabase magic link (passwordless email OTP) via `@supabase/ssr` |
 | Package manager | npm (Bun-compatible locally) |
 | Runtime | Node 24 / npm 11 (Dockerfile uses `node:24-alpine`) |
@@ -131,8 +131,8 @@ Defined in `lib/xp.ts` — single source of truth.
 
 | Action | XP |
 |---|---|
-| Complete block | 15 |
-| Complete block (with Pomodoro) | 20 |
+| Complete block | 10 |
+| Complete block (with Pomodoro) | 15 |
 | Daily login | 5 |
 | 7-day streak bonus | 10 |
 | 30-day streak bonus | 25 |
@@ -141,10 +141,10 @@ Defined in `lib/xp.ts` — single source of truth.
 | Add course | 10 |
 | Complete course | 50 |
 | Complete project | 100 |
-| Skip block | 2 |
-| Quiz attempt (any score) | 5 |
-| Quiz pass (score ≥ 70%) | +15 (stacks) |
-| Quiz perfect (score 100%) | +30 (stacks) |
+| Skip block | 1 |
+| Quiz attempt (any score) | 3 |
+| Quiz pass (score ≥ 70%) | +12 (stacks) |
+| Quiz perfect (score 100%) | +25 (stacks) |
 | GitHub push | 5 |
 | GitHub PR opened | 10 |
 | GitHub PR merged | 20 |
@@ -202,6 +202,8 @@ All XP-awarding routes wrap check → upsert → `awardXP` in a single `prisma.$
 ### Focus Sounds (PomodoroTimer)
 - Web Audio API — no external files; 4 sounds: white noise, brown noise, rain, ocean
 - Audio suspends/resumes with timer state; rain LFO modulates a tremolo GainNode
+- Shrinking pie visual timer replaces/complements the digit countdown
+- 2-minute transition warning alert before session ends
 
 ---
 
