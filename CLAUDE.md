@@ -55,6 +55,25 @@
 
 ---
 
+## Branching & PR Convention
+
+**Always branch from `origin/master` — never from a local branch that may be ahead of origin.**
+
+```bash
+# Correct workflow for every new branch/PR:
+git fetch origin
+git checkout -b feature/my-feature origin/master
+# ... make changes and commits ...
+git push -u origin feature/my-feature
+gh pr create --base master --head feature/my-feature
+```
+
+- One feature / fix / chore per branch.
+- Branch naming: `feature/`, `fix/`, `chore/`, `docs/` prefix.
+- Never commit directly to `master`; all changes go through a PR.
+
+---
+
 ## Development Commands
 
 ```bash
