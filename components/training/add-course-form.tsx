@@ -56,10 +56,11 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
           <input
             required
             autoComplete="off"
+            disabled={loading}
             value={form.title}
             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             placeholder="The Complete JavaScript Course"
-            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
 
@@ -67,9 +68,10 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Platform *</label>
             <select
+              disabled={loading}
               value={form.platform}
               onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
             </select>
@@ -79,10 +81,11 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
             <input
               type="number"
               min="0"
+              disabled={loading}
               value={form.totalLessons}
               onChange={(e) => setForm((f) => ({ ...f, totalLessons: e.target.value }))}
               placeholder="120"
-              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
         </div>
@@ -92,10 +95,11 @@ export function AddCourseForm({ onAdd }: AddCourseFormProps) {
           <input
             type="url"
             autoComplete="url"
+            disabled={loading}
             value={form.url}
             onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
             placeholder="https://www.udemy.com/..."
-            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           />
         </div>
       </div>

@@ -85,9 +85,8 @@ export async function POST() {
     const toCreate = relevant.filter((r) => !knownEventIds.has(r.event.id))
 
     if (toCreate.length > 0) {
-      const totalXP = toCreate.reduce((sum, r) => sum + r.xpToAward, 0)
-
-      await prisma.$transaction(async (tx) => {
+      const { totalXPAwarded: txnXP } = await prisma.$transaction(async (tx) => {
+        // Create the records; skipDuplicates prevents errors if concurrent request already created them
         await tx.githubEvent.createMany({
           data: toCreate.map((r) => ({
             userId: user.id,
@@ -98,10 +97,31 @@ export async function POST() {
           })),
           skipDuplicates: true,
         })
-        await awardXP(user.id, totalXP, { db: tx })
+
+        // Query back to see which events were actually created in this transaction
+        // by checking which ones are now in the database
+        const createdEvents = await tx.githubEvent.findMany({
+          where: {
+            userId: user.id,
+            eventId: { in: toCreate.map((r) => r.event.id) },
+          },
+          select: { eventId: true },
+        })
+        const createdEventIds = new Set(createdEvents.map((e) => e.eventId))
+
+        // Calculate XP only for records we know we created (vs records that were skipped)
+        const actualXP = toCreate
+          .filter((r) => createdEventIds.has(r.event.id))
+          .reduce((sum, r) => sum + r.xpToAward, 0)
+
+        if (actualXP > 0) {
+          await awardXP(user.id, actualXP, { db: tx })
+        }
+
+        return { totalXPAwarded: actualXP }
       })
 
-      totalXPAwarded = totalXP
+      totalXPAwarded = txnXP
       newEvents = toCreate.length
     }
   }

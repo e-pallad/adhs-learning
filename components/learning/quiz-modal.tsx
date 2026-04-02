@@ -65,6 +65,7 @@ export function QuizModal({
 
   const handleNext = async () => {
     if (selectedIndex === null) return
+    if (submitting) return  // Prevent double-submission
 
     const updatedAnswers = [...answers, selectedIndex]
     setAnswers(updatedAnswers)

@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, checkAchievements } from "@/lib/user"
+import { isDemoUser } from "@/lib/demo"
 import { XP_VALUES } from "@/lib/xp"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ error: "Demo mode is read-only" }, { status: 403 })
+  }
 
   const body = await req.json()
   const { action, month, repoUrl, liveUrl } = body
