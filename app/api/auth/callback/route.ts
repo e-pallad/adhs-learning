@@ -83,39 +83,10 @@ export async function GET(req: NextRequest) {
 
       const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
       if (!error) {
-        // Auto-wire GitHub token for Activity Sync when user signs in with GitHub.
-        // Validate provider_token via the GitHub API to confirm it is a GitHub token
-        // (not a token from a different OAuth provider the user may also have linked).
-        if (session?.provider_token) {
-          const abort = new AbortController()
-          const timeout = setTimeout(() => abort.abort(), 5000)
-          const ghRes = await fetch("https://api.github.com/user", {
-            headers: { Authorization: `Bearer ${session.provider_token}`, "User-Agent": "Devfluent" },
-            signal: abort.signal,
-          }).catch(() => null).finally(() => clearTimeout(timeout))
-          if (ghRes?.ok) {
-            const ghUser = await ghRes.json() as { login?: string }
-            const githubUsername = ghUser.login
-            const email = session.user.email
-            if (githubUsername && email) {
-              await persistGithubCredentials({
-                userId: session.user.id,
-                email,
-                name: (session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null) as string | null,
-                avatarUrl: (session.user.user_metadata?.avatar_url ?? null) as string | null,
-                githubUsername,
-                githubAccessToken: session.provider_token,
-              })
-            }
-          } else {
-            console.warn(`[auth/callback:${reqId}] provider_token did not resolve to GitHub user`)
-          }
-        }
-
+        // Build the redirect response and flush session cookies onto it
+        // immediately — before any async side-effects — so the browser always
+        // receives the Set-Cookie headers even if a background task takes time.
         const response = NextResponse.redirect(new URL(next, appOrigin))
-
-        // Write session cookies directly onto the redirect response so the
-        // browser receives them even though we return a custom NextResponse.
         for (const { name, value, options } of pendingCookies) {
           response.cookies.set(name, value, {
             ...(options as Parameters<typeof response.cookies.set>[2]),
@@ -131,6 +102,38 @@ export async function GET(req: NextRequest) {
           next,
           appOrigin,
         })
+
+        // Fire-and-forget: persist GitHub credentials in the background so the
+        // redirect is not blocked by the GitHub API call + DB write (avoids proxy timeout).
+        if (session?.provider_token) {
+          const providerToken = session.provider_token
+          const userId = session.user.id
+          const email = session.user.email
+          const name = (session.user.user_metadata?.full_name ?? session.user.user_metadata?.name ?? null) as string | null
+          const avatarUrl = (session.user.user_metadata?.avatar_url ?? null) as string | null
+          ;(async () => {
+            try {
+              const abort = new AbortController()
+              const timeout = setTimeout(() => abort.abort(), 5000)
+              const ghRes = await fetch("https://api.github.com/user", {
+                headers: { Authorization: `Bearer ${providerToken}`, "User-Agent": "Devfluent" },
+                signal: abort.signal,
+              }).catch(() => null).finally(() => clearTimeout(timeout))
+              if (ghRes?.ok) {
+                const ghUser = await ghRes.json() as { login?: string }
+                const githubUsername = ghUser.login
+                if (githubUsername && email) {
+                  await persistGithubCredentials({ userId, email, name, avatarUrl, githubUsername, githubAccessToken: providerToken })
+                }
+              } else {
+                console.warn(`[auth/callback:${reqId}] provider_token did not resolve to GitHub user`)
+              }
+            } catch (err) {
+              console.warn(`[auth/callback:${reqId}] Background credential sync failed`, err)
+            }
+          })()
+        }
+
         return response
       }
 
