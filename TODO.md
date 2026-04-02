@@ -106,7 +106,7 @@
 - [x] **Remove Google login**
   Strip Google OAuth provider from the login page and any related config.
 
-- [x] **Add more achievements**
+- [x] **Add more achievements** → PR #65 (`feature/achievements-scratchpad-replay`)
   Extend `ACHIEVEMENT_DEFINITIONS` in `lib/xp.ts`. Ideas:
 
   *Blocks / progress*
@@ -170,7 +170,7 @@
 
 ### Working Memory
 
-- [x] **Block scratchpad**
+- [x] **Block scratchpad** → PR #65 (`feature/achievements-scratchpad-replay`)
   A quick-notes field attached to each learning block — capture thoughts, questions, or code snippets without leaving the page.
   _ADHD: Offloads working memory so the user can stay focused without losing stray thoughts._
 
@@ -184,7 +184,7 @@
 
 ### Motivation & Progress Visibility
 
-- [x] **Progress replay**
+- [x] **Progress replay** → PR #65 (`feature/achievements-scratchpad-replay`)
   A "look how far you've come" view showing all completed blocks, milestones, and achievements over time.
   _ADHD: Combats imposter syndrome and RSD by making invisible progress visible and concrete._
 
