@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,16 +11,17 @@ import { BLOCK_TYPE_COLORS, BLOCK_TYPE_LABELS, type LearningBlock } from "@/cont
 import { XP_VALUES } from "@/lib/xp"
 import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { cn } from "@/lib/utils"
-import { ChevronDown, Check } from "lucide-react"
+import { ChevronDown, Check, StickyNote } from "lucide-react"
 
 interface BlockCardProps {
   block: LearningBlock
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED"
+  initialNotes?: string
   onComplete?: (blockId: string, usedTimer: boolean) => Promise<{ leveledUp?: boolean; newLevel?: number }>
   onSkip?: (blockId: string) => void
 }
 
-export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps) {
+export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip }: BlockCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [celebration, setCelebration] = useState<{ leveledUp?: boolean; newLevel?: number } | null>(null)
@@ -31,6 +32,9 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
     if (typeof window === "undefined") return false
     return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
   })
+  const [notes, setNotes] = useState(initialNotes)
+  const [notesSaving, setNotesSaving] = useState(false)
+  const [showNotes, setShowNotes] = useState(false)
 
   const isCompleted = status === "COMPLETED"
   const isSkipped = status === "SKIPPED"
@@ -67,6 +71,19 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
 
   const xpValue = timerUsed ? XP_VALUES.COMPLETE_BLOCK_POMODORO : XP_VALUES.COMPLETE_BLOCK
   const hasQuiz = block.quiz && block.quiz.length > 0
+
+  const saveNotes = useCallback(async (value: string) => {
+    setNotesSaving(true)
+    try {
+      await fetch("/api/progress/block", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blockId: block.id, notes: value }),
+      })
+    } finally {
+      setNotesSaving(false)
+    }
+  }, [block.id])
 
   return (
     <>
@@ -114,14 +131,30 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
               </div>
             </div>
 
-            <button
-              onClick={() => setExpanded((e) => !e)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0 transition-transform cursor-pointer"
-              style={{ transform: expanded ? "rotate(180deg)" : undefined }}
-              aria-label={expanded ? "Collapse" : "Expand"}
-            >
-              <ChevronDown className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-1">
+              {/* Notes toggle */}
+              <button
+                onClick={() => setShowNotes((v) => !v)}
+                className={cn(
+                  "p-1.5 rounded-md transition-colors cursor-pointer",
+                  showNotes ? "text-indigo-600 bg-indigo-50" : "text-gray-400 hover:text-gray-600",
+                  notes && !showNotes && "text-amber-500 hover:text-amber-600"
+                )}
+                aria-label={showNotes ? "Hide notes" : "Show notes"}
+                title="Scratchpad"
+              >
+                <StickyNote className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setExpanded((e) => !e)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0 transition-transform cursor-pointer"
+                style={{ transform: expanded ? "rotate(180deg)" : undefined }}
+                aria-label={expanded ? "Collapse" : "Expand"}
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {expanded && !isCompleted && (
@@ -184,6 +217,26 @@ export function BlockCard({ block, status, onComplete, onSkip }: BlockCardProps)
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {showNotes && (
+            <div className="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3 space-y-1">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1.5">
+                  <StickyNote className="w-3 h-3" />
+                  Scratchpad
+                </p>
+                {notesSaving && <span className="text-xs text-gray-400">Saving…</span>}
+              </div>
+              <textarea
+                className="w-full text-xs text-gray-700 dark:text-gray-300 bg-amber-50 dark:bg-gray-800 border border-amber-200 dark:border-gray-600 rounded-md p-2 resize-none focus:outline-none focus:ring-1 focus:ring-indigo-400 placeholder:text-gray-400"
+                rows={3}
+                placeholder="Capture thoughts, questions, or code snippets…"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                onBlur={(e) => saveNotes(e.target.value)}
+              />
             </div>
           )}
         </CardContent>

@@ -74,13 +74,27 @@ export function getXPProgress(xp: number): {
   return { level, label: current.label, currentLevelXP, nextLevelXP, progress }
 }
 
+export type AchievementStats = {
+  streak: number
+  level: number
+  totalXP: number
+  projectsCompleted: number
+  blocksCompleted: number
+  quizAttempts?: number
+  quizzesPassed?: number
+  perfectQuizzes?: number
+  githubPushes?: number
+  githubPRsMerged?: number
+  accountabilityLinked?: boolean
+}
+
 export const ACHIEVEMENT_DEFINITIONS: {
   slug: string
   label: string
   description: string
   icon: string
   xpBonus: number
-  check: (stats: { streak: number; level: number; totalXP: number; projectsCompleted: number; blocksCompleted: number; quizAttempts?: number; quizzesPassed?: number; perfectQuizzes?: number }) => boolean
+  check: (stats: AchievementStats) => boolean
 }[] = [
   {
     slug: "first_block",
@@ -169,5 +183,139 @@ export const ACHIEVEMENT_DEFINITIONS: {
     icon: "💯",
     xpBonus: 25,
     check: (s) => (s.perfectQuizzes ?? 0) >= 1,
+  },
+
+  // ── Blocks / Progress ──────────────────────────────────────────────────────
+  {
+    slug: "blocks_10",
+    label: "Getting Started",
+    description: "Complete 10 learning blocks",
+    icon: "🌱",
+    xpBonus: 20,
+    check: (s) => s.blocksCompleted >= 10,
+  },
+  {
+    slug: "blocks_50",
+    label: "On a Roll",
+    description: "Complete 50 learning blocks",
+    icon: "📚",
+    xpBonus: 75,
+    check: (s) => s.blocksCompleted >= 50,
+  },
+  {
+    slug: "blocks_100",
+    label: "Century",
+    description: "Complete 100 learning blocks",
+    icon: "💯",
+    xpBonus: 150,
+    check: (s) => s.blocksCompleted >= 100,
+  },
+  {
+    slug: "blocks_500",
+    label: "Grinder",
+    description: "Complete 500 learning blocks",
+    icon: "⚙️",
+    xpBonus: 500,
+    check: (s) => s.blocksCompleted >= 500,
+  },
+
+  // ── Streaks ────────────────────────────────────────────────────────────────
+  {
+    slug: "streak_14",
+    label: "Two Weeks Strong",
+    description: "Study 14 days in a row",
+    icon: "🔥",
+    xpBonus: 50,
+    check: (s) => s.streak >= 14,
+  },
+  {
+    slug: "streak_100",
+    label: "Centurion",
+    description: "Study 100 days in a row",
+    icon: "🏆",
+    xpBonus: 300,
+    check: (s) => s.streak >= 100,
+  },
+
+  // ── Levels ─────────────────────────────────────────────────────────────────
+  {
+    slug: "level_3",
+    label: "Apprentice",
+    description: "Reach level 3",
+    icon: "🎓",
+    xpBonus: 20,
+    check: (s) => s.level >= 3,
+  },
+  {
+    slug: "level_7",
+    label: "Craftsman",
+    description: "Reach level 7",
+    icon: "🛠️",
+    xpBonus: 100,
+    check: (s) => s.level >= 7,
+  },
+
+  // ── Quiz ───────────────────────────────────────────────────────────────────
+  {
+    slug: "perfect_3",
+    label: "Perfectionist",
+    description: "Get 3 perfect quiz scores",
+    icon: "🎯",
+    xpBonus: 60,
+    check: (s) => (s.perfectQuizzes ?? 0) >= 3,
+  },
+  {
+    slug: "quiz_25",
+    label: "Study Machine",
+    description: "Pass 25 quizzes",
+    icon: "🤖",
+    xpBonus: 100,
+    check: (s) => (s.quizzesPassed ?? 0) >= 25,
+  },
+
+  // ── Projects ───────────────────────────────────────────────────────────────
+  {
+    slug: "projects_6",
+    label: "Half Way There",
+    description: "Complete 6 monthly projects",
+    icon: "🔖",
+    xpBonus: 200,
+    check: (s) => s.projectsCompleted >= 6,
+  },
+  {
+    slug: "projects_12",
+    label: "Full Stack",
+    description: "Complete all 12 monthly projects",
+    icon: "🏅",
+    xpBonus: 500,
+    check: (s) => s.projectsCompleted >= 12,
+  },
+
+  // ── GitHub ─────────────────────────────────────────────────────────────────
+  {
+    slug: "first_push",
+    label: "Shipped Code",
+    description: "Sync your first GitHub push",
+    icon: "🚢",
+    xpBonus: 15,
+    check: (s) => (s.githubPushes ?? 0) >= 1,
+  },
+  {
+    slug: "pr_merged_5",
+    label: "Pull Request Pro",
+    description: "Get 5 pull requests merged",
+    icon: "🔀",
+    xpBonus: 75,
+    check: (s) => (s.githubPRsMerged ?? 0) >= 5,
+  },
+
+  // ── Social ─────────────────────────────────────────────────────────────────
+  {
+    slug: "accountability_linked",
+    label: "Better Together",
+    description: "Link an accountability partner",
+    icon: "🤝",
+    xpBonus: 20,
+    check: (s) => s.accountabilityLinked === true,
   },
 ]

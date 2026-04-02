@@ -96,3 +96,30 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true, record, leveledUp, newLevel, newXP, xpAwarded: alreadyCompleted ? 0 : xpToAward })
 }
+
+export async function PATCH(req: NextRequest) {
+  const user = await getCurrentUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const body = await req.json()
+  const { blockId, notes } = body
+
+  if (!blockId || typeof notes !== "string") {
+    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+  }
+
+  const safeNotes = notes.slice(0, 5000)
+
+  // Extract month/week from blockId
+  const match = blockId.match(/m(\d+)w(\d+)-/)
+  const month = match ? Number(match[1]) : 0
+  const week = match ? Number(match[2]) : 0
+
+  await prisma.blockProgress.upsert({
+    where: { userId_blockId: { userId: user.id, blockId } },
+    create: { userId: user.id, blockId, month, week, notes: safeNotes },
+    update: { notes: safeNotes },
+  })
+
+  return NextResponse.json({ success: true })
+}

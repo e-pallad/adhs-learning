@@ -35,12 +35,14 @@ export default async function MonthPage({ params }: Props) {
 
   const blockProgress = await prisma.blockProgress.findMany({
     where: { userId: user.id, blockId: { in: allBlockIds } },
-    select: { blockId: true, status: true },
+    select: { blockId: true, status: true, notes: true },
   })
 
   const statusMap: Record<string, "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED"> = {}
+  const notesMap: Record<string, string> = {}
   for (const bp of blockProgress) {
     statusMap[bp.blockId] = bp.status as "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED"
+    if (bp.notes) notesMap[bp.blockId] = bp.notes
   }
 
   const completedCount = blockProgress.filter((b) => b.status === "COMPLETED").length
@@ -95,6 +97,7 @@ export default async function MonthPage({ params }: Props) {
             theme={week.theme}
             blocks={week.blocks}
             statusMap={statusMap}
+            notesMap={notesMap}
           />
         ))}
       </div>
