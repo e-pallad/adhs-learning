@@ -5,8 +5,14 @@ export const DEMO_SESSION_COOKIE = "devfluent_demo"
 export const DEMO_USER_ID = "demo-user"
 
 export async function hasDemoSession(): Promise<boolean> {
-  const cookieStore = await cookies()
-  return cookieStore.get(DEMO_SESSION_COOKIE)?.value === "1"
+  try {
+    const cookieStore = await cookies()
+    return cookieStore.get(DEMO_SESSION_COOKIE)?.value === "1"
+  } catch {
+    // Some test contexts call route handlers without Next.js request storage.
+    // In those cases demo mode should be treated as disabled.
+    return false
+  }
 }
 
 export function isDemoUser(user: { id: string } | null | undefined): boolean {
