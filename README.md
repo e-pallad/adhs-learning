@@ -23,7 +23,7 @@ Devfluent is a gamified learning tracker built for developers with ADHD. It brin
 ### Learning Curriculum
 - **12-month structured path** covering JavaScript fundamentals through advanced topics
 - Weekly learning blocks organised by type: theory, practice, project, review
-- **Pomodoro timer** built into every block — focus sessions with automatic XP bonus
+- **Pomodoro timer** built into every block — shrinking pie visual, 2-minute transition warning, 4 focus sounds (Web Audio API), automatic XP bonus
 - **Knowledge quizzes** with tiered XP rewards (attempt → pass → perfect)
 - Practical examples and guided exercises for Month 1 fully populated
 
@@ -43,28 +43,32 @@ Devfluent is a gamified learning tracker built for developers with ADHD. It brin
 
 | Action | XP |
 |---|---|
-| Complete learning block | 15 |
-| Complete block with Pomodoro | 20 |
+| Complete learning block | 10 |
+| Complete block with Pomodoro | 15 |
 | Daily login | 5 |
 | 7-day streak bonus | 10 |
 | 30-day streak bonus | 25 |
-| Quiz attempt | 5 |
-| Quiz pass (≥ 70%) | +15 |
-| Quiz perfect (100%) | +30 |
+| Skip block | 1 |
+| Quiz attempt | 3 |
+| Quiz pass (≥ 70%) | +12 |
+| Quiz perfect (100%) | +25 |
 | Complete a course | 50 |
 | Complete a project | 100 |
-| GitHub contribution | 5–20 |
+| GitHub push | 5 |
+| GitHub PR opened | 10 |
+| GitHub PR merged | 20 |
 
-- **10 levels** from Newcomer to Fluent Dev (0 → 10,000 XP)
+- **10 levels** from Newcomer to Fluent Dev (0 → 18,000 XP)
 - **Streak tracking** with consecutive-day bonuses
 - **Achievements** — unlockable badges, concurrent-safe with no double-award
 - **30-day activity calendar** heatmap
 
 ### AI & Integrations
 - **AI Coach** — personalized learning recommendations powered by Claude (Anthropic SDK)
-- **GitHub sync** — auto-logs pushes, pull requests, and merged contributions as XP
+- **GitHub sync** — auto-logs pushes, pull requests, and merged contributions as XP; sign in with GitHub to wire it automatically
 - **Body-double / accountability mode** — ADHD-specific focus support
 - **PWA** — installable on any device, offline-ready with app shortcuts
+- **i18n** — English and German interface (cookie-based locale)
 
 ---
 
@@ -72,8 +76,9 @@ Devfluent is a gamified learning tracker built for developers with ADHD. It brin
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24+
 - A [Supabase](https://supabase.com) project (free tier works)
+- A GitHub OAuth app (for GitHub Activity Sync — optional)
 
 ### Setup
 
@@ -88,7 +93,7 @@ npm install
 2. Copy the environment template and fill in your credentials:
 
 ```bash
-cp .env.local.example .env.local
+cp .env.production.example .env.local
 ```
 
 3. Generate the Prisma client:
@@ -116,7 +121,9 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with a magic lin
 | `DATABASE_URL` | Pooled connection string (pgbouncer, port 6543) |
 | `DIRECT_URL` | Direct connection string (port 5432, used by migrations) |
 | `ANTHROPIC_API_KEY` | Claude API key for AI recommendations |
-| `GITHUB_TOKEN` | GitHub personal access token for activity sync (optional) |
+| `GITHUB_CLIENT_ID` | GitHub OAuth app client ID (for GitHub Activity Sync) |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth app client secret |
+| `NEXT_PUBLIC_APP_URL` | Full app URL, e.g. `https://devfluent.de` (used for OAuth callback) |
 
 ---
 
@@ -128,7 +135,7 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with a magic lin
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
 | Database | Supabase PostgreSQL |
-| ORM | Prisma 7.5 with `@prisma/adapter-pg` |
+| ORM | Prisma 7.6 with `@prisma/adapter-pg` |
 | Auth | Supabase magic link (passwordless email OTP) |
 | AI | Anthropic Claude SDK |
 
@@ -139,9 +146,11 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with a magic lin
 ```
 app/
   (auth)/login/         # Magic link login page
+  (landing)/            # Public landing page (/)
+  (legal)/              # Legal pages (/impressum, /datenschutz)
   (dashboard)/          # All authenticated pages
-    page.tsx            # Main dashboard
-    learning/           # Curriculum browser + Pomodoro
+    dashboard/          # Main dashboard
+    learning/           # Curriculum browser + Pomodoro timer
     roadmap/            # Roadmap tracker
     training/           # External courses
     projects/           # Monthly projects
@@ -149,11 +158,12 @@ app/
     settings/           # Profile & account
   api/
     auth/callback/      # Supabase auth callback
+    auth/github/        # GitHub OAuth initiation + callback
     progress/           # block, course, project, roadmap, quiz
-    user/               # stats, profile
+    user/               # stats, profile, api-key
     ai/recommendations/ # Claude-powered suggestions
     github/sync/        # GitHub activity ingestion
-    accountability/     # Body-double mode
+    accountability/     # Accountability partner linking
   generated/prisma/     # Generated Prisma client (do not edit)
 lib/
   prisma.ts             # Prisma client singleton
@@ -161,6 +171,8 @@ lib/
   xp.ts                 # XP values, level thresholds, achievements
   roadmap.ts            # roadmap.sh API integration
   user.ts               # getCurrentUser, awardXP, updateStreak, checkAchievements
+  i18n/                 # Internationalisation (EN/DE dictionaries)
+  preferences.ts        # User preference utilities
 components/
   ui/                   # card, button, badge, progress-bar
   gamification/         # xp-display, streak-counter, celebration-modal
@@ -169,7 +181,11 @@ components/
   training/             # course-card, add-course-form
   layout/               # sidebar, top-bar
 content/
-  curriculum/index.ts   # Full 12-month curriculum definition
+  curriculum/           # Multi-track curriculum (JavaScript + Python stub)
+    tracks/javascript/  # month-01.json … month-12.json
+    tracks/python/      # month-01.json (stub)
+    index.ts            # Curriculum loader (CURRICULUM, TRACKS, getTrackById)
+    types.ts            # Shared TypeScript interfaces
 prisma/
   schema.prisma         # Database schema
 prisma.config.ts        # Prisma 7 datasource config
