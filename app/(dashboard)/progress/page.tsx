@@ -5,7 +5,7 @@ import { getXPProgress, LEVEL_THRESHOLDS, ACHIEVEMENT_DEFINITIONS } from "@/lib/
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Zap, Star, CheckSquare } from "lucide-react"
+import { Zap, Star, CheckSquare, CalendarDays, Flame, Trophy } from "lucide-react"
 
 export const metadata = { title: "Progress — Devfluent" }
 
@@ -15,7 +15,7 @@ export default async function ProgressPage() {
 
   const xpProgress = getXPProgress(user.totalXP)
 
-  const [achievements, dailyLogs, blockStats] = await Promise.all([
+  const [achievements, dailyLogs, blockStats, completedBlocks, allDailyLogs] = await Promise.all([
     prisma.achievement.findMany({
       where: { userId: user.id },
       orderBy: { unlockedAt: "desc" },
@@ -29,6 +29,14 @@ export default async function ProgressPage() {
       by: ["status"],
       where: { userId: user.id },
       _count: true,
+    }),
+    prisma.blockProgress.findMany({
+      where: { userId: user.id, status: "COMPLETED" },
+      select: { blockId: true, month: true, week: true, completedAt: true },
+      orderBy: { completedAt: "asc" },
+    }),
+    prisma.dailyLog.count({
+      where: { userId: user.id, OR: [{ blocksCompleted: { gt: 0 } }, { xpEarned: { gt: 0 } }] },
     }),
   ])
 
@@ -57,6 +65,16 @@ export default async function ProgressPage() {
   const totalXPFromLogs = dailyLogs.reduce((sum, l) => sum + l.xpEarned, 0)
   const blocksDone = blockStats.find((s) => s.status === "COMPLETED")?._count ?? 0
 
+  // Group completed blocks by month for the journey view
+  const blocksByMonth: Record<number, typeof completedBlocks> = {}
+  for (const b of completedBlocks) {
+    if (!blocksByMonth[b.month]) blocksByMonth[b.month] = []
+    blocksByMonth[b.month].push(b)
+  }
+  const journeyMonths = Object.keys(blocksByMonth)
+    .map(Number)
+    .sort((a, b) => b - a) // most recent first
+
   const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
   return (
@@ -67,7 +85,7 @@ export default async function ProgressPage() {
       </div>
 
       {/* XP & Level */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-2">
@@ -100,6 +118,17 @@ export default async function ProgressPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-green-600">{blocksDone}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Study days</p>
+              <div className="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center">
+                <CalendarDays className="w-3.5 h-3.5 text-orange-500" />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-orange-500">{allDailyLogs}</p>
           </CardContent>
         </Card>
       </div>
@@ -236,6 +265,86 @@ export default async function ProgressPage() {
                 {totalXPFromLogs} XP earned in the last 30 days
               </p>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Journey — progress replay */}
+      {completedBlocks.length > 0 && (
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                Your Journey
+              </h3>
+              <span className="text-xs text-gray-400 ml-auto">{completedBlocks.length} blocks completed</span>
+            </div>
+
+            <div className="relative space-y-6 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-px before:bg-gray-200 dark:before:bg-gray-700">
+              {journeyMonths.map((month) => {
+                const blocks = blocksByMonth[month]
+                const firstDate = blocks[0]?.completedAt
+                const lastDate = blocks[blocks.length - 1]?.completedAt
+                const isFullMonth = blocks.length >= 4 // rough milestone: 4+ blocks = meaningful progress
+
+                return (
+                  <div key={month} className="relative pl-6">
+                    {/* Timeline dot */}
+                    <div className={`absolute left-0 top-1 w-3.5 h-3.5 rounded-full border-2 ${
+                      isFullMonth
+                        ? "bg-amber-400 border-amber-500"
+                        : "bg-white dark:bg-gray-800 border-indigo-400"
+                    }`} />
+
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        Month {month}
+                      </p>
+                      <Badge variant={isFullMonth ? "success" : "default"} className="text-[10px] py-0">
+                        {blocks.length} block{blocks.length !== 1 ? "s" : ""}
+                      </Badge>
+                      {lastDate && (
+                        <span className="text-xs text-gray-400 ml-auto">
+                          {new Date(lastDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                      )}
+                    </div>
+
+                    {firstDate && lastDate && firstDate.getTime() !== lastDate.getTime() && (
+                      <p className="text-xs text-gray-400 mb-1.5">
+                        {new Date(firstDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                        {" → "}
+                        {new Date(lastDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      </p>
+                    )}
+
+                    <div className="flex flex-wrap gap-1">
+                      {blocks.map((b) => (
+                        <span
+                          key={b.blockId}
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800"
+                          title={b.completedAt ? new Date(b.completedAt).toLocaleDateString() : undefined}
+                        >
+                          W{b.week}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-amber-400 border-2 border-amber-500 inline-block" />
+                Strong progress (4+ blocks)
+              </span>
+              <span className="flex items-center gap-1">
+                <Flame className="w-3 h-3 text-orange-400" />
+                Current streak: {user.streak} day{user.streak !== 1 ? "s" : ""}
+              </span>
+            </div>
           </CardContent>
         </Card>
       )}

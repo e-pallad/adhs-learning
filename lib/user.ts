@@ -176,7 +176,7 @@ export async function updateStreak(userId: string): Promise<number> {
  * Check and unlock any newly earned achievements.
  */
 export async function checkAchievements(userId: string): Promise<string[]> {
-  const [user, existingAchievements, projects, blocks, quizAttempts, quizzesPassed, perfectQuizzes] = await Promise.all([
+  const [user, existingAchievements, projects, blocks, quizAttempts, quizzesPassed, perfectQuizzes, githubPushes, githubPRsMerged, accountabilityCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.achievement.findMany({ where: { userId }, select: { slug: true } }),
     prisma.monthlyProject.count({ where: { userId, status: "COMPLETED" } }),
@@ -184,6 +184,9 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     prisma.quizAttempt.count({ where: { userId } }),
     prisma.quizAttempt.count({ where: { userId, passed: true } }),
     prisma.quizAttempt.count({ where: { userId, perfect: true } }),
+    prisma.githubEvent.count({ where: { userId, eventType: "PushEvent" } }),
+    prisma.githubEvent.count({ where: { userId, eventType: "PullRequestEvent", xpAwarded: { gte: 20 } } }),
+    prisma.accountabilityPair.count({ where: { OR: [{ requesterId: userId }, { partnerId: userId }] } }),
   ])
 
   if (!user) return []
@@ -198,6 +201,9 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     quizAttempts,
     quizzesPassed,
     perfectQuizzes,
+    githubPushes,
+    githubPRsMerged,
+    accountabilityLinked: accountabilityCount > 0,
   }
 
   const toUnlock = ACHIEVEMENT_DEFINITIONS.filter(

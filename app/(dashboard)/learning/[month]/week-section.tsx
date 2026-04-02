@@ -11,9 +11,10 @@ interface WeekSectionProps {
   theme: string
   blocks: LearningBlock[]
   statusMap: Record<string, "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED">
+  notesMap?: Record<string, string>
 }
 
-export function WeekSection({ weekNumber, theme, blocks, statusMap }: WeekSectionProps) {
+export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {} }: WeekSectionProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
@@ -69,6 +70,7 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap }: WeekSectio
             key={block.id}
             block={block}
             status={statusMap[block.id] ?? "NOT_STARTED"}
+            initialNotes={notesMap[block.id] ?? ""}
             onComplete={handleComplete}
             onSkip={handleSkip}
           />
