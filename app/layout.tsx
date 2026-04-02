@@ -20,6 +20,17 @@ export const metadata: Metadata = {
   title: "Devfluent",
   description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
   manifest: "/manifest.webmanifest",
+  openGraph: {
+    title: "Devfluent",
+    description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
+    type: "website",
+    siteName: "Devfluent",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Devfluent",
+    description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

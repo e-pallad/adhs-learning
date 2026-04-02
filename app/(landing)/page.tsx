@@ -11,6 +11,12 @@ export const metadata: Metadata = {
     title: "Devfluent — Learn to code. Actually finish.",
     description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
     type: "website",
+    siteName: "Devfluent",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Devfluent — Learn to code. Actually finish.",
+    description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
   },
 }
 
