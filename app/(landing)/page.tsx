@@ -74,12 +74,23 @@ export default async function LandingPage() {
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
           {l.hero.subheadline}
         </p>
-        <Link
-          href="/login"
-          className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
-        >
-          {l.hero.cta}
-        </Link>
+        <div className="flex gap-3 justify-center flex-wrap">
+          <Link
+            href="/login"
+            className="bg-indigo-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition-colors inline-block"
+          >
+            {l.hero.cta}
+          </Link>
+          <form method="POST" action="/api/auth/demo" className="inline-block">
+            <button
+              type="submit"
+              className="bg-amber-400 text-gray-900 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-amber-300 transition-colors inline-flex items-center gap-2 hover:scale-105 transform duration-200"
+            >
+              <span>⚡</span>
+              Try Demo
+            </button>
+          </form>
+        </div>
         <div className="mt-12 flex gap-4 justify-center flex-wrap">
           {l.hero.trust.map((s) => (
             <span key={s} className="bg-white border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-600 shadow-sm">
