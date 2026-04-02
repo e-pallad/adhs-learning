@@ -17,19 +17,28 @@ export async function POST(req: NextRequest) {
   }
 
   const partner = await prisma.user.findUnique({ where: { email: partnerEmail.toLowerCase() } })
-  if (!partner) {
-    // Generic message prevents email enumeration
-    return NextResponse.json({ error: "If that email is registered, an invitation has been sent." }, { status: 200 })
+  
+  let isSuccessful = false
+  let partnerName: string | undefined
+  
+  // Create pair if partner exists
+  if (partner && partner.id !== user.id) {
+    await prisma.accountabilityPair.upsert({
+      where: { requesterId_partnerId: { requesterId: user.id, partnerId: partner.id } },
+      create: { requesterId: user.id, partnerId: partner.id },
+      update: {},
+    })
+    isSuccessful = true
+    partnerName = partner.name ?? partner.email
   }
 
-  // Upsert both directions
-  await prisma.accountabilityPair.upsert({
-    where: { requesterId_partnerId: { requesterId: user.id, partnerId: partner.id } },
-    create: { requesterId: user.id, partnerId: partner.id },
-    update: {},
+  // Always return same response structure to prevent email enumeration
+  // Return success=true but only include partnerName if partner was found
+  return NextResponse.json({
+    success: true,
+    ...(isSuccessful ? { partnerName } : {}),
+    message: "If that email is registered, an invitation has been sent."
   })
-
-  return NextResponse.json({ success: true, partnerName: partner.name ?? partner.email })
 }
 
 export async function GET() {

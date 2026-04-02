@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP } from "@/lib/user"
+import { decryptToken } from "@/lib/encryption"
 import { XP_VALUES } from "@/lib/xp"
 
 const XP_MAP: Record<string, number> = {
@@ -26,12 +27,18 @@ export async function POST() {
     return NextResponse.json({ error: "GitHub not connected" }, { status: 400 })
   }
 
+  // Decrypt token (gracefully falls back to raw token if not encrypted)
+  const githubToken = process.env.ENCRYPTION_KEY ? decryptToken(user.githubAccessToken) : user.githubAccessToken
+  if (!githubToken) {
+    return NextResponse.json({ error: "Failed to decrypt GitHub token" }, { status: 500 })
+  }
+
   // Fetch up to 3 pages of events (300 events max)
   const events: GithubApiEvent[] = []
   for (let page = 1; page <= 3; page++) {
     const res = await fetch(
       `https://api.github.com/users/${user.githubUsername}/events?per_page=100&page=${page}`,
-      { headers: { Authorization: `Bearer ${user.githubAccessToken}`, "User-Agent": "Devfluent" } }
+      { headers: { Authorization: `Bearer ${githubToken}`, "User-Agent": "Devfluent" } }
     )
     if (!res.ok) break
     const pageEvents = await res.json() as GithubApiEvent[]

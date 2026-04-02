@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
+import { encryptToken } from "@/lib/encryption"
 
 function getAppOrigin(req: NextRequest): string {
   const configured = process.env.NEXT_PUBLIC_APP_URL?.trim()
@@ -84,9 +85,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/settings?error=github_user_failed", appOrigin))
     }
 
+    // Encrypt token before storing (if encryption key is available)
+    let encryptedToken = accessToken
+    try {
+      if (process.env.ENCRYPTION_KEY) {
+        encryptedToken = encryptToken(accessToken)
+      }
+    } catch (err) {
+      console.error(`[github/callback:${reqId}] Token encryption failed`, err)
+      // Fall through with unencrypted token if encryption fails
+    }
+
     await prisma.user.update({
       where: { id: user.id },
-      data: { githubUsername, githubAccessToken: accessToken },
+      data: { githubUsername, githubAccessToken: encryptedToken },
     })
 
     console.info(`[github/callback:${reqId}] GitHub account connected`, {
@@ -94,8 +106,13 @@ export async function GET(req: NextRequest) {
       githubUsername,
     })
 
-    const res = NextResponse.redirect(new URL("/settings?github=connected", appOrigin))
+    // Check if there's a stored next URL from the GitHub OAuth initiation
+    const nextUrl = req.cookies.get("github_oauth_next")?.value
+    const redirectUrl = nextUrl && nextUrl.startsWith("/") && !nextUrl.startsWith("//") ? nextUrl : "/settings?github=connected"
+    
+    const res = NextResponse.redirect(new URL(redirectUrl, appOrigin))
     res.cookies.delete("github_oauth_state")
+    res.cookies.delete("github_oauth_next")
     return res
   } catch (err) {
     console.error(`[github/callback:${reqId}] Unexpected callback failure`, err)
