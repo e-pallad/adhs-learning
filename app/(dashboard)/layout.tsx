@@ -31,6 +31,7 @@ export default async function DashboardLayout({
           name={user.name}
           email={user.email}
           isDemo={isDemo}
+          dict={t}
         />
         <main className="flex-1 p-6 overflow-auto pb-20 md:pb-6">
           {isDemo && <DemoBanner />}

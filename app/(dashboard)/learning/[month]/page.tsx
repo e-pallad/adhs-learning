@@ -5,6 +5,7 @@ import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
 import { isDemoUser } from "@/lib/demo"
+import { getLocale, getDictionary } from "@/lib/i18n"
 import Link from "next/link"
 import { WeekSection } from "./week-section"
 import { ChevronRight, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
@@ -25,8 +26,9 @@ export default async function MonthPage({ params }: Props) {
   const { month: monthParam } = await params
   const monthNum = Number(monthParam)
 
-  const user = await getCurrentUser()
+  const [user, locale] = await Promise.all([getCurrentUser(), getLocale()])
   if (!user) redirect("/login")
+  const dict = await getDictionary(locale)
   const demoMode = isDemoUser(user)
   if (demoMode && monthNum !== 1) {
     redirect("/learning/1")
@@ -110,6 +112,7 @@ export default async function MonthPage({ params }: Props) {
             statusMap={statusMap}
             notesMap={notesMap}
             readOnly={demoMode}
+            dict={dict}
           />
         ))}
       </div>

@@ -25,6 +25,17 @@ const de: Dictionary = {
     progress: "Fortschritt",
     settings: "Einstellungen",
   },
+  demo: {
+    banner: {
+      text: "Demo-Modus ist schreibgeschützt. Dein Fortschritt wird nicht gespeichert.",
+      cta: "Konto erstellen",
+      ctaSuffix: "um deinen Streak und deine XP zu behalten.",
+    },
+    button: "Demo ausprobieren (keine Registrierung)",
+    guestLabel: "Demo-Gast",
+    leaveDemo: "Demo beenden",
+    readOnlyMessage: "Demo-Modus ist schreibgeschützt. Erstelle ein Konto, um deinen Fortschritt zu speichern.",
+  },
   landing: {
     signIn: "Anmelden",
     hero: {

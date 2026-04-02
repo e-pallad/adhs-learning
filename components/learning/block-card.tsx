@@ -12,6 +12,7 @@ import { XP_VALUES } from "@/lib/xp"
 import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { cn } from "@/lib/utils"
 import { ChevronDown, Check, StickyNote } from "lucide-react"
+import type { Dictionary } from "@/lib/i18n/dictionaries/en"
 
 interface BlockCardProps {
   block: LearningBlock
@@ -20,9 +21,10 @@ interface BlockCardProps {
   onComplete?: (blockId: string, usedTimer: boolean) => Promise<{ leveledUp?: boolean; newLevel?: number }>
   onSkip?: (blockId: string) => void
   readOnly?: boolean
+  dict?: Dictionary
 }
 
-export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip, readOnly = false }: BlockCardProps) {
+export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip, readOnly = false, dict }: BlockCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [celebration, setCelebration] = useState<{ leveledUp?: boolean; newLevel?: number } | null>(null)
@@ -184,7 +186,7 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
 
               {readOnly ? (
                 <p className="text-xs rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900">
-                  Demo mode is read-only. Create an account to save notes and progress.
+                  {dict?.demo.readOnlyMessage || "Demo mode is read-only. Create an account to save notes and progress."}
                 </p>
               ) : (
                 <div className="flex items-center justify-between">
