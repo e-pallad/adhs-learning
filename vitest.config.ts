@@ -7,6 +7,7 @@ export default defineConfig({
     environment: "node",
     globalSetup: "./tests/vitest.globalSetup.ts",
     setupFiles: ["./tests/setup.ts"],
+    exclude: ["**/node_modules/**", "**/e2e/**"],
     coverage: {
       provider: "v8",
       include: ["lib/**", "app/api/**"],

@@ -66,6 +66,11 @@ function stubNonGitHubToken() {
   )
 }
 
+/** Allow fire-and-forget async operations in the route to complete before asserting DB state */
+async function flushFireAndForget() {
+  await new Promise(resolve => setTimeout(resolve, 50))
+}
+
 describe("GET /api/auth/callback", () => {
   beforeAll(async () => { await createTestUser(ID) })
   beforeEach(async () => {
@@ -148,6 +153,7 @@ describe("GET /api/auth/callback", () => {
       }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
+    await flushFireAndForget()
     const user = await prisma.user.findUnique({ where: { id: ID } })
     expect(user!.githubAccessToken).toBe("gh-token-signup")
     expect(user!.githubUsername).toBe("octocat")
@@ -161,6 +167,7 @@ describe("GET /api/auth/callback", () => {
       }) as unknown as ReturnType<typeof createCallbackClient>
     )
     await GET(makeGET("valid-code"))
+    await flushFireAndForget()
     const user = await prisma.user.findUnique({ where: { id: ID } })
     expect(user!.githubAccessToken).toBe("gh-token-linked")
     expect(user!.githubUsername).toBe("octocat-linked")
@@ -178,6 +185,7 @@ describe("GET /api/auth/callback", () => {
         }) as unknown as ReturnType<typeof createCallbackClient>
       )
       await GET(makeGET("valid-code"))
+      await flushFireAndForget()
       const user = await prisma.user.findUnique({ where: { id: NEW_ID } })
       expect(user).not.toBeNull()
       expect(user!.githubUsername).toBe("newdev")

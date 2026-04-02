@@ -71,6 +71,26 @@ const en = {
       monthLabel: "Month",
       cta: "Start with Month 1 →",
     },
+    testimonials: {
+      headline: "What developers are saying",
+      items: [
+        {
+          quote: "Finally a curriculum that doesn't assume I'll watch 40 hours of video. The XP system keeps me coming back every day.",
+          name: "Alex M.",
+          role: "Career-switcher, 3 months in",
+        },
+        {
+          quote: "I've tried Udemy, freeCodeCamp, The Odin Project. Nothing stuck. This is the first thing that feels like it was made for my brain.",
+          name: "Sam R.",
+          role: "Self-taught developer",
+        },
+        {
+          quote: "The body-double mode is surprisingly effective. Knowing others are online at the same time helps me actually open the app.",
+          name: "Jordan K.",
+          role: "ADHD developer, 6 months in",
+        },
+      ],
+    },
     cta: {
       headline: "Ready to start your dev journey?",
       subheadline: "Join developers learning with a system built for focus.",

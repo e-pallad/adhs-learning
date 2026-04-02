@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Claude Code hook scripts (not app code)
     ".claude/**",
+    // Playwright E2E tests — not React code; `use` is Playwright's fixture callback, not a hook
+    "e2e/**",
   ]),
 ]);
 

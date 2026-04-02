@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Zap, Timer, BookOpen, Bot, Github, Users } from "lucide-react"
+import { Zap, Timer, BookOpen, Bot, Github, Users, Star } from "lucide-react"
 import { getLocale, getDictionary } from "@/lib/i18n"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
@@ -136,7 +136,7 @@ export default async function LandingPage() {
             </span>
             <p className="text-sm text-gray-400 mt-4 mb-2">{l.gamification.xpLabel}</p>
             <div className="bg-gray-800 rounded-full h-2 w-full">
-              <div className="bg-indigo-500 h-2 rounded-full" style={{ width: "94%" }} />
+              <div className="bg-indigo-500 h-2 rounded-full animate-xp-fill" style={{ width: "94%" }} />
             </div>
             <p className="text-white font-semibold mt-4">{l.gamification.streak}</p>
             <span className="bg-yellow-900/30 text-yellow-400 text-xs px-3 py-1.5 rounded-lg inline-block mt-3">
@@ -170,6 +170,29 @@ export default async function LandingPage() {
         >
           {l.curriculum.cta}
         </Link>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 px-6 bg-indigo-50">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">{l.testimonials.headline}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {l.testimonials.items.map(({ quote, name, role }) => (
+              <div key={name} className="bg-white rounded-xl p-6 border border-indigo-100 shadow-sm">
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">&ldquo;{quote}&rdquo;</p>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{name}</p>
+                  <p className="text-xs text-gray-400">{role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Final CTA */}
