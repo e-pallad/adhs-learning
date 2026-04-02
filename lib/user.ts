@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { PrismaClient } from "@/app/generated/prisma/client"
 import { getLevelFromXP, ACHIEVEMENT_DEFINITIONS, XP_VALUES } from "@/lib/xp"
+import { hasDemoSession, createDemoUser } from "@/lib/demo"
 
 // Accepts either the full PrismaClient or a transaction client
 type DbClient = Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">
@@ -28,7 +29,12 @@ export async function getCurrentUser() {
 
   const supabase = await createClient()
   const { data: { user: authUser } } = await supabase.auth.getUser()
-  if (!authUser) return null
+  if (!authUser) {
+    if (await hasDemoSession()) {
+      return createDemoUser()
+    }
+    return null
+  }
 
   // upsert prevents unique constraint errors when concurrent requests race on first login
   const user = await prisma.user.upsert({

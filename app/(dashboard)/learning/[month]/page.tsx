@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/user"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
+import { isDemoUser } from "@/lib/demo"
+import { getLocale, getDictionary } from "@/lib/i18n"
 import Link from "next/link"
 import { WeekSection } from "./week-section"
 import { ChevronRight, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
@@ -24,19 +26,30 @@ export default async function MonthPage({ params }: Props) {
   const { month: monthParam } = await params
   const monthNum = Number(monthParam)
 
-  const user = await getCurrentUser()
+  const [user, locale] = await Promise.all([getCurrentUser(), getLocale()])
   if (!user) redirect("/login")
+  const dict = await getDictionary(locale)
+  const demoMode = isDemoUser(user)
+  if (demoMode && monthNum !== 1) {
+    redirect("/learning/1")
+  }
 
   const months = getTrackById(user.track)?.months ?? CURRICULUM
   const monthData = months.find((m) => m.month === monthNum)
   if (!monthData) notFound()
 
-  const allBlockIds = monthData.weeks.flatMap((w) => w.blocks.map((b) => b.id))
+  const visibleMonthData = demoMode
+    ? { ...monthData, weeks: monthData.weeks.slice(0, 1) }
+    : monthData
 
-  const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id, blockId: { in: allBlockIds } },
-    select: { blockId: true, status: true, notes: true },
-  })
+  const allBlockIds = visibleMonthData.weeks.flatMap((w) => w.blocks.map((b) => b.id))
+
+  const blockProgress = demoMode
+    ? []
+    : await prisma.blockProgress.findMany({
+      where: { userId: user.id, blockId: { in: allBlockIds } },
+      select: { blockId: true, status: true, notes: true },
+    })
 
   const statusMap: Record<string, "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED"> = {}
   const notesMap: Record<string, string> = {}
@@ -64,8 +77,8 @@ export default async function MonthPage({ params }: Props) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Month {monthNum}</p>
-            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{monthData.title}</h1>
-            <p className="text-sm text-gray-500 mt-1">{monthData.description}</p>
+            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{visibleMonthData.title}</h1>
+              <p className="text-sm text-gray-500 mt-1">{visibleMonthData.description}</p>
           </div>
           {isCompleted && <Badge variant="success">Completed</Badge>}
         </div>
@@ -80,8 +93,8 @@ export default async function MonthPage({ params }: Props) {
       {/* Project info */}
       <div className="border border-indigo-100 bg-indigo-50 rounded-xl p-4 space-y-1">
         <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">Monthly project</p>
-        <p className="text-sm font-semibold text-gray-900">{monthData.projectTitle}</p>
-        <p className="text-xs text-gray-500">{monthData.projectDescription}</p>
+        <p className="text-sm font-semibold text-gray-900">{visibleMonthData.projectTitle}</p>
+        <p className="text-xs text-gray-500">{visibleMonthData.projectDescription}</p>
         <Link href="/projects" className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 mt-1 transition-colors">
           Track in Projects
           <ExternalLink className="w-3 h-3" />
@@ -90,7 +103,7 @@ export default async function MonthPage({ params }: Props) {
 
       {/* Weeks */}
       <div className="space-y-8">
-        {monthData.weeks.map((week) => (
+        {visibleMonthData.weeks.map((week) => (
           <WeekSection
             key={week.week}
             weekNumber={week.week}
@@ -98,6 +111,8 @@ export default async function MonthPage({ params }: Props) {
             blocks={week.blocks}
             statusMap={statusMap}
             notesMap={notesMap}
+            readOnly={demoMode}
+            dict={dict}
           />
         ))}
       </div>

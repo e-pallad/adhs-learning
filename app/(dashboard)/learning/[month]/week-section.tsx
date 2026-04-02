@@ -5,6 +5,7 @@ import { useTransition } from "react"
 import { toast } from "sonner"
 import { BlockCard } from "@/components/learning/block-card"
 import type { LearningBlock } from "@/content/curriculum"
+import type { Dictionary } from "@/lib/i18n/dictionaries/en"
 
 interface WeekSectionProps {
   weekNumber: number
@@ -12,13 +13,16 @@ interface WeekSectionProps {
   blocks: LearningBlock[]
   statusMap: Record<string, "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED">
   notesMap?: Record<string, string>
+  readOnly?: boolean
+  dict?: Dictionary
 }
 
-export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {} }: WeekSectionProps) {
+export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {}, readOnly = false, dict }: WeekSectionProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
   const handleComplete = async (blockId: string, usedTimer: boolean) => {
+    if (readOnly) return {}
     let res: Response
     try {
       res = await fetch("/api/progress/block", {
@@ -40,6 +44,7 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
   }
 
   const handleSkip = async (blockId: string) => {
+    if (readOnly) return
     let res: Response
     try {
       res = await fetch("/api/progress/block", {
@@ -73,6 +78,8 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
             initialNotes={notesMap[block.id] ?? ""}
             onComplete={handleComplete}
             onSkip={handleSkip}
+            readOnly={readOnly}
+            dict={dict}
           />
         ))}
       </div>

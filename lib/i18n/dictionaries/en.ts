@@ -23,6 +23,17 @@ const en = {
     progress: "Progress",
     settings: "Settings",
   },
+  demo: {
+    banner: {
+      text: "Demo mode is read-only. Your progress is not saved.",
+      cta: "Create an account",
+      ctaSuffix: "to keep your streak and XP.",
+    },
+    button: "Try demo mode (no sign-up)",
+    guestLabel: "Demo Guest",
+    leaveDemo: "Leave demo",
+    readOnlyMessage: "Demo mode is read-only. Create an account to save your progress.",
+  },
   landing: {
     signIn: "Sign In",
     hero: {

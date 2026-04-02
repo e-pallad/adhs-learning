@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
 import Anthropic from "@anthropic-ai/sdk"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
+import { isDemoUser } from "@/lib/demo"
 
 const CACHE_HOURS = 24
 
@@ -12,6 +13,27 @@ interface Recommendation {
   priority: "high" | "medium" | "low"
   icon: string
 }
+
+const DEMO_RECOMMENDATIONS: Recommendation[] = [
+  {
+    title: "Finish week one",
+    description: "Explore all week 1 blocks to see how lessons and quizzes feel.",
+    priority: "high",
+    icon: "🚀",
+  },
+  {
+    title: "Try one Pomodoro",
+    description: "Open a block and run a focus timer to preview the flow.",
+    priority: "medium",
+    icon: "⏱️",
+  },
+  {
+    title: "Create account to save",
+    description: "Sign up when ready to keep XP, streaks, and notes across sessions.",
+    priority: "low",
+    icon: "✨",
+  },
+]
 
 async function generateRecommendations(userId: string): Promise<Recommendation[]> {
   const user = await prisma.user.findUnique({
@@ -93,6 +115,9 @@ async function getOrGenerateRecommendations(userId: string): Promise<NextRespons
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ recommendations: DEMO_RECOMMENDATIONS, cached: true })
+  }
 
   // Return cached recommendation if still valid
   const cached = await prisma.aiRecommendation.findUnique({ where: { userId: user.id } })
@@ -109,6 +134,9 @@ export async function GET() {
 export async function POST() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ recommendations: DEMO_RECOMMENDATIONS, cached: true })
+  }
 
   // Rate-limit forced regeneration to once per hour (prevents unbounded API cost)
   const existing = await prisma.aiRecommendation.findUnique({ where: { userId: user.id } })

@@ -253,7 +253,7 @@
 - [ ] **Data privacy & user tracking transparency page**
   Add a dedicated page where users can see exactly what data is collected and stored about them (XP history, quiz scores, GitHub tokens, etc.), download their data (GDPR Art. 20 portability), and permanently delete their account + all associated data (GDPR Art. 17 right to erasure). Link from Settings and the Datenschutz page.
 
-- [ ] **Demo mode with limited access**
+- [x] **Demo mode with limited access**
   Allow unauthenticated visitors to try the app without signing up. Show a fixed set of blocks (e.g. Month 1, Week 1), a mock XP/streak state, and a persistent banner prompting sign-up to save progress. No DB writes in demo mode.
 
 - [ ] **Profile images**

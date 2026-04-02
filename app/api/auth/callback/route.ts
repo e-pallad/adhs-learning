@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createCallbackClient } from "@/lib/supabase/server"
+import { DEMO_SESSION_COOKIE } from "@/lib/demo"
 
 // Resolve the canonical app origin so redirects always target the public
 // domain (https://devfluent.de) and never the Docker-internal binding
@@ -94,6 +95,7 @@ export async function GET(req: NextRequest) {
             sameSite: "lax",
           })
         }
+        response.cookies.delete(DEMO_SESSION_COOKIE)
 
         console.info(`[auth/callback:${reqId}] Auth callback success`, {
           hasSession: Boolean(session),

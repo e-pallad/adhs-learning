@@ -6,6 +6,8 @@ import { AppTour } from "@/components/tour/app-tour"
 import { getCurrentUser } from "@/lib/user"
 import { getXPProgress } from "@/lib/xp"
 import { getLocale, getDictionary } from "@/lib/i18n"
+import { isDemoUser } from "@/lib/demo"
+import { DemoBanner } from "@/components/demo/demo-banner"
 
 export default async function DashboardLayout({
   children,
@@ -16,6 +18,7 @@ export default async function DashboardLayout({
   if (!user) redirect("/login")
 
   const [xpProgress, t] = [getXPProgress(user.totalXP), await getDictionary(locale)]
+  const isDemo = isDemoUser(user)
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -27,8 +30,11 @@ export default async function DashboardLayout({
           streak={user.streak}
           name={user.name}
           email={user.email}
+          isDemo={isDemo}
+          dict={t}
         />
         <main className="flex-1 p-6 overflow-auto pb-20 md:pb-6">
+          {isDemo && <DemoBanner />}
           {children}
         </main>
       </div>

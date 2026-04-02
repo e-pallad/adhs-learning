@@ -12,6 +12,7 @@ import { XP_VALUES } from "@/lib/xp"
 import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { cn } from "@/lib/utils"
 import { ChevronDown, Check, StickyNote } from "lucide-react"
+import type { Dictionary } from "@/lib/i18n/dictionaries/en"
 
 interface BlockCardProps {
   block: LearningBlock
@@ -19,9 +20,11 @@ interface BlockCardProps {
   initialNotes?: string
   onComplete?: (blockId: string, usedTimer: boolean) => Promise<{ leveledUp?: boolean; newLevel?: number }>
   onSkip?: (blockId: string) => void
+  readOnly?: boolean
+  dict?: Dictionary
 }
 
-export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip }: BlockCardProps) {
+export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip, readOnly = false, dict }: BlockCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [celebration, setCelebration] = useState<{ leveledUp?: boolean; newLevel?: number } | null>(null)
@@ -40,6 +43,7 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
   const isSkipped = status === "SKIPPED"
 
   const handleComplete = async () => {
+    if (readOnly) return
     if (!onComplete || loading) return
     setLoading(true)
     try {
@@ -73,6 +77,7 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
   const hasQuiz = block.quiz && block.quiz.length > 0
 
   const saveNotes = useCallback(async (value: string) => {
+    if (readOnly) return
     setNotesSaving(true)
     try {
       await fetch("/api/progress/block", {
@@ -83,7 +88,7 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
     } finally {
       setNotesSaving(false)
     }
-  }, [block.id])
+  }, [block.id, readOnly])
 
   return (
     <>
@@ -101,10 +106,10 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
                 onClick={() => !isCompleted && handleComplete()}
                 className={cn(
                   "mt-0.5 flex-shrink-0 p-2 -m-2 rounded-full transition-colors flex items-center justify-center",
-                  isCompleted ? "cursor-default" : "cursor-pointer hover:opacity-70"
+                  isCompleted || readOnly ? "cursor-default" : "cursor-pointer hover:opacity-70"
                 )}
                 aria-label={isCompleted ? "Completed" : "Mark complete"}
-                disabled={isCompleted}
+                disabled={isCompleted || readOnly}
               >
                 <span className={cn(
                   "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
@@ -179,44 +184,50 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
                 </div>
               )}
 
-              <div className="flex items-center justify-between">
-                <PomodoroTimer
-                  blockTitle={block.title}
-                  onComplete={() => setTimerUsed(true)}
-                />
-                <div className="space-y-2 text-right">
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    +{xpValue} XP {timerUsed && <span className="text-green-600">(timer bonus!)</span>}
-                  </p>
-                  {hasQuiz && (
+              {readOnly ? (
+                <p className="text-xs rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900">
+                  {dict?.demo.readOnlyMessage || "Demo mode is read-only. Create an account to save notes and progress."}
+                </p>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <PomodoroTimer
+                    blockTitle={block.title}
+                    onComplete={() => setTimerUsed(true)}
+                  />
+                  <div className="space-y-2 text-right">
+                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                      +{xpValue} XP {timerUsed && <span className="text-green-600">(timer bonus!)</span>}
+                    </p>
+                    {hasQuiz && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setShowQuiz(true)}
+                        className="block w-full"
+                      >
+                        Take quiz
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="secondary"
-                      onClick={() => setShowQuiz(true)}
-                      className="block w-full"
+                      onClick={handleComplete}
+                      loading={loading}
                     >
-                      Take quiz
+                      Mark complete
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    onClick={handleComplete}
-                    loading={loading}
-                  >
-                    Mark complete
-                  </Button>
-                  {onSkip && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => onSkip(block.id)}
-                      className="block w-full text-xs"
-                    >
-                      Skip for now
-                    </Button>
-                  )}
+                    {onSkip && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onSkip(block.id)}
+                        className="block w-full text-xs"
+                      >
+                        Skip for now
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
