@@ -9,9 +9,10 @@ interface TopBarProps {
   name?: string | null
   email?: string
   title?: string
+  isDemo?: boolean
 }
 
-export function TopBar({ totalXP, level, streak, name, email, title }: TopBarProps) {
+export function TopBar({ totalXP, level, streak, name, email, title, isDemo = false }: TopBarProps) {
   return (
     <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between px-6">
       {title && <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h1>}
@@ -26,7 +27,7 @@ export function TopBar({ totalXP, level, streak, name, email, title }: TopBarPro
           <XPDisplay totalXP={totalXP} level={level} compact />
         </div>
         <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
-        <TopBarUserMenu name={name ?? null} email={email ?? null} />
+        <TopBarUserMenu name={name ?? null} email={email ?? null} isDemo={isDemo} />
       </div>
     </header>
   )

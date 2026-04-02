@@ -57,6 +57,7 @@ function LoginForm() {
       if (error) {
         setError(error.message)
       } else {
+        await fetch("/api/auth/demo", { method: "DELETE" })
         window.location.href = next
       }
     }
@@ -86,7 +87,20 @@ function LoginForm() {
   const handleGitHub = async () => {
     setLoading(true)
     setError(null)
+    await fetch("/api/auth/demo", { method: "DELETE" })
     window.location.href = `/api/auth/github/login?next=${encodeURIComponent(next)}`
+  }
+
+  const handleDemo = async () => {
+    setLoading(true)
+    setError(null)
+    const response = await fetch("/api/auth/demo", { method: "POST" })
+    if (!response.ok) {
+      setError("Failed to start demo mode. Please try again.")
+      setLoading(false)
+      return
+    }
+    window.location.href = "/dashboard"
   }
 
   return (
@@ -189,6 +203,14 @@ function LoginForm() {
             >
               <Github className="w-4 h-4 shrink-0" />
               Continue with GitHub
+            </button>
+
+            <button
+              onClick={handleDemo}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 border border-amber-300 bg-amber-50 rounded-xl px-4 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100 transition-all disabled:opacity-50 cursor-pointer"
+            >
+              Try demo mode (no sign-up)
             </button>
 
             <div className="flex items-center gap-3">

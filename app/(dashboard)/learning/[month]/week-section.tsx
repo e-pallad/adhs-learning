@@ -12,13 +12,15 @@ interface WeekSectionProps {
   blocks: LearningBlock[]
   statusMap: Record<string, "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED">
   notesMap?: Record<string, string>
+  readOnly?: boolean
 }
 
-export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {} }: WeekSectionProps) {
+export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {}, readOnly = false }: WeekSectionProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
 
   const handleComplete = async (blockId: string, usedTimer: boolean) => {
+    if (readOnly) return {}
     let res: Response
     try {
       res = await fetch("/api/progress/block", {
@@ -40,6 +42,7 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
   }
 
   const handleSkip = async (blockId: string) => {
+    if (readOnly) return
     let res: Response
     try {
       res = await fetch("/api/progress/block", {
@@ -73,6 +76,7 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
             initialNotes={notesMap[block.id] ?? ""}
             onComplete={handleComplete}
             onSkip={handleSkip}
+            readOnly={readOnly}
           />
         ))}
       </div>

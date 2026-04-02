@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createServerClient } from "@supabase/ssr"
 import { LOCALE_COOKIE, LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/config"
+import { DEMO_SESSION_COOKIE } from "@/lib/demo"
 
 const PUBLIC_PATHS = ["/", "/login", "/api/auth", "/impressum", "/datenschutz", "/offline", "/sw.js", "/manifest.webmanifest"]
+const DEMO_ALLOWED_PATHS = ["/dashboard", "/learning", "/api/ai/recommendations", "/api/progress/block"]
 
 function detectLocale(req: NextRequest): string {
   const accept = req.headers.get("accept-language") ?? ""
@@ -38,6 +40,32 @@ export async function proxy(req: NextRequest) {
       })
     }
     return res
+  }
+
+  const isDemoSession = req.cookies.get(DEMO_SESSION_COOKIE)?.value === "1"
+  if (isDemoSession) {
+    if (DEMO_ALLOWED_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
+      const res = NextResponse.next()
+      if (needsLocaleCookie) {
+        res.cookies.set(LOCALE_COOKIE, localeValue, {
+          path: "/",
+          maxAge: 60 * 60 * 24 * 365,
+          sameSite: "lax",
+        })
+      }
+      return res
+    }
+
+    const dashboardUrl = new URL("/dashboard", req.url)
+    const redirect = NextResponse.redirect(dashboardUrl)
+    if (needsLocaleCookie) {
+      redirect.cookies.set(LOCALE_COOKIE, localeValue, {
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: "lax",
+      })
+    }
+    return redirect
   }
 
   // E2E test bypass: allow Playwright to set a fake user identity via cookie

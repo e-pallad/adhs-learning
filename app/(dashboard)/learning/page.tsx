@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/user"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { MonthCard } from "@/components/learning/month-card"
 import { redirect } from "next/navigation"
+import { isDemoUser } from "@/lib/demo"
 
 export const metadata = { title: "Learning — Devfluent" }
 
@@ -10,13 +11,17 @@ export default async function LearningPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
 
-  const months = getTrackById(user.track)?.months ?? CURRICULUM
+  const allMonths = getTrackById(user.track)?.months ?? CURRICULUM
+  const demoMode = isDemoUser(user)
+  const months = demoMode ? allMonths.filter((m) => m.month === 1) : allMonths
   const trackBlockIds = months.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
 
-  const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id, blockId: { in: trackBlockIds } },
-    select: { month: true, status: true },
-  })
+  const blockProgress = demoMode
+    ? []
+    : await prisma.blockProgress.findMany({
+      where: { userId: user.id, blockId: { in: trackBlockIds } },
+      select: { month: true, status: true },
+    })
 
   const completedByMonth: Record<number, number> = {}
   for (const bp of blockProgress) {

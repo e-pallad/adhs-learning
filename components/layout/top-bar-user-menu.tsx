@@ -9,9 +9,10 @@ import { User, LogOut, Settings } from "lucide-react"
 interface TopBarUserMenuProps {
   name: string | null
   email: string | null
+  isDemo?: boolean
 }
 
-export function TopBarUserMenu({ name, email }: TopBarUserMenuProps) {
+export function TopBarUserMenu({ name, email, isDemo = false }: TopBarUserMenuProps) {
   const [open, setOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -31,8 +32,12 @@ export function TopBarUserMenu({ name, email }: TopBarUserMenuProps) {
 
   const handleSignOut = async () => {
     setSigningOut(true)
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    if (isDemo) {
+      await fetch("/api/auth/demo", { method: "DELETE" })
+    } else {
+      const supabase = createClient()
+      await supabase.auth.signOut()
+    }
     router.push("/login")
   }
 
@@ -52,18 +57,20 @@ export function TopBarUserMenu({ name, email }: TopBarUserMenuProps) {
       {open && (
         <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg p-2 z-50">
           <div className="px-2 py-1.5 border-b border-gray-100 dark:border-gray-700 mb-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{name || "User"}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{name || (isDemo ? "Demo Guest" : "User")}</p>
             {email && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{email}</p>}
           </div>
 
-          <Link
-            href="/settings"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-            onClick={() => setOpen(false)}
-          >
-            <Settings className="h-4 w-4" />
-            Profile & settings
-          </Link>
+          {!isDemo && (
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+              onClick={() => setOpen(false)}
+            >
+              <Settings className="h-4 w-4" />
+              Profile & settings
+            </Link>
+          )}
 
           <button
             type="button"
@@ -72,7 +79,7 @@ export function TopBarUserMenu({ name, email }: TopBarUserMenuProps) {
             disabled={signingOut}
           >
             <LogOut className="h-4 w-4" />
-            {signingOut ? "Signing out..." : "Sign out"}
+            {signingOut ? (isDemo ? "Leaving demo..." : "Signing out...") : (isDemo ? "Leave demo" : "Sign out")}
           </button>
         </div>
       )}

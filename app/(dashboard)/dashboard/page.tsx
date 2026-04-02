@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { BodyDoubleMode } from "@/components/body-double-mode"
 import { AiRecommendations } from "@/components/ai-recommendations"
 import { AccountabilityPartner } from "@/components/accountability-partner"
+import { isDemoUser } from "@/lib/demo"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
@@ -26,9 +27,12 @@ import {
 export default async function DashboardPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+  const demoMode = isDemoUser(user)
 
   // Award daily login XP (idempotent — at most once per day)
-  await awardDailyLoginXP(user.id)
+  if (!demoMode) {
+    await awardDailyLoginXP(user.id)
+  }
 
   const xpProgress = getXPProgress(user.totalXP)
   const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)
@@ -37,10 +41,12 @@ export default async function DashboardPage() {
   const trackBlockIds = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
 
   // Block completion stats grouped by month (scoped to active track)
-  const blockProgress = await prisma.blockProgress.findMany({
-    where: { userId: user.id, blockId: { in: trackBlockIds } },
-    select: { blockId: true, month: true, status: true },
-  })
+  const blockProgress = demoMode
+    ? []
+    : await prisma.blockProgress.findMany({
+      where: { userId: user.id, blockId: { in: trackBlockIds } },
+      select: { blockId: true, month: true, status: true },
+    })
 
   const progressByBlockId = new Map(blockProgress.map((bp) => [bp.blockId, bp.status]))
   let resumeTarget: { month: number; blockId: string } | null = null
@@ -104,21 +110,25 @@ export default async function DashboardPage() {
   const currentMonthDone = completedByMonth[currentMonth] ?? 0
 
   // Recent achievements
-  const recentAchievements = await prisma.achievement.findMany({
-    where: { userId: user.id },
-    orderBy: { unlockedAt: "desc" },
-    take: 3,
-  })
+  const recentAchievements = demoMode
+    ? []
+    : await prisma.achievement.findMany({
+      where: { userId: user.id },
+      orderBy: { unlockedAt: "desc" },
+      take: 3,
+    })
 
   // 7-day activity
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
   sevenDaysAgo.setHours(0, 0, 0, 0)
 
-  const recentLogs = await prisma.dailyLog.findMany({
-    where: { userId: user.id, date: { gte: sevenDaysAgo } },
-    orderBy: { date: "asc" },
-  })
+  const recentLogs = demoMode
+    ? []
+    : await prisma.dailyLog.findMany({
+      where: { userId: user.id, date: { gte: sevenDaysAgo } },
+      orderBy: { date: "asc" },
+    })
 
   // Build 7-day heatmap
   const days: { date: Date; xp: number }[] = []

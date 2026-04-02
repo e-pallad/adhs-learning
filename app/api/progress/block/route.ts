@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP, updateStreak, checkAchievements } from "@/lib/user"
 import { getBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
+import { isDemoUser } from "@/lib/demo"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ error: "Demo mode is read-only" }, { status: 403 })
+  }
 
   const body = await req.json()
   const { blockId, status, minutesSpent, usedTimer } = body
@@ -100,6 +104,9 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ error: "Demo mode is read-only" }, { status: 403 })
+  }
 
   const body = await req.json()
   const { blockId, notes } = body
