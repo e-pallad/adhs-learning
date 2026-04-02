@@ -19,6 +19,12 @@ enum NodeStatus {
   SKIPPED
 }
 
+enum NodeType {
+  topic
+  subtopic
+  step
+}
+
 enum BlockStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -96,7 +102,7 @@ model RoadmapProgress {
   roadmapId   String
   nodeId      String
   nodeLabel   String
-  nodeType    String
+  nodeType    NodeType   @default(subtopic)
   status      NodeStatus @default(NOT_STARTED)
   completedAt DateTime?
   createdAt   DateTime   @default(now())

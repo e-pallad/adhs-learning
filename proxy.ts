@@ -69,9 +69,11 @@ export async function proxy(req: NextRequest) {
   }
 
   // E2E test bypass: allow Playwright to set a fake user identity via cookie
-  if (process.env.E2E_TEST === 'true') {
-    const testUserId = req.cookies.get('x-test-user-id')?.value
-    if (testUserId) {
+  // Only enabled in test environments with specific allowlisted test user IDs
+  if (process.env.NODE_ENV === "test" && process.env.E2E_TEST === "true") {
+    const testUserId = req.cookies.get("x-test-user-id")?.value
+    const ALLOWED_TEST_IDS = ["test-user-1", "test-user-2", "test-user-3"]
+    if (testUserId && ALLOWED_TEST_IDS.includes(testUserId)) {
       return NextResponse.next()
     }
   }

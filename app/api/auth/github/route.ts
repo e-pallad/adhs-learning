@@ -21,6 +21,11 @@ export async function GET(req: NextRequest) {
 
   const appOrigin = getAppOrigin(req)
   const state = crypto.randomUUID()
+  
+  // Capture the `next` redirect parameter from query string
+  const nextParam = req.nextUrl.searchParams.get("next")
+  const isSafeNextUrl = nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+  
   const params = new URLSearchParams({
     client_id: process.env.GITHUB_CLIENT_ID!,
     redirect_uri: `${appOrigin}/api/auth/github/callback`,
@@ -35,5 +40,15 @@ export async function GET(req: NextRequest) {
     maxAge: 300,
     path: "/",
   })
+  // Store safe next URL in cookie for callback to use
+  if (isSafeNextUrl) {
+    res.cookies.set("github_oauth_next", nextParam, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      maxAge: 300,
+      path: "/",
+    })
+  }
   return res
 }

@@ -28,7 +28,7 @@ describe("POST /api/progress/block", () => {
     const res = await POST(makePost("/api/progress/block", { blockId: BLOCK, status: "DONE" }))
     expect(res.status).toBe(400)
     const body = await res.json()
-    expect(body.error).toBe("Invalid status")
+    expect(body.error).toMatch(/Invalid status.*Must be one of/)
   })
 
   it("returns 404 for unknown blockId", async () => {

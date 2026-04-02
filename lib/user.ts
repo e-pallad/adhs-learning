@@ -158,21 +158,25 @@ export async function updateStreak(userId: string): Promise<number> {
   // Streak bonuses — only award once per streak cycle (exact milestone, not re-award on re-reach)
   // Wrapped in a transaction so the achievement record and XP are always consistent.
   if (newStreak === 7) {
-    const { count } = await prisma.achievement.createMany({
-      data: [{ userId, slug: "streak_bonus_7", label: "7-Day Streak Bonus", description: "Bonus XP for a 7-day streak", icon: "🔥", xpBonus: XP_VALUES.STREAK_BONUS_7 }],
-      skipDuplicates: true,
+    await prisma.$transaction(async (tx) => {
+      const { count } = await tx.achievement.createMany({
+        data: [{ userId, slug: "streak_bonus_7", label: "7-Day Streak Bonus", description: "Bonus XP for a 7-day streak", icon: "🔥", xpBonus: XP_VALUES.STREAK_BONUS_7 }],
+        skipDuplicates: true,
+      })
+      if (count > 0) {
+        await awardXP(userId, XP_VALUES.STREAK_BONUS_7, { db: tx })
+      }
     })
-    if (count > 0) {
-      await awardXP(userId, XP_VALUES.STREAK_BONUS_7)
-    }
   } else if (newStreak === 30) {
-    const { count } = await prisma.achievement.createMany({
-      data: [{ userId, slug: "streak_bonus_30", label: "30-Day Streak Bonus", description: "Bonus XP for a 30-day streak", icon: "⚡", xpBonus: XP_VALUES.STREAK_BONUS_30 }],
-      skipDuplicates: true,
+    await prisma.$transaction(async (tx) => {
+      const { count } = await tx.achievement.createMany({
+        data: [{ userId, slug: "streak_bonus_30", label: "30-Day Streak Bonus", description: "Bonus XP for a 30-day streak", icon: "⚡", xpBonus: XP_VALUES.STREAK_BONUS_30 }],
+        skipDuplicates: true,
+      })
+      if (count > 0) {
+        await awardXP(userId, XP_VALUES.STREAK_BONUS_30, { db: tx })
+      }
     })
-    if (count > 0) {
-      await awardXP(userId, XP_VALUES.STREAK_BONUS_30)
-    }
   }
 
   return newStreak
@@ -219,22 +223,25 @@ export async function checkAchievements(userId: string): Promise<string[]> {
   if (toUnlock.length === 0) return []
 
   // skipDuplicates prevents unique constraint errors from concurrent calls
-  await prisma.achievement.createMany({
-    data: toUnlock.map((def) => ({
-      userId,
-      slug: def.slug,
-      label: def.label,
-      description: def.description,
-      icon: def.icon,
-      xpBonus: def.xpBonus,
-    })),
-    skipDuplicates: true,
-  })
+  // Wrap in transaction to ensure achievement creation and XP award are atomic
+  await prisma.$transaction(async (tx) => {
+    await tx.achievement.createMany({
+      data: toUnlock.map((def) => ({
+        userId,
+        slug: def.slug,
+        label: def.label,
+        description: def.description,
+        icon: def.icon,
+        xpBonus: def.xpBonus,
+      })),
+      skipDuplicates: true,
+    })
 
-  const totalXPBonus = toUnlock.reduce((sum, def) => sum + (def.xpBonus > 0 ? def.xpBonus : 0), 0)
-  if (totalXPBonus > 0) {
-    await awardXP(userId, totalXPBonus)
-  }
+    const totalXPBonus = toUnlock.reduce((sum, def) => sum + (def.xpBonus > 0 ? def.xpBonus : 0), 0)
+    if (totalXPBonus > 0) {
+      await awardXP(userId, totalXPBonus, { db: tx })
+    }
+  })
 
   return toUnlock.map((d) => d.slug)
 }

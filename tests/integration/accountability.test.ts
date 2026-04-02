@@ -68,7 +68,7 @@ describe("Accountability routes", () => {
       // Generic response prevents email enumeration
       expect(res.status).toBe(200)
       const body = await res.json()
-      expect(body.error).toMatch(/registered/)
+      expect(body.message).toMatch(/registered/)
     })
 
     it("creates an accountability pair and returns partner name", async () => {

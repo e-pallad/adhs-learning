@@ -16,12 +16,12 @@ export async function POST(req: NextRequest) {
   const { blockId, status, minutesSpent, usedTimer } = body
 
   if (!blockId || !status) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    return NextResponse.json({ error: "Missing required fields: blockId and status are required" }, { status: 400 })
   }
 
   const validStatuses = ["COMPLETED", "SKIPPED", "IN_PROGRESS"]
   if (!validStatuses.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+    return NextResponse.json({ error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` }, { status: 400 })
   }
 
   const safeMinutes = typeof minutesSpent === "number" && minutesSpent >= 0 ? Math.floor(minutesSpent) : 0

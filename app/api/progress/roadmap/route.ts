@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardXP } from "@/lib/user"
+import { isDemoUser } from "@/lib/demo"
 import { XP_VALUES } from "@/lib/xp"
 
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (isDemoUser(user)) {
+    return NextResponse.json({ error: "Demo mode is read-only" }, { status: 403 })
+  }
 
   const body = await req.json()
   const { roadmapId, nodeId, nodeLabel, nodeType, status } = body
@@ -26,11 +30,14 @@ export async function POST(req: NextRequest) {
 
   const validStatuses = ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "SKIPPED"]
   if (!validStatuses.includes(status)) {
-    return NextResponse.json({ error: "Invalid status" }, { status: 400 })
+    return NextResponse.json({ error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` }, { status: 400 })
   }
 
   const validNodeTypes = ["topic", "subtopic", "step"]
-  const safeNodeType = validNodeTypes.includes(nodeType) ? nodeType : "subtopic"
+  if (nodeType && !validNodeTypes.includes(nodeType)) {
+    return NextResponse.json({ error: `Invalid nodeType. Must be one of: ${validNodeTypes.join(", ")}` }, { status: 400 })
+  }
+  const safeNodeType = nodeType && validNodeTypes.includes(nodeType) ? nodeType : "subtopic"
 
   const { record } = await prisma.$transaction(async (tx) => {
     const existing = await tx.roadmapProgress.findUnique({
