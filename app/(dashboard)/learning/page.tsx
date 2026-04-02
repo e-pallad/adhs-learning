@@ -4,12 +4,15 @@ import { getTrackById, CURRICULUM } from "@/content/curriculum"
 import { MonthCard } from "@/components/learning/month-card"
 import { redirect } from "next/navigation"
 import { isDemoUser } from "@/lib/demo"
+import { getDictionary, getLocale } from "@/lib/i18n"
 
 export const metadata = { title: "Learning — Devfluent" }
 
 export default async function LearningPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+  const locale = await getLocale()
+  const t = await getDictionary(locale)
 
   const allMonths = getTrackById(user.track)?.months ?? CURRICULUM
   const demoMode = isDemoUser(user)
@@ -49,8 +52,8 @@ export default async function LearningPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Learning Path</h1>
-        <p className="text-sm text-gray-500 mt-0.5">12-month curriculum — click a month to start studying</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t.learning.pageTitle}</h1>
+        <p className="text-sm text-gray-500 mt-0.5">{t.learning.pageSubtitle}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -68,6 +71,12 @@ export default async function LearningPage() {
               completedBlocks={done}
               totalBlocks={total}
               isCurrent={isCurrent}
+              labels={{
+                month: t.learning.monthLabel,
+                current: t.learning.current,
+                done: t.learning.done,
+                blocks: t.learning.blocks,
+              }}
             />
           )
         })}

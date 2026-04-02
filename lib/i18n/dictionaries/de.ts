@@ -25,6 +25,31 @@ const de: Dictionary = {
     progress: "Fortschritt",
     settings: "Einstellungen",
   },
+  offline: {
+    title: "Du bist offline",
+    description:
+      "Keine Internetverbindung. Kürzlich besuchte Seiten sind weiterhin verfügbar — gehe zurück und lerne weiter.",
+    back: "Zurück zur App",
+  },
+  error: {
+    dashboard: {
+      title: "Etwas ist schiefgelaufen",
+      description: "Ein unerwarteter Fehler ist aufgetreten. Bitte lade die Seite neu.",
+      retry: "Erneut versuchen",
+    },
+  },
+  learning: {
+    pageTitle: "Lernpfad",
+    pageSubtitle: "12-Monats-Curriculum — klicke auf einen Monat, um mit dem Lernen zu starten",
+    monthLabel: "Monat",
+    current: "Aktuell",
+    done: "Fertig",
+    blocks: "Blöcke",
+  },
+  settings: {
+    pageTitle: "Einstellungen",
+    pageSubtitle: "Verwalte deine Kontoeinstellungen",
+  },
   demo: {
     banner: {
       text: "Demo-Modus ist schreibgeschützt. Dein Fortschritt wird nicht gespeichert.",

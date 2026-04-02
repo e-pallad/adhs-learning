@@ -1,18 +1,21 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/user"
 import { SettingsClient } from "./settings-client"
+import { getDictionary, getLocale } from "@/lib/i18n"
 
 export const metadata = { title: "Settings — Devfluent" }
 
 export default async function SettingsPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
+  const locale = await getLocale()
+  const t = await getDictionary(locale)
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Settings</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Manage your account preferences</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t.settings.pageTitle}</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t.settings.pageSubtitle}</p>
       </div>
 
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
