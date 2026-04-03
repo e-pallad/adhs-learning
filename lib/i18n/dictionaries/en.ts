@@ -23,6 +23,31 @@ const en = {
     progress: "Progress",
     settings: "Settings",
   },
+  offline: {
+    title: "You're offline",
+    description:
+      "No internet connection. Pages you've visited recently are still available — go back and keep learning.",
+    back: "Back to app",
+  },
+  error: {
+    dashboard: {
+      title: "Something went wrong",
+      description: "An unexpected error occurred. Please try refreshing the page.",
+      retry: "Try again",
+    },
+  },
+  learning: {
+    pageTitle: "Learning Path",
+    pageSubtitle: "12-month curriculum — click a month to start studying",
+    monthLabel: "Month",
+    current: "Current",
+    done: "Done",
+    blocks: "blocks",
+  },
+  settings: {
+    pageTitle: "Settings",
+    pageSubtitle: "Manage your account preferences",
+  },
   demo: {
     banner: {
       text: "Demo mode is read-only. Your progress is not saved.",

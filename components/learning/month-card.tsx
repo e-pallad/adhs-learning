@@ -12,9 +12,15 @@ interface MonthCardProps {
   totalBlocks: number
   isLocked?: boolean
   isCurrent?: boolean
+  labels: {
+    month: string
+    current: string
+    done: string
+    blocks: string
+  }
 }
 
-export function MonthCard({ month, title, description, completedBlocks, totalBlocks, isLocked, isCurrent }: MonthCardProps) {
+export function MonthCard({ month, title, description, completedBlocks, totalBlocks, isLocked, isCurrent, labels }: MonthCardProps) {
   const progress = totalBlocks > 0 ? Math.round((completedBlocks / totalBlocks) * 100) : 0
   const isCompleted = completedBlocks === totalBlocks && totalBlocks > 0
 
@@ -28,12 +34,12 @@ export function MonthCard({ month, title, description, completedBlocks, totalBlo
       <CardContent className="p-5 space-y-3">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Month {month}</p>
+            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{labels.month} {month}</p>
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{title}</h3>
           </div>
           <div className="flex flex-col items-end gap-1">
-            {isCurrent && <Badge variant="info">Current</Badge>}
-            {isCompleted && <Badge variant="success">Done</Badge>}
+            {isCurrent && <Badge variant="info">{labels.current}</Badge>}
+            {isCompleted && <Badge variant="success">{labels.done}</Badge>}
           </div>
         </div>
 
@@ -41,7 +47,7 @@ export function MonthCard({ month, title, description, completedBlocks, totalBlo
 
         <ProgressBar value={progress} showPercentage color={isCompleted ? "green" : "indigo"} />
 
-        <p className="text-xs text-gray-400">{completedBlocks} / {totalBlocks} blocks</p>
+        <p className="text-xs text-gray-400">{completedBlocks} / {totalBlocks} {labels.blocks}</p>
       </CardContent>
     </Card>
   )
