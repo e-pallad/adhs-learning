@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://devfluent.de"),
   title: "Devfluent",
   description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
   manifest: "/manifest.webmanifest",

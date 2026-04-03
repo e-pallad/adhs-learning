@@ -7,11 +7,15 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 export const metadata: Metadata = {
   title: "Devfluent — Learn to code. Actually finish.",
   description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
+  alternates: {
+    canonical: "https://devfluent.de",
+  },
   openGraph: {
     title: "Devfluent — Learn to code. Actually finish.",
     description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
     type: "website",
     siteName: "Devfluent",
+    url: "https://devfluent.de",
   },
   twitter: {
     card: "summary_large_image",
