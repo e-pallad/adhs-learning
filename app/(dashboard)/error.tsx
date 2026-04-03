@@ -1,6 +1,6 @@
 "use client"
 
-import { LOCALE_COOKIE } from "@/lib/i18n"
+import { LOCALE_COOKIE } from "@/lib/i18n/config"
 
 function getClientLocale(): "en" | "de" {
   if (typeof document === "undefined") return "en"
