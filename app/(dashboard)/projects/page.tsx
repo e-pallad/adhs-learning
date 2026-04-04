@@ -39,16 +39,16 @@ export default async function ProjectsPage() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Monthly Projects</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-2xl font-bold text-white">Monthly Projects</h1>
+          <p className="text-sm text-zinc-400 mt-0.5">
             Build something real every month — one project per month
           </p>
         </div>
         {(completedCount > 0 || inProgressCount > 0) && (
           <div className="text-right flex-shrink-0">
-            <p className="text-xs text-gray-400">{completedCount} / {curriculum.length} completed</p>
+            <p className="text-xs text-zinc-500">{completedCount} / {curriculum.length} completed</p>
             {inProgressCount > 0 && (
-              <p className="text-xs text-indigo-600">{inProgressCount} in progress</p>
+              <p className="text-xs text-indigo-400">{inProgressCount} in progress</p>
             )}
           </div>
         )}

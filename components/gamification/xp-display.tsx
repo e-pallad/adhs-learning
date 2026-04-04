@@ -17,10 +17,10 @@ export function XPDisplay({ totalXP, level, compact, className }: XPDisplayProps
   if (compact) {
     return (
       <div className={cn("flex items-center gap-2", className)}>
-        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 rounded-full px-2 py-0.5">
+        <span className="text-xs font-bold text-indigo-400 bg-indigo-500/15 rounded-full px-2 py-0.5">
           Lv.{level}
         </span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">{totalXP.toLocaleString()} XP</span>
+        <span className="text-xs text-zinc-400">{totalXP.toLocaleString()} XP</span>
       </div>
     )
   }
@@ -29,12 +29,12 @@ export function XPDisplay({ totalXP, level, compact, className }: XPDisplayProps
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-bold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
+          <span className="text-sm font-bold text-indigo-400 bg-indigo-500/15 rounded-full px-3 py-1">
             Level {level}
           </span>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+          <span className="text-sm font-medium text-zinc-300">{label}</span>
         </div>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-zinc-500">
           {totalXP.toLocaleString()} XP total
         </span>
       </div>
@@ -46,7 +46,7 @@ export function XPDisplay({ totalXP, level, compact, className }: XPDisplayProps
           color="indigo"
         />
       ) : (
-        <p className="text-xs text-indigo-600 font-medium">Max level reached!</p>
+        <p className="text-xs text-indigo-400 font-medium">Max level reached!</p>
       )}
     </div>
   )
