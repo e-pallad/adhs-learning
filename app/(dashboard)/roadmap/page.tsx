@@ -31,8 +31,8 @@ export default async function RoadmapPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Roadmaps</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Pick a technology roadmap and track your progress through each topic</p>
+        <h1 className="text-2xl font-bold text-white">Roadmaps</h1>
+        <p className="text-sm text-zinc-400 mt-0.5">Pick a technology roadmap and track your progress through each topic</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -43,13 +43,13 @@ export default async function RoadmapPage() {
           const started = total > 0
 
           return (
-            <Link key={roadmap.id} href={`/roadmap/${roadmap.id}`} className="block">
-              <Card className="hover:shadow-md transition-all hover:border-indigo-300">
+            <Link key={roadmap.id} href={`/roadmap/${roadmap.id}`} className="block group">
+              <Card className="hover:border-indigo-500/40 transition-all group-hover:shadow-lg group-hover:shadow-indigo-500/5">
                 <CardContent className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h2 className="text-sm font-semibold text-gray-900">{roadmap.title}</h2>
-                      <p className="text-xs text-gray-500 mt-0.5">{roadmap.description}</p>
+                      <h2 className="text-sm font-semibold text-white">{roadmap.title}</h2>
+                      <p className="text-xs text-zinc-400 mt-0.5">{roadmap.description}</p>
                     </div>
                     {started && (
                       <Badge variant={pct === 100 ? "success" : "info"}>

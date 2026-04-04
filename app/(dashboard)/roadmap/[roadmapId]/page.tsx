@@ -35,12 +35,12 @@ export default async function RoadmapDetailPage({ params }: Props) {
   if (sections.length === 0) {
     return (
       <div className="max-w-3xl mx-auto space-y-6">
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <Link href="/roadmap" className="hover:text-gray-600">Roadmaps</Link>
+        <div className="flex items-center gap-2 text-sm text-zinc-500">
+          <Link href="/roadmap" className="hover:text-zinc-300 transition-colors">Roadmaps</Link>
           <span>/</span>
-          <span className="text-gray-900">{meta.title}</span>
+          <span className="text-white">{meta.title}</span>
         </div>
-        <div className="text-center py-12 text-gray-400">
+        <div className="text-center py-12 text-zinc-500">
           <p className="text-sm">Could not load roadmap data. Try again later.</p>
         </div>
       </div>
@@ -55,16 +55,16 @@ export default async function RoadmapDetailPage({ params }: Props) {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/roadmap" className="hover:text-gray-600">Roadmaps</Link>
+      <div className="flex items-center gap-2 text-sm text-zinc-500">
+        <Link href="/roadmap" className="hover:text-zinc-300 transition-colors">Roadmaps</Link>
         <span>/</span>
-        <span className="text-gray-900">{meta.title}</span>
+        <span className="text-white">{meta.title}</span>
       </div>
 
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-gray-900">{meta.title} Roadmap</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{meta.description}</p>
+        <h1 className="text-xl font-bold text-white">{meta.title} Roadmap</h1>
+        <p className="text-sm text-zinc-400 mt-0.5">{meta.description}</p>
       </div>
 
       {/* List */}

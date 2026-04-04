@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   const isDemo = isDemoUser(user)
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-[#09090f] dark">
       <Sidebar locale={locale} t={t} />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar
@@ -33,7 +33,7 @@ export default async function DashboardLayout({
           isDemo={isDemo}
           dict={t}
         />
-        <main className="flex-1 p-6 overflow-auto pb-20 md:pb-6">
+        <main className="flex-1 p-6 overflow-auto pb-24 md:pb-6">
           {isDemo && <DemoBanner />}
           {children}
         </main>

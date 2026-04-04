@@ -52,7 +52,7 @@ export function TopBarUserMenu({ name, email, isDemo = false, dict }: TopBarUser
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 px-2.5 py-1.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        className="inline-flex items-center gap-2 rounded-xl border border-white/8 px-2.5 py-1.5 text-sm text-zinc-200 hover:bg-white/5 transition-colors cursor-pointer"
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -61,16 +61,16 @@ export function TopBarUserMenu({ name, email, isDemo = false, dict }: TopBarUser
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg p-2 z-50">
-          <div className="px-2 py-1.5 border-b border-gray-100 dark:border-gray-700 mb-1">
-            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{name || (isDemo ? guestLabel : "User")}</p>
-            {email && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{email}</p>}
+        <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-white/8 bg-[#111118] shadow-xl shadow-black/40 p-2 z-50">
+          <div className="px-2 py-1.5 border-b border-white/6 mb-1">
+            <p className="text-sm font-medium text-white truncate">{name || (isDemo ? guestLabel : "User")}</p>
+            {email && <p className="text-xs text-zinc-500 truncate">{email}</p>}
           </div>
 
           {!isDemo && (
             <Link
               href="/settings"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex items-center gap-2 rounded-xl px-2 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
               onClick={() => setOpen(false)}
             >
               <Settings className="h-4 w-4" />
@@ -80,7 +80,7 @@ export function TopBarUserMenu({ name, email, isDemo = false, dict }: TopBarUser
 
           <button
             type="button"
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+            className="flex w-full items-center gap-2 rounded-xl px-2 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
             onClick={handleSignOut}
             disabled={signingOut}
           >

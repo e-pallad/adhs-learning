@@ -20,7 +20,7 @@ export function MobileNav({ t }: MobileNavProps) {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 flex md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+      className="fixed bottom-4 left-4 right-4 z-40 flex md:hidden rounded-2xl border border-[#1a1a24] bg-[#0d0d14]/90 backdrop-blur-xl shadow-2xl shadow-black/60 px-2"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Mobile navigation"
     >
@@ -33,12 +33,12 @@ export function MobileNav({ t }: MobileNavProps) {
             href={href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex-1 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] text-xs transition-colors",
-              active ? "text-indigo-600" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              "flex-1 flex flex-col items-center justify-center gap-1 py-3 min-h-[56px] text-[10px] font-medium transition-all duration-150 rounded-xl cursor-pointer",
+              active ? "text-primary" : "text-zinc-500 hover:text-zinc-300"
             )}
           >
             <Icon className={cn("w-5 h-5 flex-shrink-0", active && "stroke-[2.5]")} />
-            <span className={cn("font-medium", active && "font-semibold")}>{labels[i]}</span>
+            <span>{labels[i]}</span>
           </Link>
         )
       })}

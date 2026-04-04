@@ -16,19 +16,21 @@ interface TopBarProps {
 
 export function TopBar({ totalXP, level, streak, name, email, title, isDemo = false, dict }: TopBarProps) {
   return (
-    <header className="h-14 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between px-6">
-      {title && <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h1>}
-      {!title && <div />}
+    <header className="h-14 border-b border-[#1a1a24] bg-[#0d0d14]/80 backdrop-blur-sm flex items-center justify-between px-6 sticky top-0 z-30">
+      {title
+        ? <h1 className="text-sm font-semibold text-foreground">{title}</h1>
+        : <div />
+      }
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div data-tour="streak">
           <StreakCounter streak={streak} compact />
         </div>
-        <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
+        <div className="w-px h-4 bg-border" />
         <div data-tour="xp-display">
           <XPDisplay totalXP={totalXP} level={level} compact />
         </div>
-        <div className="w-px h-5 bg-gray-200 dark:bg-gray-700" />
+        <div className="w-px h-4 bg-border" />
         <TopBarUserMenu name={name ?? null} email={email ?? null} isDemo={isDemo} dict={dict} />
       </div>
     </header>

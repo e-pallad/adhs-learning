@@ -38,7 +38,6 @@ export default async function LearningPage() {
     totalByMonth[m.month] = m.weeks.flatMap((w) => w.blocks).length
   }
 
-  // Determine current month (first one not fully complete)
   let currentMonth = 1
   for (const m of months) {
     const done = completedByMonth[m.month] ?? 0
@@ -49,13 +48,33 @@ export default async function LearningPage() {
     }
   }
 
+  const totalDone = Object.values(completedByMonth).reduce((a, b) => a + b, 0)
+  const totalAll = Object.values(totalByMonth).reduce((a, b) => a + b, 0)
+  const overallProgress = totalAll > 0 ? Math.round((totalDone / totalAll) * 100) : 0
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t.learning.pageTitle}</h1>
-        <p className="text-sm text-gray-500 mt-0.5">{t.learning.pageSubtitle}</p>
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-100">{t.learning.pageTitle}</h1>
+          <p className="text-sm text-zinc-500 mt-0.5">{t.learning.pageSubtitle}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-2xl font-bold text-indigo-400">{overallProgress}%</p>
+          <p className="text-[11px] text-zinc-600 mt-0.5">{totalDone} / {totalAll} blocks</p>
+        </div>
       </div>
 
+      {/* Overall progress bar */}
+      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
+          style={{ width: `${overallProgress}%` }}
+        />
+      </div>
+
+      {/* Month grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {months.map((m) => {
           const done = completedByMonth[m.month] ?? 0

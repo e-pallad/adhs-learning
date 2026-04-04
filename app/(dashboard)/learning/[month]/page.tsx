@@ -66,19 +66,19 @@ export default async function MonthPage({ params }: Props) {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-1.5 text-sm text-gray-400">
-        <Link href="/learning" className="hover:text-gray-600 transition-colors">Learning</Link>
+      <div className="flex items-center gap-1.5 text-sm text-zinc-500">
+        <Link href="/learning" className="hover:text-zinc-300 transition-colors">Learning</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="text-gray-900">Month {monthNum}</span>
+        <span className="text-white">Month {monthNum}</span>
       </div>
 
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Month {monthNum}</p>
-            <h1 className="text-2xl font-bold text-gray-900 mt-0.5">{visibleMonthData.title}</h1>
-              <p className="text-sm text-gray-500 mt-1">{visibleMonthData.description}</p>
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Month {monthNum}</p>
+            <h1 className="text-2xl font-bold text-white mt-0.5">{visibleMonthData.title}</h1>
+              <p className="text-sm text-zinc-400 mt-1">{visibleMonthData.description}</p>
           </div>
           {isCompleted && <Badge variant="success">Completed</Badge>}
         </div>
@@ -91,11 +91,11 @@ export default async function MonthPage({ params }: Props) {
       </div>
 
       {/* Project info */}
-      <div className="border border-indigo-100 bg-indigo-50 rounded-xl p-4 space-y-1">
-        <p className="text-xs font-medium text-indigo-700 uppercase tracking-wide">Monthly project</p>
-        <p className="text-sm font-semibold text-gray-900">{visibleMonthData.projectTitle}</p>
-        <p className="text-xs text-gray-500">{visibleMonthData.projectDescription}</p>
-        <Link href="/projects" className="flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-700 mt-1 transition-colors">
+      <div className="border border-indigo-500/20 bg-indigo-500/8 rounded-2xl p-4 space-y-1">
+        <p className="text-xs font-semibold text-indigo-400 uppercase tracking-widest">Monthly project</p>
+        <p className="text-sm font-semibold text-white">{visibleMonthData.projectTitle}</p>
+        <p className="text-xs text-zinc-400">{visibleMonthData.projectDescription}</p>
+        <Link href="/projects" className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 mt-1 transition-colors">
           Track in Projects
           <ExternalLink className="w-3 h-3" />
         </Link>
@@ -118,15 +118,15 @@ export default async function MonthPage({ params }: Props) {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4 border-t border-gray-100">
+      <div className="flex justify-between pt-4 border-t border-white/6">
         {monthNum > 1 ? (
-          <Link href={`/learning/${monthNum - 1}`} className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link href={`/learning/${monthNum - 1}`} className="flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Month {monthNum - 1}
           </Link>
         ) : <div />}
         {monthNum < 12 ? (
-          <Link href={`/learning/${monthNum + 1}`} className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link href={`/learning/${monthNum + 1}`} className="flex items-center gap-1 text-sm text-indigo-400 hover:text-indigo-300 transition-colors">
             Month {monthNum + 1}
             <ArrowRight className="w-4 h-4" />
           </Link>

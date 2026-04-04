@@ -66,8 +66,8 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-2">
-        <h3 className="text-sm font-semibold text-gray-900">Week {weekNumber}</h3>
-        <span className="text-xs text-gray-400">{theme}</span>
+        <h3 className="text-sm font-semibold text-white">Week {weekNumber}</h3>
+        <span className="text-xs text-zinc-500">{theme}</span>
       </div>
       <div className="space-y-2">
         {blocks.map((block) => (

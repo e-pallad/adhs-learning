@@ -83,16 +83,16 @@ export function TrainingClient({ courses, defaultTab, userTrack }: TrainingClien
     <div className="space-y-6">
       {/* Tab switcher + live stats */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+        <div className="flex gap-1 p-1 bg-[#0d0d14] border border-white/6 rounded-xl">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               className={cn(
-                "px-4 py-1.5 text-sm font-medium rounded-md transition-colors",
+                "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors cursor-pointer",
                 tab === t.id
-                  ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                  : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  ? "bg-indigo-600 text-white shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
               )}
             >
               {t.label}
@@ -102,8 +102,8 @@ export function TrainingClient({ courses, defaultTab, userTrack }: TrainingClien
 
         {tab === "courses" && courses.length > 0 && (
           <div className="text-right flex-shrink-0">
-            <p className="text-xs text-gray-400">{completedCount} / {courses.length} completed</p>
-            <p className="text-xs text-indigo-600">{totalXP} XP earned</p>
+            <p className="text-xs text-zinc-500">{completedCount} / {courses.length} completed</p>
+            <p className="text-xs text-indigo-400">{totalXP} XP earned</p>
           </div>
         )}
       </div>
@@ -111,14 +111,14 @@ export function TrainingClient({ courses, defaultTab, userTrack }: TrainingClien
       {tab === "courses" && (
         <>
           {error && (
-            <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+            <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">
               {error}
             </div>
           )}
           <AddCourseForm onAdd={handleAdd} />
 
           {courses.length === 0 ? (
-            <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+            <div className="text-center py-12 text-zinc-500">
               <p className="text-sm">No courses yet. Add one to start tracking!</p>
             </div>
           ) : (
@@ -138,7 +138,7 @@ export function TrainingClient({ courses, defaultTab, userTrack }: TrainingClien
 
       {tab === "practice" && (
         <Suspense fallback={
-          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+          <div className="text-center py-12 text-zinc-500">
             <p className="text-sm">Loading exercises…</p>
           </div>
         }>

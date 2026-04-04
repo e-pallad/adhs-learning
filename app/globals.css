@@ -1,24 +1,133 @@
 @import "tailwindcss";
 @variant dark (.dark &);
 
+/* ============================================================
+   Design Tokens — Devfluent
+   Deep dark base + vibrant indigo primary
+   Playful XP/gamification elements on clean dark shell
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Backgrounds */
+  --background: #f8f9ff;
+  --foreground: #0f0f1a;
+  --card: #ffffff;
+  --card-foreground: #0f0f1a;
+  --popover: #ffffff;
+  --popover-foreground: #0f0f1a;
+
+  /* Brand primary — indigo */
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+
+  /* Secondary */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+
+  /* Muted */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  /* Accent — indigo tint */
+  --accent: #eef2ff;
+  --accent-foreground: #4f46e5;
+
+  /* XP/Gamification accent — green */
+  --xp-accent: #22c55e;
+  --xp-foreground: #ffffff;
+
+  /* Destructive */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & inputs */
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #4f46e5;
+
+  /* Radius */
+  --radius: 0.75rem;
+}
+
+.dark {
+  /* Backgrounds — deep navy/slate */
+  --background: #09090f;
+  --foreground: #e8e9f3;
+  --card: #111118;
+  --card-foreground: #e8e9f3;
+  --popover: #18181f;
+  --popover-foreground: #e8e9f3;
+
+  /* Brand primary — slightly brighter in dark */
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+
+  /* Secondary */
+  --secondary: #1e1e2e;
+  --secondary-foreground: #c8c8d8;
+
+  /* Muted */
+  --muted: #1e1e2e;
+  --muted-foreground: #71717a;
+
+  /* Accent */
+  --accent: #1e1e3a;
+  --accent-foreground: #818cf8;
+
+  /* XP accent stays green */
+  --xp-accent: #22c55e;
+  --xp-foreground: #ffffff;
+
+  /* Destructive */
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
+
+  /* Borders */
+  --border: #27272f;
+  --input: #27272f;
+  --ring: #6366f1;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius: var(--radius);
+}
+
+*, *::before, *::after {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ============================================================
+   XP bar animation (landing page hero)
+   ============================================================ */
 @keyframes xp-fill {
   from { width: 0% }
   to { width: 94% }
@@ -28,34 +137,49 @@ body {
   animation: xp-fill 1.5s ease-out 0.5s both;
 }
 
-/* driver.js tour — dark theme overrides */
+/* ============================================================
+   Gamification pulse — XP gain flash
+   ============================================================ */
+@keyframes xp-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-xp-pulse {
+  animation: xp-pulse 1s ease-in-out 3;
+}
+
+/* ============================================================
+   Driver.js tour — dark theme overrides
+   ============================================================ */
 .devfluent-tour.driver-popover {
-  background-color: #030712;
-  border: 1px solid rgb(55 65 81);
+  background-color: #111118;
+  border: 1px solid #27272f;
   border-radius: 0.75rem;
-  color: #f3f4f6;
+  color: #e8e9f3;
   max-width: 320px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 .devfluent-tour.driver-popover .driver-popover-title {
-  color: #f9fafb;
+  color: #f4f4f8;
   font-size: 0.9375rem;
 }
 
 .devfluent-tour.driver-popover .driver-popover-description {
-  color: #9ca3af;
+  color: #71717a;
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .devfluent-tour.driver-popover .driver-popover-progress-text {
-  color: #6b7280;
+  color: #52525b;
   font-size: 0.75rem;
 }
 
 .devfluent-tour.driver-popover .driver-popover-next-btn,
 .devfluent-tour.driver-popover .driver-popover-prev-btn {
-  background-color: #4f46e5;
+  background-color: #6366f1;
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -66,36 +190,36 @@ body {
 
 .devfluent-tour.driver-popover .driver-popover-next-btn:hover,
 .devfluent-tour.driver-popover .driver-popover-prev-btn:hover {
-  background-color: #4338ca;
+  background-color: #4f46e5;
 }
 
 .devfluent-tour.driver-popover .driver-popover-prev-btn {
-  background-color: rgb(31 41 55);
-  color: #d1d5db;
+  background-color: #1e1e2e;
+  color: #c8c8d8;
 }
 
 .devfluent-tour.driver-popover .driver-popover-prev-btn:hover {
-  background-color: rgb(55 65 81);
+  background-color: #27272f;
 }
 
 .devfluent-tour.driver-popover .driver-popover-close-btn {
-  color: #6b7280;
+  color: #52525b;
 }
 
 .devfluent-tour.driver-popover .driver-popover-close-btn:hover {
-  color: #f3f4f6;
+  color: #e8e9f3;
   background: transparent;
 }
 
 .devfluent-tour.driver-popover .driver-popover-arrow-side-left.driver-popover-arrow {
-  border-left-color: #030712;
+  border-left-color: #111118;
 }
 .devfluent-tour.driver-popover .driver-popover-arrow-side-right.driver-popover-arrow {
-  border-right-color: #030712;
+  border-right-color: #111118;
 }
 .devfluent-tour.driver-popover .driver-popover-arrow-side-top.driver-popover-arrow {
-  border-top-color: #030712;
+  border-top-color: #111118;
 }
 .devfluent-tour.driver-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
-  border-bottom-color: #030712;
+  border-bottom-color: #111118;
 }

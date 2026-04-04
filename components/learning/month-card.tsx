@@ -1,8 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { CheckCircle2, Lock } from "lucide-react"
 
 interface MonthCardProps {
   month: number
@@ -25,34 +25,69 @@ export function MonthCard({ month, title, description, completedBlocks, totalBlo
   const isCompleted = completedBlocks === totalBlocks && totalBlocks > 0
 
   const content = (
-    <Card className={cn(
-      "transition-all hover:shadow-md",
-      isCurrent && "border-indigo-400 ring-1 ring-indigo-300",
-      isLocked && "opacity-60 cursor-not-allowed",
-      isCompleted && "border-green-300"
-    )}>
-      <CardContent className="p-5 space-y-3">
-        <div className="flex items-start justify-between">
+    <div
+      className={cn(
+        "group relative rounded-2xl border bg-[#111118] p-5 space-y-3 transition-all duration-150",
+        isCurrent
+          ? "border-indigo-500/40 shadow-lg shadow-indigo-500/8 hover:border-indigo-400/60 hover:shadow-indigo-500/15"
+          : isCompleted
+          ? "border-emerald-500/25 hover:border-emerald-500/40"
+          : isLocked
+          ? "border-white/4 opacity-50 cursor-not-allowed"
+          : "border-white/6 hover:border-white/12"
+      )}
+    >
+      {/* Month number + status */}
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <span className={cn(
+            "inline-flex w-8 h-8 rounded-xl items-center justify-center text-xs font-bold flex-shrink-0",
+            isCurrent
+              ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/25"
+              : isCompleted
+              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/25"
+              : "bg-white/5 text-zinc-500 border border-white/8"
+          )}>
+            {month}
+          </span>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{labels.month} {month}</p>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-0.5">{title}</h3>
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            {isCurrent && <Badge variant="info">{labels.current}</Badge>}
-            {isCompleted && <Badge variant="success">{labels.done}</Badge>}
+            <p className="text-[11px] text-zinc-600 font-semibold uppercase tracking-widest">{labels.month} {month}</p>
           </div>
         </div>
+        <div>
+          {isCurrent && (
+            <Badge variant="primary" className="text-[10px] py-0.5">
+              {labels.current}
+            </Badge>
+          )}
+          {isCompleted && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {labels.done}
+            </span>
+          )}
+          {isLocked && (
+            <Lock className="w-3.5 h-3.5 text-zinc-600" />
+          )}
+        </div>
+      </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{description}</p>
+      {/* Title + description */}
+      <div>
+        <h3 className="text-sm font-semibold text-zinc-100 leading-snug">{title}</h3>
+        <p className="text-xs text-zinc-600 mt-1 line-clamp-2 leading-relaxed">{description}</p>
+      </div>
 
-        <ProgressBar value={progress} showPercentage color={isCompleted ? "green" : "indigo"} />
+      {/* Progress */}
+      <ProgressBar value={progress} color={isCompleted ? "green" : "indigo"} />
 
-        <p className="text-xs text-gray-400">{completedBlocks} / {totalBlocks} {labels.blocks}</p>
-      </CardContent>
-    </Card>
+      <div className="flex items-center justify-between text-[11px] text-zinc-600">
+        <span>{completedBlocks} / {totalBlocks} {labels.blocks}</span>
+        <span className="font-medium text-zinc-500">{progress}%</span>
+      </div>
+    </div>
   )
 
   if (isLocked) return content
-
   return <Link href={`/learning/${month}`} className="block">{content}</Link>
 }
