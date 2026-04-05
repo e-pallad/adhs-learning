@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://devfluent.de"),
   title: "Devfluent",
+  themeColor: "#4f46e5",
   description: "ADHD-friendly developer learning tracker — roadmaps, curriculum, and gamified progress",
   manifest: "/manifest.webmanifest",
   openGraph: {
@@ -36,9 +37,6 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "Devfluent",
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
   },
 }
 

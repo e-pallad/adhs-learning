@@ -332,6 +332,53 @@
 
 ---
 
+## SEO — i18n URL-Prefix Routing (Deferred)
+
+> **Context:** Currently the app uses cookie-based i18n (`NEXT_LOCALE` cookie, no URL differentiation). Both `en` and `de` content is served from the same URL (e.g. `https://devfluent.de/`). This means `hreflang` tags provide no SEO value — Google cannot crawl separate URLs per language.
+
+> **Goal:** Switch to URL-prefix routing (`/de/`, `/en/`) so each language has a distinct, crawlable URL. This enables proper `hreflang` tags, which tell Google which language version to serve to users in different regions.
+
+### Required Changes
+
+- [ ] **URL-prefix routing**
+  Add `/en/` and `/de/` path prefixes. The root `/` should redirect to the user's preferred locale (from `Accept-Language` header or cookie).
+  Files: `proxy.ts`, `app/` route structure (possibly a `[locale]` dynamic segment or route group per locale).
+
+- [ ] **Update `getLocale()` to read from URL path first**
+  Current: reads from `NEXT_LOCALE` cookie only.
+  Target: read locale from URL path segment → fall back to cookie → fall back to `Accept-Language` header.
+  File: `lib/i18n/index.ts`, `lib/i18n/config.ts`
+
+- [ ] **Update `proxy.ts` to handle locale prefixes**
+  - `/en/login`, `/de/login` etc. must be public
+  - Redirect bare paths (`/login`) to the locale-prefixed version
+  - Update `PUBLIC_PATHS` to account for locale prefixes
+  File: `proxy.ts`
+
+- [ ] **Add `hreflang` alternate links**
+  Once URL-prefix routing is in place, add `alternates.languages` to the root layout metadata and each page's metadata:
+  ```ts
+  alternates: {
+    languages: {
+      en: "https://devfluent.de/en",
+      de: "https://devfluent.de/de",
+    },
+  },
+  ```
+  This generates `<link rel="alternate" hreflang="en" href="...">` tags.
+  Files: `app/layout.tsx`, all `page.tsx` files with metadata exports
+
+- [ ] **Update sitemap with locale variants**
+  Each URL in `app/sitemap.ts` should include `alternates.languages` so Google discovers all locale versions.
+  File: `app/sitemap.ts`
+
+- [ ] **Update internal links**
+  All `<Link href="...">` must include the current locale prefix (e.g. `/${locale}/login`).
+  Consider a `useLocalizedHref()` hook or wrapper component.
+  Files: all components with `<Link>` tags
+
+---
+
 ## Completed
 
 - [x] Impressum page created (`/impressum`) — placeholders still need to be filled
