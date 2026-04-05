@@ -41,6 +41,40 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#09090f] text-zinc-100 dark">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "name": "Devfluent",
+                "url": "https://devfluent.de",
+                "description": "ADHD-friendly developer learning platform with a 12-month structured curriculum, XP system, and gamified progress tracking.",
+              },
+              {
+                "@type": "Organization",
+                "name": "Devfluent",
+                "url": "https://devfluent.de",
+                "logo": "https://devfluent.de/icon-512.png",
+              },
+              {
+                "@type": "SoftwareApplication",
+                "name": "Devfluent",
+                "applicationCategory": "EducationalApplication",
+                "operatingSystem": "Web",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "EUR",
+                },
+                "description": "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
+              },
+            ],
+          }),
+        }}
+      />
 
       {/* Navbar */}
       <header className="sticky top-0 z-50 border-b border-white/5 bg-[#09090f]/80 backdrop-blur-xl">

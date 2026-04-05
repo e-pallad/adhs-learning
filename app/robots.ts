@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/(dashboard)/"],
+      disallow: ["/api/", "/dashboard", "/learning", "/roadmap", "/progress", "/settings", "/training", "/projects"],
     },
     sitemap: "https://devfluent.de/sitemap.xml",
   }
