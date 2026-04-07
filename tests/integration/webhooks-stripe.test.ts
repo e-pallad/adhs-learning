@@ -16,6 +16,13 @@ const ID = "test-user-stripe-webhook"
 const CUSTOMER_ID = "cus_test_stripe_webhook"
 const SUB_ID = "sub_test_stripe_webhook"
 
+// Stable test price IDs — set before the route module is imported so
+// mapPriceTier() inside the route sees the same values makeStripeSub() uses.
+const TEST_PRICE_MONTHLY = "price_test_monthly"
+const TEST_PRICE_ANNUAL = "price_test_annual"
+process.env.STRIPE_PRICE_MONTHLY_ID = TEST_PRICE_MONTHLY
+process.env.STRIPE_PRICE_ANNUAL_ID = TEST_PRICE_ANNUAL
+
 // ─── Stripe mock ────────────────────────────────────────────────────────────
 
 // We control what constructEvent returns; subscriptions.retrieve is stubbed per-test.
@@ -62,7 +69,7 @@ function makeStripeSub(
   const {
     id = SUB_ID,
     status = "active",
-    priceId = process.env.STRIPE_PRICE_MONTHLY_ID ?? "price_monthly",
+    priceId = TEST_PRICE_MONTHLY,
     periodEnd = Math.floor(Date.now() / 1000) + 30 * 24 * 3600,
     cancelAtPeriodEnd = false,
   } = opts
