@@ -12,6 +12,7 @@ const FREE_FEATURES = [
   "Full 12-month JavaScript curriculum",
   "XP & level-up system",
   "Daily + weekly streak tracking",
+  "Streak freeze (auto, once per week)",
   "Roadmap progress tracker",
   "Project portfolio tracking",
   "External course tracker",
@@ -115,9 +116,12 @@ export default function UpgradePage() {
             ))}
           </ul>
           <div className="pt-2">
-            <span className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-indigo-600/30 text-sm font-medium text-indigo-300 border border-indigo-500/30 cursor-default">
+            <a
+              href="mailto:kontakt@devfluent.de?subject=Devfluent%20Pro%20%E2%80%94%20notify%20me"
+              className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-indigo-600/20 text-sm font-medium text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/30 transition-colors"
+            >
               Notify me when available
-            </span>
+            </a>
           </div>
         </div>
       </div>

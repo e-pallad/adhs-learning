@@ -88,7 +88,7 @@ export function getFeatureFlags(tier: SubscriptionTier): FeatureFlags {
     aiRecommendations: pro,
     accountabilityPartner: pro,
     analyticsHeatmap: pro,
-    streakFreeze: pro,
+    streakFreeze: true, // Always free — streak freeze auto-activates for all users
     bodyDoubleMode: true, // Always free — community feature
   }
 }

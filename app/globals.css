@@ -211,13 +211,24 @@ body {
   animation: legendary-shimmer 2.5s ease-in-out infinite;
 }
 
+@keyframes fade-out-slow {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-fade-out-slow {
+  animation: fade-out-slow 3s ease-in-out forwards;
+}
+
 /* ============================================================
    prefers-reduced-motion: disable all custom animations
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .animate-xp-fill,
   .animate-xp-pulse,
-  .animate-level-glow {
+  .animate-level-glow,
+  .animate-fade-out-slow {
     animation: none !important;
     transition: none !important;
   }

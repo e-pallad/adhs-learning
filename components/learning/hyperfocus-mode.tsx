@@ -9,12 +9,14 @@
  *   for screen readers; it's just invisible to sighted users.
  * - The timer content is centered in the full viewport.
  * - Press ESC or click "Exit focus" to leave.
+ * - A dismissible ESC hint appears for 3 s on first enter so the shortcut is
+ *   always discoverable.
  *
  * ADHD-UX: entering is opt-in (one click). Exiting is always one key/tap away.
  * No unlock prompts, no modals, no data loss.
  */
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { Maximize2, Minimize2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -24,15 +26,22 @@ interface HyperfocusModeProps {
 
 export function HyperfocusMode({ children }: HyperfocusModeProps) {
   const [active, setActive] = useState(false)
+  const [showHint, setShowHint] = useState(false)
+  const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const enter = useCallback(() => {
     setActive(true)
     document.documentElement.classList.add("hyperfocus")
+    // Show ESC hint for 3 s on every enter
+    setShowHint(true)
+    hintTimerRef.current = setTimeout(() => setShowHint(false), 3000)
   }, [])
 
   const exit = useCallback(() => {
     setActive(false)
     document.documentElement.classList.remove("hyperfocus")
+    setShowHint(false)
+    if (hintTimerRef.current) clearTimeout(hintTimerRef.current)
   }, [])
 
   // ESC to exit
@@ -49,6 +58,7 @@ export function HyperfocusMode({ children }: HyperfocusModeProps) {
   useEffect(() => {
     return () => {
       document.documentElement.classList.remove("hyperfocus")
+      if (hintTimerRef.current) clearTimeout(hintTimerRef.current)
     }
   }, [])
 
@@ -78,6 +88,18 @@ export function HyperfocusMode({ children }: HyperfocusModeProps) {
           </>
         )}
       </button>
+
+      {/* ESC hint — auto-fades after 3 s, tap to dismiss early */}
+      {active && showHint && (
+        <button
+          onClick={() => setShowHint(false)}
+          aria-label="Dismiss hint"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/6 border border-white/10 text-xs text-zinc-400 animate-fade-out-slow"
+        >
+          <kbd className="font-mono bg-white/10 px-1.5 py-0.5 rounded text-zinc-300">Esc</kbd>
+          to exit focus mode
+        </button>
+      )}
 
       <div className={cn(active && "w-full max-w-md px-6")}>
         {children}
