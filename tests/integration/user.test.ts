@@ -141,7 +141,7 @@ describe("lib/user.ts helpers", () => {
         data: { userId: ID, blockId: "m1w1-b1", month: 1, week: 1, status: "COMPLETED", xpEarned: 15 },
       })
       const unlocked = await checkAchievements(ID)
-      expect(unlocked).toContain("first_block")
+      expect(unlocked.map((a) => a.slug)).toContain("first_block")
       const user = await prisma.user.findUnique({ where: { id: ID } })
       // first_block xpBonus = 10 (from ACHIEVEMENT_DEFINITIONS in lib/xp.ts)
       expect(user!.totalXP).toBe(10)

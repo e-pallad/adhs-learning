@@ -298,6 +298,22 @@ else
   fi
 fi
 
+# ── 6. Test suite ────────────────────────────────────────────────────────────
+# Run the full integration + unit suite when a test DB is available.
+# Skipped gracefully when .env.test is absent (CI without DB, or bare dev machine).
+if [ -f "$ROOT/.env.test" ]; then
+  echo ""
+  echo "Running test suite..."
+  if npm test --silent 2>&1; then
+    green "All tests passed"
+  else
+    red "Tests failed — run 'npm test' locally to see details"
+    FAIL=1
+  fi
+else
+  warn "Skipping tests — .env.test not found (no test DB configured)"
+fi
+
 echo ""
 if [ "$FAIL" -eq 1 ]; then
   red "Pre-push checks FAILED — fix the issues above before pushing."
