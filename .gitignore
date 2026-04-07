@@ -36,6 +36,7 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+.opencode
 
 # UI audit artifacts
 artifacts/
