@@ -4,7 +4,7 @@
  * Receives Stripe webhook events and keeps the `subscriptions` table in sync.
  *
  * Handled events:
- *   checkout.session.completed      → create/activate Subscription row
+ *   checkout.session.completed      → create/activate Subscription row (subscription + payment mode)
  *   customer.subscription.updated   → update tier/status/period fields
  *   customer.subscription.deleted   → mark CANCELLED, clear period
  *   invoice.payment_failed          → mark PAST_DUE
@@ -89,11 +89,11 @@ async function resolveUserId(
  * checkout.session.completed
  *
  * Fired when a customer completes a Stripe Checkout session.
- * The session must be in `subscription` mode.
+ * Handles both subscription mode (monthly/annual Pro) and payment mode (lifetime).
  * We expect `metadata.userId` to be set when creating the Checkout session.
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  if (session.mode !== "subscription") return
+  if (session.mode !== "subscription" && session.mode !== "payment") return
 
   const userId =
     session.metadata?.userId ??
@@ -115,12 +115,63 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const customerId =
     typeof session.customer === "string" ? session.customer : session.customer?.id
+
+  if (!customerId || !stripe) return
+
+  if (session.mode === "payment") {
+    // Lifetime purchase — no subscription object. Retrieve line items to get the price ID.
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, { limit: 1 })
+    const priceId = lineItems.data[0]?.price?.id ?? ""
+    const tier = mapPriceTier(priceId)
+
+    if (tier !== "LIFETIME") {
+      console.warn("[stripe/webhook] checkout.session.completed: payment mode but price is not LIFETIME", {
+        sessionId: session.id,
+        priceId,
+      })
+      return
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.subscription.upsert({
+        where: { userId },
+        create: {
+          userId,
+          tier: "LIFETIME",
+          status: "ACTIVE",
+          stripeCustomerId: customerId,
+          // No stripeSubId for one-time payments
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+        },
+        update: {
+          tier: "LIFETIME",
+          status: "ACTIVE",
+          stripeCustomerId: customerId,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+        },
+      })
+      await tx.user.update({
+        where: { id: userId },
+        data: { subscriptionTier: "LIFETIME" },
+      })
+    })
+
+    console.info("[stripe/webhook] checkout.session.completed: lifetime purchase activated", {
+      userId,
+      sessionId: session.id,
+    })
+    return
+  }
+
+  // subscription mode — retrieve the full Subscription object for price/period details
   const subscriptionId =
     typeof session.subscription === "string"
       ? session.subscription
       : session.subscription?.id
 
-  if (!customerId || !subscriptionId || !stripe) return
+  if (!subscriptionId) return
 
   // Fetch the full subscription object to get price/period details
   const sub = await stripe.subscriptions.retrieve(subscriptionId, {
