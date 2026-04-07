@@ -4,7 +4,7 @@ import { LOCALE_COOKIE, LOCALES, DEFAULT_LOCALE } from "@/lib/i18n/config"
 import { DEMO_SESSION_COOKIE } from "@/lib/demo"
 
 const PUBLIC_PATHS = ["/", "/login", "/api/auth", "/impressum", "/datenschutz", "/offline", "/sw.js", "/manifest.webmanifest", "/robots.txt", "/sitemap.xml", "/opengraph-image"]
-const DEMO_ALLOWED_PATHS = ["/dashboard", "/learning", "/api/ai/recommendations", "/api/progress/block"]
+const DEMO_ALLOWED_PATHS = ["/dashboard", "/learning", "/api/ai/recommendations", "/api/accountability", "/api/progress/block"]
 
 function detectLocale(req: NextRequest): string {
   const accept = req.headers.get("accept-language") ?? ""

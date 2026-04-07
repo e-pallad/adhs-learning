@@ -2,13 +2,17 @@ import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/user"
 import { SettingsClient } from "./settings-client"
 import { getDictionary, getLocale } from "@/lib/i18n"
+import { isPro } from "@/lib/subscription"
 
 export const metadata = { title: "Settings — Devfluent" }
 
 export default async function SettingsPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
-  const locale = await getLocale()
+  const [locale, proUser] = await Promise.all([
+    getLocale(),
+    isPro(user.id),
+  ])
   const t = await getDictionary(locale)
 
   return (
@@ -29,6 +33,7 @@ export default async function SettingsPage() {
           githubUsername={user.githubUsername ?? null}
           githubLastSyncAt={user.githubLastSyncAt?.toISOString() ?? null}
           apiKey={user.apiKey ?? null}
+          isProUser={proUser}
         />
       </div>
     </div>

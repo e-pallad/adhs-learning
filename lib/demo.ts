@@ -39,6 +39,7 @@ export function createDemoUser(): User {
     githubAccessToken: null,
     githubLastSyncAt: null,
     apiKey: null,
+    subscriptionTier: "FREE",
     createdAt: now,
     updatedAt: now,
   }

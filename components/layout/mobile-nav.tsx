@@ -2,11 +2,11 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, GraduationCap, TrendingUp, Settings } from "lucide-react"
+import { LayoutDashboard, BookOpen, Timer, TrendingUp, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { Dictionary } from "@/lib/i18n/dictionaries/en"
 
-const MOBILE_ICONS = [LayoutDashboard, BookOpen, GraduationCap, TrendingUp, Settings] as const
+const MOBILE_ICONS = [LayoutDashboard, BookOpen, Timer, TrendingUp, Settings] as const
 const MOBILE_HREFS = ["/", "/learning", "/training", "/progress", "/settings"] as const
 
 interface MobileNavProps {
@@ -20,12 +20,13 @@ export function MobileNav({ t }: MobileNavProps) {
 
   return (
     <nav
+      data-mobile-nav
       className="fixed bottom-4 left-4 right-4 z-40 flex md:hidden rounded-2xl border border-[#1a1a24] bg-[#0d0d14]/90 backdrop-blur-xl shadow-2xl shadow-black/60 px-2"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Mobile navigation"
     >
       {MOBILE_HREFS.map((href, i) => {
-        const active = href === "/" ? pathname === "/" : pathname.startsWith(href)
+        const active = href === "/" ? pathname === "/" : pathname === href || (href === "/training" && pathname.startsWith("/training"))
         const Icon = MOBILE_ICONS[i]
         return (
           <Link

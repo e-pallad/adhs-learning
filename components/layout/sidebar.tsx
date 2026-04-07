@@ -13,14 +13,15 @@ import {
   Zap,
   Settings,
   Compass,
+  Timer,
 } from "lucide-react"
 import type { Dictionary } from "@/lib/i18n/dictionaries/en"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import type { Locale } from "@/lib/i18n/config"
 
-const NAV_ICONS = [LayoutDashboard, BookOpen, Map, GraduationCap, Rocket, TrendingUp] as const
-const NAV_HREFS = ["/dashboard", "/learning", "/roadmap", "/training", "/projects", "/progress"] as const
-const NAV_TOUR_IDS: (string | undefined)[] = [undefined, "nav-learning", "nav-roadmap", "nav-training", undefined, "nav-progress"]
+const NAV_ICONS = [LayoutDashboard, BookOpen, Map, Timer, GraduationCap, Rocket, TrendingUp] as const
+const NAV_HREFS = ["/dashboard", "/learning", "/roadmap", "/training", "/training/courses", "/projects", "/progress"] as const
+const NAV_TOUR_IDS: (string | undefined)[] = [undefined, "nav-learning", "nav-roadmap", "nav-training", undefined, undefined, "nav-progress"]
 
 interface SidebarProps {
   locale: Locale
@@ -30,7 +31,7 @@ interface SidebarProps {
 export function Sidebar({ locale, t }: SidebarProps) {
   const pathname = usePathname()
 
-  const navLabels = [t.nav.dashboard, t.nav.learning, t.nav.roadmap, t.nav.courses, t.nav.projects, t.nav.progress]
+  const navLabels = [t.nav.dashboard, t.nav.learning, t.nav.roadmap, "Focus", t.nav.courses, t.nav.projects, t.nav.progress]
 
   return (
     <aside className="hidden md:flex w-64 min-h-screen flex-col bg-[#0d0d14] border-r border-[#1a1a24]">
@@ -50,7 +51,10 @@ export function Sidebar({ locale, t }: SidebarProps) {
           Navigation
         </p>
         {NAV_HREFS.map((href, i) => {
-          const active = pathname.startsWith(href)
+          // Exact match for /training to avoid collision with /training/courses
+          const active = href === "/training"
+            ? pathname === "/training"
+            : pathname.startsWith(href)
           const Icon = NAV_ICONS[i]
           const tourId = NAV_TOUR_IDS[i]
 

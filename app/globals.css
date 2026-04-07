@@ -86,6 +86,42 @@
   --border: #27272f;
   --input: #27272f;
   --ring: #6366f1;
+
+  /* ── Unified Design Spec — Energy Layer (gamification tokens) ── */
+
+  /* XP progress bar gradient */
+  --xp-bar-start: #818cf8;
+  --xp-bar-end: #6366f1;
+  --xp-bar-glow: rgba(99, 102, 241, 0.35);
+
+  /* Streak flame tiers */
+  --streak-fire-low: #fb923c;   /* 1–6 days */
+  --streak-fire-mid: #f97316;   /* 7–29 days */
+  --streak-fire-high: #fbbf24;  /* 30+ days (gold) */
+
+  /* Level-up animation ring */
+  --level-up-ring: #a78bfa;
+
+  /* Achievement badge tiers */
+  --achievement-gold: #f59e0b;
+  --achievement-muted: #4a4a60;
+
+  /* Hyperfocus mode overrides */
+  --hyperfocus-bg: #080810;
+  --hyperfocus-timer-glow: rgba(99, 102, 241, 0.2);
+
+  /* Pro feature gate */
+  --pro-gate-bg: rgba(99, 102, 241, 0.08);
+  --pro-gate-border: rgba(99, 102, 241, 0.4);
+
+  /* Animation durations (Unified Design Spec) */
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+  --duration-xp-fill: 800ms;
+  --duration-level-up: 1200ms;
+  --duration-achievement-slide: 350ms;
 }
 
 @theme inline {
@@ -147,6 +183,44 @@ body {
 
 .animate-xp-pulse {
   animation: xp-pulse 1s ease-in-out 3;
+}
+
+/* ============================================================
+   Level-up glow sweep (XP bar hero, fires once on level-up)
+   ============================================================ */
+@keyframes level-glow {
+  0%   { box-shadow: 0 0 0 rgba(99,102,241,0); }
+  40%  { box-shadow: 0 0 20px rgba(99,102,241,0.6); }
+  100% { box-shadow: 0 0 0 rgba(99,102,241,0); }
+}
+
+.animate-level-glow {
+  animation: level-glow 1.5s ease-out forwards;
+}
+
+/* ============================================================
+   Legendary achievement shimmer sweep
+   ============================================================ */
+@keyframes legendary-shimmer {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.75; }
+  100% { opacity: 1; }
+}
+
+.animate-legendary-shimmer {
+  animation: legendary-shimmer 2.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   prefers-reduced-motion: disable all custom animations
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-xp-fill,
+  .animate-xp-pulse,
+  .animate-level-glow {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* ============================================================
@@ -222,4 +296,17 @@ body {
 }
 .devfluent-tour.driver-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
   border-bottom-color: #111118;
+}
+
+/* ─── Hyperfocus Mode ────────────────────────────────────────────────────────   When .hyperfocus is on <html>, suppress sidebar, top-bar, and mobile nav.
+   Content itself is rendered in a fixed overlay by HyperfocusMode.tsx.
+   Uses opacity (not display:none) so screen readers still have access.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+html.hyperfocus aside,
+html.hyperfocus header,
+html.hyperfocus [data-mobile-nav] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) ease;
 }

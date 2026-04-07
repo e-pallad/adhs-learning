@@ -2,6 +2,12 @@ import { getDictionary, getLocale } from "@/lib/i18n"
 import { Suspense } from "react"
 import { LoginForm } from "./login-form"
 
+export const metadata = {
+  title: "Sign in — Devfluent",
+  description: "Sign in with a magic link to your Devfluent account.",
+  robots: { index: false },
+}
+
 interface LoginPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }

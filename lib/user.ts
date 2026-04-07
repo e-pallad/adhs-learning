@@ -2,7 +2,7 @@ import { startOfDay, differenceInCalendarDays } from "date-fns"
 import { createClient } from "@/lib/supabase/server"
 import { prisma } from "@/lib/prisma"
 import { PrismaClient } from "@/app/generated/prisma/client"
-import { getLevelFromXP, ACHIEVEMENT_DEFINITIONS, XP_VALUES } from "@/lib/xp"
+import { getLevelFromXP, ACHIEVEMENT_DEFINITIONS, XP_VALUES, type AchievementRarity } from "@/lib/xp"
 import { hasDemoSession, createDemoUser } from "@/lib/demo"
 
 // Accepts either the full PrismaClient or a transaction client
@@ -182,10 +182,19 @@ export async function updateStreak(userId: string): Promise<number> {
   return newStreak
 }
 
+export interface UnlockedAchievement {
+  slug: string
+  label: string
+  description: string
+  icon: string
+  xpBonus: number
+  rarity: AchievementRarity
+}
+
 /**
  * Check and unlock any newly earned achievements.
  */
-export async function checkAchievements(userId: string): Promise<string[]> {
+export async function checkAchievements(userId: string): Promise<UnlockedAchievement[]> {
   const [user, existingAchievements, projects, blocks, quizAttempts, quizzesPassed, perfectQuizzes, githubPushes, githubPRsMerged, accountabilityCount] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.achievement.findMany({ where: { userId }, select: { slug: true } }),
@@ -243,5 +252,12 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     }
   })
 
-  return toUnlock.map((d) => d.slug)
+  return toUnlock.map((d) => ({
+    slug: d.slug,
+    label: d.label,
+    description: d.description,
+    icon: d.icon,
+    xpBonus: d.xpBonus,
+    rarity: d.rarity,
+  }))
 }

@@ -40,10 +40,10 @@ export function StreakCounter({ streak, compact, className }: StreakCounterProps
         <p className="text-xs text-zinc-500">Complete a block to start your streak</p>
       )}
       {streak >= 3 && streak < 7 && (
-        <p className="text-xs text-indigo-400 font-medium">{7 - streak} days to 7-day bonus!</p>
+        <p className="text-xs text-indigo-400 font-medium">{streak}-day streak — great momentum!</p>
       )}
       {streak >= 7 && streak < 30 && (
-        <p className="text-xs text-orange-400 font-medium">{30 - streak} days to 30-day bonus!</p>
+        <p className="text-xs text-orange-400 font-medium">{streak}-day streak — keep it going!</p>
       )}
     </div>
   )

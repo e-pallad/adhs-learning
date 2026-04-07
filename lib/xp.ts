@@ -74,6 +74,8 @@ export function getXPProgress(xp: number): {
   return { level, label: current.label, currentLevelXP, nextLevelXP, progress }
 }
 
+export type AchievementRarity = "common" | "rare" | "epic" | "legendary"
+
 export type AchievementStats = {
   streak: number
   level: number
@@ -94,6 +96,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
   description: string
   icon: string
   xpBonus: number
+  rarity: AchievementRarity
   check: (stats: AchievementStats) => boolean
 }[] = [
   {
@@ -102,6 +105,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete your first learning block",
     icon: "🎯",
     xpBonus: 10,
+    rarity: "common",
     check: (s) => s.blocksCompleted >= 1,
   },
   {
@@ -110,6 +114,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Study 3 days in a row",
     icon: "🔥",
     xpBonus: 15,
+    rarity: "common",
     check: (s) => s.streak >= 3,
   },
   {
@@ -118,6 +123,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Study 7 days in a row",
     icon: "🔥",
     xpBonus: 30,
+    rarity: "rare",
     check: (s) => s.streak >= 7,
   },
   {
@@ -126,6 +132,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Study 30 days in a row",
     icon: "⚡",
     xpBonus: 100,
+    rarity: "epic",
     check: (s) => s.streak >= 30,
   },
   {
@@ -134,6 +141,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Reach level 5: Builder",
     icon: "🏗️",
     xpBonus: 50,
+    rarity: "rare",
     check: (s) => s.level >= 5,
   },
   {
@@ -142,6 +150,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Reach max level: Fluent Dev",
     icon: "🌟",
     xpBonus: 200,
+    rarity: "legendary",
     check: (s) => s.level >= 10,
   },
   {
@@ -150,6 +159,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete your first monthly project",
     icon: "🚀",
     xpBonus: 50,
+    rarity: "common",
     check: (s) => s.projectsCompleted >= 1,
   },
   {
@@ -158,6 +168,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 3 monthly projects",
     icon: "💼",
     xpBonus: 100,
+    rarity: "rare",
     check: (s) => s.projectsCompleted >= 3,
   },
   {
@@ -166,6 +177,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete your first quiz",
     icon: "📝",
     xpBonus: 10,
+    rarity: "common",
     check: (s) => (s.quizAttempts ?? 0) >= 1,
   },
   {
@@ -174,6 +186,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Pass 5 quizzes",
     icon: "🧠",
     xpBonus: 50,
+    rarity: "rare",
     check: (s) => (s.quizzesPassed ?? 0) >= 5,
   },
   {
@@ -182,6 +195,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Get 100% on a quiz",
     icon: "💯",
     xpBonus: 25,
+    rarity: "rare",
     check: (s) => (s.perfectQuizzes ?? 0) >= 1,
   },
 
@@ -192,6 +206,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 10 learning blocks",
     icon: "🌱",
     xpBonus: 20,
+    rarity: "common",
     check: (s) => s.blocksCompleted >= 10,
   },
   {
@@ -200,6 +215,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 50 learning blocks",
     icon: "📚",
     xpBonus: 75,
+    rarity: "rare",
     check: (s) => s.blocksCompleted >= 50,
   },
   {
@@ -208,6 +224,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 100 learning blocks",
     icon: "💯",
     xpBonus: 150,
+    rarity: "epic",
     check: (s) => s.blocksCompleted >= 100,
   },
   {
@@ -216,6 +233,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 500 learning blocks",
     icon: "⚙️",
     xpBonus: 500,
+    rarity: "legendary",
     check: (s) => s.blocksCompleted >= 500,
   },
 
@@ -226,6 +244,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Study 14 days in a row",
     icon: "🔥",
     xpBonus: 50,
+    rarity: "rare",
     check: (s) => s.streak >= 14,
   },
   {
@@ -234,6 +253,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Study 100 days in a row",
     icon: "🏆",
     xpBonus: 300,
+    rarity: "legendary",
     check: (s) => s.streak >= 100,
   },
 
@@ -244,6 +264,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Reach level 3",
     icon: "🎓",
     xpBonus: 20,
+    rarity: "common",
     check: (s) => s.level >= 3,
   },
   {
@@ -252,6 +273,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Reach level 7",
     icon: "🛠️",
     xpBonus: 100,
+    rarity: "epic",
     check: (s) => s.level >= 7,
   },
 
@@ -262,6 +284,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Get 3 perfect quiz scores",
     icon: "🎯",
     xpBonus: 60,
+    rarity: "epic",
     check: (s) => (s.perfectQuizzes ?? 0) >= 3,
   },
   {
@@ -270,6 +293,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Pass 25 quizzes",
     icon: "🤖",
     xpBonus: 100,
+    rarity: "epic",
     check: (s) => (s.quizzesPassed ?? 0) >= 25,
   },
 
@@ -280,6 +304,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete 6 monthly projects",
     icon: "🔖",
     xpBonus: 200,
+    rarity: "epic",
     check: (s) => s.projectsCompleted >= 6,
   },
   {
@@ -288,6 +313,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Complete all 12 monthly projects",
     icon: "🏅",
     xpBonus: 500,
+    rarity: "legendary",
     check: (s) => s.projectsCompleted >= 12,
   },
 
@@ -298,6 +324,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Sync your first GitHub push",
     icon: "🚢",
     xpBonus: 15,
+    rarity: "common",
     check: (s) => (s.githubPushes ?? 0) >= 1,
   },
   {
@@ -306,6 +333,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Get 5 pull requests merged",
     icon: "🔀",
     xpBonus: 75,
+    rarity: "rare",
     check: (s) => (s.githubPRsMerged ?? 0) >= 5,
   },
 
@@ -316,6 +344,7 @@ export const ACHIEVEMENT_DEFINITIONS: {
     description: "Link an accountability partner",
     icon: "🤝",
     xpBonus: 20,
+    rarity: "common",
     check: (s) => s.accountabilityLinked === true,
   },
 ]

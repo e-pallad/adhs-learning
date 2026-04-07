@@ -40,7 +40,7 @@ export function WeekSection({ weekNumber, theme, blocks, statusMap, notesMap = {
     }
     const data = await res.json()
     startTransition(() => router.refresh())
-    return { leveledUp: data.leveledUp, newLevel: data.newLevel }
+    return { leveledUp: data.leveledUp, newLevel: data.newLevel, achievements: data.achievements ?? [] }
   }
 
   const handleSkip = async (blockId: string) => {
