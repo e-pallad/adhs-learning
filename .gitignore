@@ -38,5 +38,11 @@ yarn-error.log*
 *.swo
 .opencode
 
+# Generated Prisma client
+app/generated/
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo
+
 # UI audit artifacts
 artifacts/

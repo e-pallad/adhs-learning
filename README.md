@@ -120,6 +120,10 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with a magic lin
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
 | `DATABASE_URL` | Pooled connection string (pgbouncer, port 6543) |
 | `DIRECT_URL` | Direct connection string (port 5432, used by migrations) |
+| `STRIPE_SECRET_KEY` | Stripe secret key for server-side Checkout/webhook calls |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
+| `STRIPE_PRICE_MONTHLY_ID` | Stripe price ID for the monthly Pro plan |
+| `STRIPE_PRICE_ANNUAL_ID` | Stripe price ID for the annual Pro plan |
 | `ANTHROPIC_API_KEY` | Claude API key for AI recommendations |
 | `GITHUB_CLIENT_ID` | GitHub OAuth app client ID (for GitHub Activity Sync) |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth app client secret |
