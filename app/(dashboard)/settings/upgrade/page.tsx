@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { ArrowLeft, Check } from "lucide-react"
 import { ProBadge } from "@/components/ui/pro-badge"
+import { CheckoutButton, ManagePlanButton } from "@/components/stripe/checkout-button"
+import { getCurrentUser } from "@/lib/user"
+import { getUserTier } from "@/lib/subscription"
 
 export const metadata = {
   title: "Upgrade to Pro — Devfluent",
@@ -39,15 +42,28 @@ const FAQ = [
   },
   {
     q: "Is there a trial?",
-    a: "Pro is not yet available for purchase. When it launches, there will be a way to try it risk-free.",
+    a: "Pro is not yet available as a public launch, but when it is there will be a way to try it risk-free.",
   },
   {
     q: "What does 'Lifetime' mean?",
     a: "A one-time payment for permanent Pro access — no recurring subscription.",
   },
+  {
+    q: "How do I cancel?",
+    a: "Any time. Click 'Manage plan' to open the Stripe Customer Portal where you can cancel, change plan, or update your payment method. Access continues until the end of the billing period.",
+  },
 ]
 
-export default function UpgradePage() {
+export default async function UpgradePage() {
+  const user = await getCurrentUser()
+  const tier = user ? await getUserTier(user.id) : "FREE"
+  const isPro = tier === "PRO" || tier === "LIFETIME"
+
+  const monthlyPriceId = process.env.STRIPE_PRICE_MONTHLY_ID
+  const annualPriceId = process.env.STRIPE_PRICE_ANNUAL_ID
+  const lifetimePriceId = process.env.STRIPE_PRICE_LIFETIME_ID
+  const stripeReady = !!(monthlyPriceId || annualPriceId || lifetimePriceId)
+
   return (
     <div className="max-w-2xl mx-auto space-y-10 pb-16">
       {/* Back link */}
@@ -88,9 +104,13 @@ export default function UpgradePage() {
             ))}
           </ul>
           <div className="pt-2">
-            <span className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-white/5 text-sm font-medium text-zinc-400 border border-white/8 cursor-default">
-              Your current plan
-            </span>
+            {isPro ? (
+              <ManagePlanButton />
+            ) : (
+              <span className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-white/5 text-sm font-medium text-zinc-400 border border-white/8 cursor-default">
+                Your current plan
+              </span>
+            )}
           </div>
         </div>
 
@@ -98,12 +118,28 @@ export default function UpgradePage() {
         <div className="rounded-2xl border border-indigo-500/40 bg-indigo-500/5 p-6 space-y-4 relative">
           <div>
             <p className="text-xs font-semibold text-indigo-400 uppercase tracking-widest mb-1">Pro</p>
-            <p className="text-3xl font-bold text-white">Coming soon</p>
-            <p className="text-xs text-zinc-500 mt-0.5">Monthly &amp; lifetime options</p>
+            {stripeReady ? (
+              <>
+                {monthlyPriceId && (
+                  <p className="text-3xl font-bold text-white">
+                    $4<span className="text-lg font-normal text-zinc-400">/mo</span>
+                  </p>
+                )}
+                {annualPriceId && (
+                  <p className="text-xs text-emerald-400 mt-0.5">or $36/yr — save 25%</p>
+                )}
+                {lifetimePriceId && !monthlyPriceId && (
+                  <p className="text-3xl font-bold text-white">$79</p>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-3xl font-bold text-white">Coming soon</p>
+                <p className="text-xs text-zinc-500 mt-0.5">Monthly &amp; lifetime options</p>
+              </>
+            )}
           </div>
-          <p className="text-xs text-zinc-400">
-            Everything in Free, plus:
-          </p>
+          <p className="text-xs text-zinc-400">Everything in Free, plus:</p>
           <ul className="space-y-3">
             {PRO_FEATURES.map((f) => (
               <li key={f.name} className="flex items-start gap-2">
@@ -115,26 +151,59 @@ export default function UpgradePage() {
               </li>
             ))}
           </ul>
-          <div className="pt-2">
-            <a
-              href="mailto:kontakt@devfluent.de?subject=Devfluent%20Pro%20%E2%80%94%20notify%20me"
-              className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-indigo-600/20 text-sm font-medium text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/30 transition-colors"
-            >
-              Notify me when available
-            </a>
+
+          <div className="pt-2 space-y-2">
+            {isPro ? (
+              <span className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-indigo-600/20 text-sm font-medium text-indigo-300 border border-indigo-500/30 cursor-default">
+                {tier === "LIFETIME" ? "Lifetime — active" : "Pro — active"}
+              </span>
+            ) : stripeReady ? (
+              <>
+                {monthlyPriceId && (
+                  <CheckoutButton
+                    priceId={monthlyPriceId}
+                    label="Subscribe monthly — $4/mo"
+                    variant="primary"
+                  />
+                )}
+                {annualPriceId && (
+                  <CheckoutButton
+                    priceId={annualPriceId}
+                    label="Subscribe annually — $36/yr"
+                    variant="secondary"
+                  />
+                )}
+                {lifetimePriceId && (
+                  <CheckoutButton
+                    priceId={lifetimePriceId}
+                    label="Buy lifetime access — $79"
+                    variant="secondary"
+                  />
+                )}
+              </>
+            ) : (
+              <a
+                href="mailto:kontakt@devfluent.de?subject=Devfluent%20Pro%20%E2%80%94%20notify%20me"
+                className="inline-block w-full text-center px-4 py-2.5 rounded-xl bg-indigo-600/20 text-sm font-medium text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/30 transition-colors"
+              >
+                Notify me when available
+              </a>
+            )}
           </div>
         </div>
       </div>
 
       {/* Continue free CTA */}
-      <div className="text-center">
-        <Link
-          href="/"
-          className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-4"
-        >
-          Continue with Free — no action needed
-        </Link>
-      </div>
+      {!isPro && (
+        <div className="text-center">
+          <Link
+            href="/"
+            className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors underline underline-offset-4"
+          >
+            Continue with Free — no action needed
+          </Link>
+        </div>
+      )}
 
       {/* FAQ */}
       <div className="space-y-4">

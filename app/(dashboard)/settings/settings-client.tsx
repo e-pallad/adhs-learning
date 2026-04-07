@@ -6,7 +6,45 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/theme-provider"
 import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
-import { Moon, Sun, Sparkles } from "lucide-react"
+import { Moon, Sun, Sparkles, Loader2 } from "lucide-react"
+
+function ManagePlanClientButton() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleClick = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data?.error ?? "Something went wrong.")
+        setLoading(false)
+        return
+      }
+      window.location.href = data.url
+    } catch {
+      setError("Network error. Please try again.")
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-1">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={loading}
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-white/8 text-sm font-medium text-zinc-300 hover:bg-white/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {loading ? "Opening…" : "Manage plan"}
+      </button>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+    </div>
+  )
+}
 
 const TRACKS = [
   { id: "javascript", label: "Full-Stack JavaScript", icon: "⚡" },
@@ -371,25 +409,38 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
         </div>
       </div>
 
-      {/* Upgrade CTA — only shown to free users */}
-      {!isProUser && (
-        <>
-          <div className="border-t border-white/6" />
-          <div className="space-y-3">
-            <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Pro Features</h2>
-            <p className="text-xs text-zinc-500">
-              Unlock focus sounds, AI coaching, accountability partner, and full-year analytics.
-            </p>
-            <a
-              href="/settings/upgrade"
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-sm font-medium text-indigo-300 hover:bg-indigo-500/20 transition-colors"
-            >
-              <Sparkles className="w-4 h-4" aria-hidden="true" />
-              See what&apos;s coming with Pro
-            </a>
-          </div>
-        </>
-      )}
+      {/* Plan section */}
+      <>
+        <div className="border-t border-white/6" />
+        <div className="space-y-3">
+          <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Plan</h2>
+          {isProUser ? (
+            <>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/25">
+                <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+                Pro — active
+              </div>
+              <p className="text-xs text-zinc-500">
+                Manage your subscription, update payment method, or cancel any time from the Stripe portal.
+              </p>
+              <ManagePlanClientButton />
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-zinc-500">
+                Unlock focus sounds, AI coaching, accountability partner, and full-year analytics.
+              </p>
+              <a
+                href="/settings/upgrade"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-sm font-medium text-indigo-300 hover:bg-indigo-500/20 transition-colors"
+              >
+                <Sparkles className="w-4 h-4" aria-hidden="true" />
+                See Pro features
+              </a>
+            </>
+          )}
+        </div>
+      </>
 
       {/* Divider */}
       <div className="border-t border-white/6" />
