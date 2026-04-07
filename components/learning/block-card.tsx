@@ -5,11 +5,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PomodoroTimer } from "@/components/learning/pomodoro-timer"
-import { CelebrationModal } from "@/components/gamification/celebration-modal"
+import { toastBlockComplete, toastQuizComplete, toastAchievementUnlocked } from "@/components/gamification/achievement-toast"
+import type { UnlockedAchievement } from "@/lib/user"
 import { QuizModal } from "@/components/learning/quiz-modal"
 import { BLOCK_TYPE_COLORS, BLOCK_TYPE_LABELS, type LearningBlock } from "@/content/curriculum"
 import { XP_VALUES } from "@/lib/xp"
-import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
 import { cn } from "@/lib/utils"
 import { ChevronDown, Check, StickyNote } from "lucide-react"
 import type { Dictionary } from "@/lib/i18n/dictionaries/en"
@@ -18,7 +18,7 @@ interface BlockCardProps {
   block: LearningBlock
   status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED"
   initialNotes?: string
-  onComplete?: (blockId: string, usedTimer: boolean) => Promise<{ leveledUp?: boolean; newLevel?: number }>
+  onComplete?: (blockId: string, usedTimer: boolean) => Promise<{ leveledUp?: boolean; newLevel?: number; achievements?: UnlockedAchievement[] }>
   onSkip?: (blockId: string) => void
   readOnly?: boolean
   dict?: Dictionary
@@ -27,14 +27,8 @@ interface BlockCardProps {
 export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip, readOnly = false, dict }: BlockCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [celebration, setCelebration] = useState<{ leveledUp?: boolean; newLevel?: number } | null>(null)
   const [timerUsed, setTimerUsed] = useState(false)
   const [showQuiz, setShowQuiz] = useState(false)
-  const [quizCelebration, setQuizCelebration] = useState<{ xpEarned: number; passed: boolean; perfect: boolean } | null>(null)
-  const [celebrationsEnabled] = useState(() => {
-    if (typeof window === "undefined") return false
-    return window.localStorage.getItem(CELEBRATION_ANIMATIONS_KEY) === "true"
-  })
   const [notes, setNotes] = useState(initialNotes)
   const [notesSaving, setNotesSaving] = useState(false)
   const [showNotes, setShowNotes] = useState(false)
@@ -48,8 +42,18 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
     setLoading(true)
     try {
       const result = await onComplete(block.id, timerUsed)
-      if (celebrationsEnabled) {
-        setCelebration(result)
+      toastBlockComplete({
+        blockTitle: block.title,
+        xpEarned: xpValue,
+        leveledUp: result.leveledUp,
+        newLevel: result.newLevel,
+        usedTimer: timerUsed,
+      })
+      // Fire rarity-aware achievement toasts for any newly unlocked achievements
+      if (result.achievements && result.achievements.length > 0) {
+        for (const ach of result.achievements) {
+          toastAchievementUnlocked(ach)
+        }
       }
     } finally {
       setLoading(false)
@@ -60,12 +64,15 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
     xpEarned: number
     passed: boolean
     perfect: boolean
-    achievements: unknown[]
+    achievements: UnlockedAchievement[]
   }) => {
     if (result.passed) {
-      if (celebrationsEnabled) {
-        setQuizCelebration(result)
-      }
+      toastQuizComplete({
+        blockTitle: block.title,
+        xpEarned: result.xpEarned,
+        passed: result.passed,
+        perfect: result.perfect,
+      })
       if (onComplete && !isCompleted && !loading) {
         setLoading(true)
         onComplete(block.id, timerUsed).finally(() => setLoading(false))
@@ -253,20 +260,6 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
         </CardContent>
       </Card>
 
-      {celebration && (
-        <CelebrationModal
-          title={celebration.leveledUp ? "Level Up!" : "Block Complete!"}
-          message={celebration.leveledUp
-            ? `You reached Level ${celebration.newLevel}!`
-            : `Great work on "${block.title}"!`
-          }
-          xpGained={xpValue}
-          leveledUp={celebration.leveledUp}
-          newLevel={celebration.newLevel}
-          onClose={() => setCelebration(null)}
-        />
-      )}
-
       {showQuiz && hasQuiz && (
         <QuizModal
           blockId={block.id}
@@ -274,18 +267,6 @@ export function BlockCard({ block, status, initialNotes = "", onComplete, onSkip
           questions={block.quiz!}
           onComplete={handleQuizComplete}
           onClose={() => setShowQuiz(false)}
-        />
-      )}
-
-      {quizCelebration && (
-        <CelebrationModal
-          title={quizCelebration.perfect ? "Perfect Score!" : "Quiz Passed!"}
-          message={quizCelebration.perfect
-            ? `Flawless on "${block.title}"!`
-            : `You passed the quiz for "${block.title}"!`
-          }
-          xpGained={quizCelebration.xpEarned > 0 ? quizCelebration.xpEarned : undefined}
-          onClose={() => setQuizCelebration(null)}
         />
       )}
     </>

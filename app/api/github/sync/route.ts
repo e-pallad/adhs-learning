@@ -10,6 +10,9 @@ const XP_MAP: Record<string, number> = {
   PullRequestEvent_closed_merged: XP_VALUES.GITHUB_PR_MERGED,
 }
 
+/** Maximum XP that can be awarded from GitHub events per calendar day. */
+const GITHUB_DAILY_XP_CAP = 50
+
 interface GithubApiEvent {
   id: string
   type: string
@@ -117,9 +120,27 @@ export async function POST() {
         const createdEventIds = new Set(createdEvents.map((e) => e.eventId))
 
         // Calculate XP only for records we know we created (vs records that were skipped)
-        const actualXP = toCreate
-          .filter((r) => createdEventIds.has(r.event.id))
-          .reduce((sum, r) => sum + r.xpToAward, 0)
+        const rawXP = toCreate
+          .filter((r: { event: { id: string }; xpToAward: number }) => createdEventIds.has(r.event.id))
+          .reduce((sum: number, r: { xpToAward: number }) => sum + r.xpToAward, 0)
+
+        // Apply daily cap: check how much GitHub XP has already been awarded today
+        const todayStart = new Date()
+        todayStart.setHours(0, 0, 0, 0)
+        const todayGithubEvents = await tx.githubEvent.findMany({
+          where: {
+            userId: user.id,
+            createdAt: { gte: todayStart },
+            // Exclude events we just created (they're in the DB but we're inside the transaction)
+            eventId: { notIn: toCreate.map((r: { event: { id: string } }) => r.event.id) },
+          },
+          select: { xpAwarded: true },
+        })
+        const xpAlreadyTodayFromGithub = todayGithubEvents.reduce(
+          (sum: number, e: { xpAwarded: number }) => sum + e.xpAwarded, 0
+        )
+        const remainingCap = Math.max(0, GITHUB_DAILY_XP_CAP - xpAlreadyTodayFromGithub)
+        const actualXP = Math.min(rawXP, remainingCap)
 
         if (actualXP > 0) {
           await awardXP(user.id, actualXP, { db: tx })

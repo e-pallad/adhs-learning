@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import { useTheme } from "@/components/theme-provider"
 import { CELEBRATION_ANIMATIONS_KEY } from "@/lib/preferences"
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun, Sparkles } from "lucide-react"
 
 const TRACKS = [
   { id: "javascript", label: "Full-Stack JavaScript", icon: "⚡" },
@@ -23,9 +23,10 @@ interface SettingsClientProps {
   githubUsername: string | null
   githubLastSyncAt: string | null
   apiKey: string | null
+  isProUser?: boolean
 }
 
-export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt, apiKey: initialApiKey }: SettingsClientProps) {
+export function SettingsClient({ name: initialName, email, track: initialTrack, streakFreezeUsedAt, dailyGoalBlocks: initialDailyGoal, weeklyGoalBlocks: initialWeeklyGoal, githubUsername: initialGithubUsername, githubLastSyncAt, apiKey: initialApiKey, isProUser = false }: SettingsClientProps) {
   const { theme, toggle } = useTheme()
   // Capture current time once at mount — avoids calling Date.now() during render
   const [now] = useState<number>(() => Date.now())
@@ -369,6 +370,26 @@ export function SettingsClient({ name: initialName, email, track: initialTrack, 
           )}
         </div>
       </div>
+
+      {/* Upgrade CTA — only shown to free users */}
+      {!isProUser && (
+        <>
+          <div className="border-t border-white/6" />
+          <div className="space-y-3">
+            <h2 className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Pro Features</h2>
+            <p className="text-xs text-zinc-500">
+              Unlock focus sounds, AI coaching, accountability partner, and full-year analytics.
+            </p>
+            <a
+              href="/settings/upgrade"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-sm font-medium text-indigo-300 hover:bg-indigo-500/20 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
+              See what&apos;s coming with Pro
+            </a>
+          </div>
+        </>
+      )}
 
       {/* Divider */}
       <div className="border-t border-white/6" />

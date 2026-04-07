@@ -93,12 +93,13 @@ export async function POST(req: NextRequest) {
     return { record, alreadyCompleted, leveledUp, newLevel, newXP }
   })
 
+  let newAchievements: Awaited<ReturnType<typeof checkAchievements>> = []
   if (isCompleting && !alreadyCompleted) {
     await updateStreak(user.id)
-    await checkAchievements(user.id)
+    newAchievements = await checkAchievements(user.id)
   }
 
-  return NextResponse.json({ success: true, record, leveledUp, newLevel, newXP, xpAwarded: alreadyCompleted ? 0 : xpToAward })
+  return NextResponse.json({ success: true, record, leveledUp, newLevel, newXP, xpAwarded: alreadyCompleted ? 0 : xpToAward, achievements: newAchievements })
 }
 
 export async function PATCH(req: NextRequest) {

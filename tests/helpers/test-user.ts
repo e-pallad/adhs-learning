@@ -16,10 +16,11 @@ export async function resetTestUser(id: string) {
   await prisma.roadmapProgress.deleteMany({ where: { userId: id } })
   await prisma.externalCourse.deleteMany({ where: { userId: id } })
   await prisma.monthlyProject.deleteMany({ where: { userId: id } })
+  await prisma.subscription.deleteMany({ where: { userId: id } })
   // Reset mutable user fields to baseline
   await prisma.user.update({
     where: { id },
-    data: { totalXP: 0, level: 1, streak: 0, lastSeenAt: null },
+    data: { totalXP: 0, level: 1, streak: 0, lastSeenAt: null, subscriptionTier: "FREE" },
   })
 }
 

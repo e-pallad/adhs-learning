@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getCurrentUser, awardDailyLoginXP } from "@/lib/user"
 import { getXPProgress, LEVEL_THRESHOLDS } from "@/lib/xp"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
+import { getUserTier, getFeatureFlags } from "@/lib/subscription"
 import { ProgressBar } from "@/components/ui/progress-bar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -16,12 +17,6 @@ import {
   Zap,
   Flame,
   CheckSquare,
-  BookOpen,
-  Map as MapIcon,
-  GraduationCap,
-  Rocket,
-  TrendingUp,
-  Settings,
   ArrowRight,
 } from "lucide-react"
 
@@ -34,13 +29,16 @@ export default async function DashboardPage() {
     await awardDailyLoginXP(user.id)
   }
 
+  const tier = await getUserTier(user.id)
+  const flags = getFeatureFlags(tier)
+
   const xpProgress = getXPProgress(user.totalXP)
   const nextLevel = LEVEL_THRESHOLDS.find((t) => t.level === xpProgress.level + 1)
 
   const curriculum = getTrackById(user.track)?.months ?? CURRICULUM
   const trackBlockIds = curriculum.flatMap((m) => m.weeks.flatMap((w) => w.blocks.map((b) => b.id)))
 
-  const blockProgress = demoMode
+  const blockProgress: Array<{ blockId: string; month: number; status: string }> = demoMode
     ? []
     : await prisma.blockProgress.findMany({
       where: { userId: user.id, blockId: { in: trackBlockIds } },
@@ -106,7 +104,7 @@ export default async function DashboardPage() {
   const currentMonthBlocks = currentMonthData.weeks.flatMap((w) => w.blocks)
   const currentMonthDone = completedByMonth[currentMonth] ?? 0
 
-  const recentAchievements = demoMode
+  const recentAchievements: Array<{ id: string; label: string; description: string | null; icon: string | null; xpBonus: number }> = demoMode
     ? []
     : await prisma.achievement.findMany({
       where: { userId: user.id },
@@ -118,7 +116,7 @@ export default async function DashboardPage() {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
   sevenDaysAgo.setHours(0, 0, 0, 0)
 
-  const recentLogs = demoMode
+  const recentLogs: Array<{ date: Date; xpEarned: number; blocksCompleted: number }> = demoMode
     ? []
     : await prisma.dailyLog.findMany({
       where: { userId: user.id, date: { gte: sevenDaysAgo } },
@@ -327,12 +325,12 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="bg-[#111118] border-white/6">
           <CardContent className="p-5">
-            <AiRecommendations />
+            <AiRecommendations isProUser={flags.aiRecommendations} />
           </CardContent>
         </Card>
         <Card className="bg-[#111118] border-white/6">
           <CardContent className="p-5">
-            <AccountabilityPartner />
+            <AccountabilityPartner isProUser={flags.accountabilityPartner} />
           </CardContent>
         </Card>
       </div>
@@ -405,37 +403,6 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* Quick navigation */}
-      <div>
-        <h3 className="text-[11px] font-semibold text-zinc-600 uppercase tracking-widest mb-3">Quick access</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {[
-            { href: `/learning/${currentMonth}`, label: "Continue learning", desc: `Month ${currentMonth}: ${currentMonthData.title}`, icon: BookOpen, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
-            { href: "/roadmap", label: "Roadmap", desc: "Track tech skills", icon: MapIcon, color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-            { href: "/training", label: "Courses", desc: "External resources", icon: GraduationCap, color: "text-violet-400 bg-violet-500/10 border-violet-500/20" },
-            { href: "/projects", label: "Projects", desc: "Monthly builds", icon: Rocket, color: "text-orange-400 bg-orange-500/10 border-orange-500/20" },
-            { href: "/progress", label: "Progress", desc: "XP & achievements", icon: TrendingUp, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-            { href: "/settings", label: "Settings", desc: "Account & preferences", icon: Settings, color: "text-zinc-400 bg-zinc-500/10 border-zinc-500/20" },
-          ].map((item) => {
-            const Icon = item.icon
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-start gap-3 p-4 bg-[#111118] border border-white/6 rounded-2xl hover:border-white/12 hover:bg-white/3 transition-all duration-150 cursor-pointer group"
-              >
-                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center flex-shrink-0 ${item.color} group-hover:scale-105 transition-transform duration-150`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-200">{item.label}</p>
-                  <p className="text-xs text-zinc-600 mt-0.5 truncate">{item.desc}</p>
-                </div>
-              </Link>
-            )
-          })}
-        </div>
-      </div>
     </div>
   )
 }

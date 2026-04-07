@@ -16,11 +16,20 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Devfluent",
     url: "https://devfluent.de",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Devfluent — ADHD-friendly developer learning",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Devfluent — Learn to code. Actually finish.",
     description: "A 12-month structured curriculum with XP, streaks, and body-double mode — designed for the way ADHD brains actually work.",
+    images: ["/opengraph-image"],
   },
 }
 

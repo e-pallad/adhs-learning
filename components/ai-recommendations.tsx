@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useRef, useState } from "react"
+import { ProFeatureGate } from "@/components/ui/pro-feature-gate"
 
 interface Recommendation {
   title: string
@@ -17,7 +18,11 @@ function fetchRecommendations(force: boolean): Promise<Recommendation[]> {
     .catch(() => [])
 }
 
-export function AiRecommendations() {
+interface AiRecommendationsProps {
+  isProUser?: boolean
+}
+
+export function AiRecommendations({ isProUser = false }: AiRecommendationsProps) {
   const [recs, setRecs] = useState<Recommendation[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -40,14 +45,24 @@ export function AiRecommendations() {
 
   if (loading)
     return (
-      <div className="space-y-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-14 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
-        ))}
-      </div>
+      <ProFeatureGate featureName="AI Coach" isLocked={!isProUser}>
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-14 bg-gray-100 dark:bg-gray-700 rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </ProFeatureGate>
     )
 
-  if (recs.length === 0) return null
+  if (recs.length === 0)
+    return (
+      <ProFeatureGate featureName="AI Coach" isLocked={!isProUser}>
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">AI Coach</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">No recommendations yet.</p>
+        </div>
+      </ProFeatureGate>
+    )
 
   const priorityBadge: Record<Recommendation["priority"], string> = {
     high: "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300",
@@ -56,38 +71,40 @@ export function AiRecommendations() {
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">AI Coach</h3>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="text-xs text-indigo-600 hover:text-indigo-700 disabled:opacity-50 transition-colors"
-        >
-          {refreshing ? "Thinking..." : "Refresh"}
-        </button>
-      </div>
-      <ul className="space-y-2">
-        {recs.map((r, i) => (
-          <li
-            key={i}
-            className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700"
+    <ProFeatureGate featureName="AI Coach" isLocked={!isProUser}>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">AI Coach</h3>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="text-xs text-indigo-600 hover:text-indigo-700 disabled:opacity-50 transition-colors"
           >
-            <span className="text-lg leading-none mt-0.5">{r.icon}</span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.title}</p>
-                <span
-                  className={`text-xs px-1.5 py-0.5 rounded font-medium ${priorityBadge[r.priority]}`}
-                >
-                  {r.priority}
-                </span>
+            {refreshing ? "Thinking..." : "Refresh"}
+          </button>
+        </div>
+        <ul className="space-y-2">
+          {recs.map((r, i) => (
+            <li
+              key={i}
+              className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700"
+            >
+              <span className="text-lg leading-none mt-0.5">{r.icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{r.title}</p>
+                  <span
+                    className={`text-xs px-1.5 py-0.5 rounded font-medium ${priorityBadge[r.priority]}`}
+                  >
+                    {r.priority}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{r.description}</p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{r.description}</p>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </ProFeatureGate>
   )
 }

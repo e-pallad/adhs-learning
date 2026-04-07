@@ -2,12 +2,13 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getCurrentUser } from "@/lib/user"
 import { getXPProgress } from "@/lib/xp"
+import { getUserTier } from "@/lib/subscription"
 
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const [blockStats, roadmapStats, courseStats, recentLogs, achievements] = await Promise.all([
+  const [blockStats, roadmapStats, courseStats, recentLogs, achievements, tier] = await Promise.all([
     prisma.blockProgress.groupBy({
       by: ["status"],
       where: { userId: user.id },
@@ -33,6 +34,7 @@ export async function GET() {
       orderBy: { unlockedAt: "desc" },
       take: 5,
     }),
+    getUserTier(user.id),
   ])
 
   const xpProgress = getXPProgress(user.totalXP)
@@ -44,6 +46,7 @@ export async function GET() {
       name: user.name,
       totalXP: user.totalXP,
       streak: user.streak,
+      tier,
       ...xpProgress,
     },
     blocks: blockStats,

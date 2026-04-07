@@ -12,6 +12,19 @@ datasource db {
 
 // ─── Enums ───────────────────────────────────────────────────────────────────
 
+enum SubscriptionTier {
+  FREE
+  PRO
+  LIFETIME
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  TRIALING
+}
+
 enum NodeStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -56,9 +69,10 @@ model User {
   githubUsername     String?
   githubAccessToken  String?
   githubLastSyncAt   DateTime?
-  apiKey             String?   @unique
-  createdAt          DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  apiKey             String?            @unique
+  subscriptionTier   SubscriptionTier   @default(FREE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   dailyLogs          DailyLog[]
   roadmapProgress    RoadmapProgress[]
@@ -69,6 +83,7 @@ model User {
   quizAttempts       QuizAttempt[]
   githubEvents       GithubEvent[]
   aiRecommendation   AiRecommendation?
+  subscription       Subscription?
   sentPairs          AccountabilityPair[] @relation("RequesterPairs")
   receivedPairs      AccountabilityPair[] @relation("PartnerPairs")
 
@@ -258,4 +273,23 @@ model GithubEvent {
 
   @@unique([userId, eventId])
   @@map("github_events")
+}
+
+// ─── Subscription ─────────────────────────────────────────────────────────────
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  tier               SubscriptionTier   @default(FREE)
+  status             SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId   String?            @unique
+  stripeSubId        String?            @unique
+  currentPeriodEnd   DateTime?
+  cancelAtPeriodEnd  Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
 }

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { QuizQuestion } from "@/content/curriculum"
+import { toastAchievementUnlocked } from "@/components/gamification/achievement-toast"
+import type { UnlockedAchievement } from "@/lib/user"
 
 interface QuizModalProps {
   blockId: string
@@ -13,7 +15,7 @@ interface QuizModalProps {
     xpEarned: number
     passed: boolean
     perfect: boolean
-    achievements: unknown[]
+    achievements: UnlockedAchievement[]
   }) => void
   onClose: () => void
 }
@@ -40,7 +42,7 @@ export function QuizModal({
     xpEarned: number
     passed: boolean
     perfect: boolean
-    achievements: unknown[]
+    achievements: UnlockedAchievement[]
   } | null>(null)
 
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -144,6 +146,12 @@ export function QuizModal({
   const handleFinish = () => {
     if (result) {
       onComplete(result)
+      // Fire rarity-aware achievement toasts after the modal closes
+      if (result.achievements && result.achievements.length > 0) {
+        for (const ach of result.achievements) {
+          toastAchievementUnlocked(ach)
+        }
+      }
     }
     onClose()
   }

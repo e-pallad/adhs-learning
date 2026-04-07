@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { FocusSounds } from "./focus-sounds"
+import { ProFeatureGate } from "@/components/ui/pro-feature-gate"
 import { toast } from "sonner"
 
 type TimerState = "idle" | "running" | "break" | "done"
@@ -13,9 +14,10 @@ const BREAK_MINUTES = 5
 interface PomodoroTimerProps {
   onComplete?: () => void
   blockTitle?: string
+  isProUser?: boolean
 }
 
-export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
+export function PomodoroTimer({ onComplete, blockTitle, isProUser = false }: PomodoroTimerProps) {
   const [state, setState] = useState<TimerState>("idle")
   const [secondsLeft, setSecondsLeft] = useState(FOCUS_MINUTES * 60)
   const [pomodoros, setPomodoros] = useState(0)
@@ -30,9 +32,16 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
     if (intervalRef.current) clearInterval(intervalRef.current)
   }, [])
 
+  const dispatchState = useCallback((timerState: TimerState, secs: number) => {
+    window.dispatchEvent(
+      new CustomEvent("pomodoro-state", { detail: { state: timerState, secondsLeft: secs } })
+    )
+  }, [])
+
   const tick = useCallback(() => {
     secondsLeftRef.current -= 1
     setSecondsLeft(secondsLeftRef.current)
+    dispatchState(stateRef.current, secondsLeftRef.current)
 
     if (stateRef.current === "running" && secondsLeftRef.current === 120 && !warnedRef.current) {
       warnedRef.current = true
@@ -48,23 +57,30 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
       setState("break")
       secondsLeftRef.current = BREAK_MINUTES * 60
       setSecondsLeft(BREAK_MINUTES * 60)
+      dispatchState("break", BREAK_MINUTES * 60)
       intervalRef.current = setInterval(() => tickRef.current(), 1000)
     } else if (stateRef.current === "break") {
       setState("done")
+      dispatchState("done", 0)
       onCompleteRef.current?.()
     }
-  }, [clear])
+  }, [clear, dispatchState])
 
   useEffect(() => { stateRef.current = state }, [state])
   useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])
   useEffect(() => { tickRef.current = tick }, [tick])
-  useEffect(() => () => clear(), [clear])
+  useEffect(() => () => {
+    clear()
+    // Clear banner on unmount
+    window.dispatchEvent(new CustomEvent("pomodoro-state", { detail: { state: "idle", secondsLeft: 0 } }))
+  }, [clear])
 
   const start = () => {
     warnedRef.current = false
     secondsLeftRef.current = FOCUS_MINUTES * 60
     setState("running")
     setSecondsLeft(FOCUS_MINUTES * 60)
+    dispatchState("running", FOCUS_MINUTES * 60)
     clear()
     intervalRef.current = setInterval(tick, 1000)
   }
@@ -72,6 +88,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
   const pause = () => {
     clear()
     setState("idle")
+    dispatchState("idle", secondsLeftRef.current)
   }
 
   const reset = () => {
@@ -80,6 +97,7 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
     setState("idle")
     secondsLeftRef.current = FOCUS_MINUTES * 60
     setSecondsLeft(FOCUS_MINUTES * 60)
+    dispatchState("idle", FOCUS_MINUTES * 60)
   }
 
   const minutes = Math.floor(secondsLeft / 60)
@@ -146,7 +164,9 @@ export function PomodoroTimer({ onComplete, blockTitle }: PomodoroTimerProps) {
         )}
       </div>
 
-      <FocusSounds playing={state === "running"} />
+      <ProFeatureGate featureName="Focus Sounds" isLocked={!isProUser}>
+        <FocusSounds playing={state === "running"} />
+      </ProFeatureGate>
     </div>
   )
 }

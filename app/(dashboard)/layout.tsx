@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/layout/sidebar"
 import { TopBar } from "@/components/layout/top-bar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppTour } from "@/components/tour/app-tour"
+import { ActiveSessionBanner } from "@/components/learning/active-session-banner"
 import { getCurrentUser } from "@/lib/user"
 import { getXPProgress } from "@/lib/xp"
 import { getLocale, getDictionary } from "@/lib/i18n"
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-[#09090f] dark">
+      <ActiveSessionBanner />
       <Sidebar locale={locale} t={t} />
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar
