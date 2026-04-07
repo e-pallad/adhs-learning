@@ -158,27 +158,27 @@ describe("POST /api/progress/quiz", () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 50 }))
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.achievements).toContain("first-quiz")
+    expect(body.achievements.map((a: { slug: string }) => a.slug)).toContain("first-quiz")
   })
 
   it("does not re-unlock 'first-quiz' on a subsequent attempt", async () => {
     await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 50 }))
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 60 }))
     const body = await res.json()
-    expect(body.achievements).not.toContain("first-quiz")
+    expect(body.achievements.map((a: { slug: string }) => a.slug)).not.toContain("first-quiz")
   })
 
   it("unlocks the 'perfect-score' achievement on a score of 100", async () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 100 }))
     expect(res.status).toBe(200)
     const body = await res.json()
-    expect(body.achievements).toContain("perfect-score")
+    expect(body.achievements.map((a: { slug: string }) => a.slug)).toContain("perfect-score")
   })
 
   it("does not unlock 'perfect-score' on a passing but non-perfect score", async () => {
     const res = await POST(makePost("/api/progress/quiz", { blockId: BLOCK, score: 90 }))
     const body = await res.json()
-    expect(body.achievements).not.toContain("perfect-score")
+    expect(body.achievements.map((a: { slug: string }) => a.slug)).not.toContain("perfect-score")
   })
 
   // --- User XP reflected in database ---
