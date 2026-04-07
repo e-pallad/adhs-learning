@@ -20,19 +20,24 @@ const SUB_ID = "sub_test_stripe_webhook"
 // mapPriceTier() inside the route sees the same values makeStripeSub() uses.
 const TEST_PRICE_MONTHLY = "price_test_monthly"
 const TEST_PRICE_ANNUAL = "price_test_annual"
+const TEST_PRICE_LIFETIME = "price_test_lifetime"
 process.env.STRIPE_PRICE_MONTHLY_ID = TEST_PRICE_MONTHLY
 process.env.STRIPE_PRICE_ANNUAL_ID = TEST_PRICE_ANNUAL
+process.env.STRIPE_PRICE_LIFETIME_ID = TEST_PRICE_LIFETIME
 
 // ─── Stripe mock ────────────────────────────────────────────────────────────
 
-// We control what constructEvent returns; subscriptions.retrieve is stubbed per-test.
+// We control what constructEvent returns; subscriptions.retrieve and
+// checkout.sessions.listLineItems are stubbed per-test.
 const mockConstructEvent = vi.fn()
 const mockRetrieve = vi.fn()
+const mockListLineItems = vi.fn()
 
 vi.mock("@/lib/stripe", () => ({
   stripe: {
     webhooks: { constructEvent: mockConstructEvent },
     subscriptions: { retrieve: mockRetrieve },
+    checkout: { sessions: { listLineItems: mockListLineItems } },
   },
   stripeWebhookSecret: "whsec_test",
 }))
@@ -168,7 +173,26 @@ describe("POST /api/webhooks/stripe", () => {
     expect(user!.subscriptionTier).toBe("PRO")
   })
 
-  it("checkout.session.completed: skips non-subscription mode", async () => {
+  it("checkout.session.completed: skips modes other than subscription/payment", async () => {
+    mockEvent("checkout.session.completed", {
+      mode: "setup",
+      metadata: { userId: ID },
+      customer: CUSTOMER_ID,
+      subscription: null,
+    })
+
+    const res = await POST(makeRequest("{}"))
+    expect(res.status).toBe(200)
+
+    const sub = await prisma.subscription.findUnique({ where: { userId: ID } })
+    expect(sub).toBeNull()
+  })
+
+  it("checkout.session.completed: activates LIFETIME tier for payment-mode session", async () => {
+    mockListLineItems.mockResolvedValueOnce({
+      data: [{ price: { id: TEST_PRICE_LIFETIME } }],
+    })
+
     mockEvent("checkout.session.completed", {
       mode: "payment",
       metadata: { userId: ID },
@@ -180,7 +204,15 @@ describe("POST /api/webhooks/stripe", () => {
     expect(res.status).toBe(200)
 
     const sub = await prisma.subscription.findUnique({ where: { userId: ID } })
-    expect(sub).toBeNull()
+    expect(sub).not.toBeNull()
+    expect(sub!.tier).toBe("LIFETIME")
+    expect(sub!.status).toBe("ACTIVE")
+    expect(sub!.stripeCustomerId).toBe(CUSTOMER_ID)
+    expect(sub!.stripeSubId).toBeNull() // no subscription for one-time payment
+    expect(sub!.currentPeriodEnd).toBeNull() // lifetime has no expiry
+
+    const user = await prisma.user.findUnique({ where: { id: ID } })
+    expect(user!.subscriptionTier).toBe("LIFETIME")
   })
 
   it("checkout.session.completed: logs error and returns 200 when userId missing", async () => {
