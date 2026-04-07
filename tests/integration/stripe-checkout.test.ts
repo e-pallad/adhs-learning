@@ -1,8 +1,8 @@
 /**
- * Integration tests for POST /api/stripe/checkout and POST /api/stripe/portal
+ * Integration tests for POST /api/stripe/checkout
  *
- * Both routes require an authenticated user (getCurrentUser) and a mocked
- * Stripe client (no real API calls).
+ * Requires an authenticated user (getCurrentUser) and a mocked Stripe client.
+ * Portal tests live in stripe-portal.test.ts.
  */
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest"
@@ -12,8 +12,6 @@ import { setTestUserId } from "../setup"
 import { createTestUser, deleteTestUser } from "../helpers/test-user"
 
 const ID = "test-user-stripe-checkout"
-const CUSTOMER_ID = "cus_checkout_test"
-const SUB_ID = "sub_checkout_test"
 
 const TEST_PRICE_MONTHLY = "price_checkout_monthly"
 const TEST_PRICE_ANNUAL = "price_checkout_annual"
@@ -28,12 +26,11 @@ process.env.NEXT_PUBLIC_APP_URL = "https://test.devfluent"
 // ─── Stripe mock ─────────────────────────────────────────────────────────────
 
 const mockSessionCreate = vi.fn()
-const mockPortalCreate = vi.fn()
 
 vi.mock("@/lib/stripe", () => ({
   stripe: {
     checkout: { sessions: { create: mockSessionCreate } },
-    billingPortal: { sessions: { create: mockPortalCreate } },
+    billingPortal: { sessions: { create: vi.fn() } },
   },
   stripeWebhookSecret: "whsec_test",
 }))
@@ -167,89 +164,5 @@ describe("POST /api/stripe/checkout", () => {
     })
     const res = await POST(req)
     expect(res.status).toBe(400)
-  })
-})
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-describe("POST /api/stripe/portal", () => {
-  let POST: () => Promise<Response>
-
-  beforeAll(async () => {
-    await createTestUser(`${ID}-portal`)
-    const mod = await import("@/app/api/stripe/portal/route")
-    POST = mod.POST
-  })
-
-  beforeEach(async () => {
-    vi.clearAllMocks()
-    setTestUserId(`${ID}-portal`)
-    await prisma.subscription.deleteMany({ where: { userId: `${ID}-portal` } })
-  })
-
-  afterAll(async () => {
-    await deleteTestUser(`${ID}-portal`)
-  })
-
-  it("returns 401 when unauthenticated", async () => {
-    setTestUserId(null)
-    const res = await POST()
-    expect(res.status).toBe(401)
-  })
-
-  it("returns 404 when user has no Stripe customer", async () => {
-    // No Subscription row → no stripeCustomerId
-    const res = await POST()
-    expect(res.status).toBe(404)
-    const body = await res.json()
-    expect(body.error).toMatch(/no stripe customer/i)
-  })
-
-  it("returns 404 when Subscription row has no stripeCustomerId", async () => {
-    await prisma.subscription.create({
-      data: { userId: `${ID}-portal`, tier: "PRO", status: "ACTIVE" },
-      // stripeCustomerId left null
-    })
-    const res = await POST()
-    expect(res.status).toBe(404)
-  })
-
-  it("creates portal session and returns URL when customer exists", async () => {
-    await prisma.subscription.create({
-      data: {
-        userId: `${ID}-portal`,
-        tier: "PRO",
-        status: "ACTIVE",
-        stripeCustomerId: CUSTOMER_ID,
-        stripeSubId: SUB_ID,
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 3600 * 1000),
-      },
-    })
-    mockPortalCreate.mockResolvedValueOnce({ url: "https://billing.stripe.com/portal_test" })
-
-    const res = await POST()
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body.url).toBe("https://billing.stripe.com/portal_test")
-
-    expect(mockPortalCreate).toHaveBeenCalledOnce()
-    const call = mockPortalCreate.mock.calls[0][0]
-    expect(call.customer).toBe(CUSTOMER_ID)
-    expect(call.return_url).toContain("/settings")
-  })
-
-  it("returns 500 when Stripe portal create throws", async () => {
-    await prisma.subscription.create({
-      data: {
-        userId: `${ID}-portal`,
-        tier: "PRO",
-        status: "ACTIVE",
-        stripeCustomerId: CUSTOMER_ID,
-      },
-    })
-    mockPortalCreate.mockRejectedValueOnce(new Error("Stripe API error"))
-
-    const res = await POST()
-    expect(res.status).toBe(500)
   })
 })
