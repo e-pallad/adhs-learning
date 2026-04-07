@@ -52,6 +52,11 @@
 | `GITHUB_CLIENT_ID` | GitHub OAuth app client ID |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth app client secret |
 | `NEXT_PUBLIC_APP_URL` | Full app URL (e.g. `https://devfluent.de`) — used for GitHub OAuth callback |
+| `STRIPE_SECRET_KEY` | Stripe secret API key — never commit |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_…`) — never commit |
+| `STRIPE_PRICE_MONTHLY_ID` | Stripe Price ID for monthly Pro plan (`price_…`) |
+| `STRIPE_PRICE_ANNUAL_ID` | Stripe Price ID for annual Pro plan (`price_…`) |
+| `STRIPE_PRICE_LIFETIME_ID` | Stripe Price ID for lifetime plan (optional one-time purchase) |
 
 ---
 
