@@ -26,6 +26,7 @@ yarn-error.log*
 
 # local env files
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
@@ -46,3 +47,19 @@ tsconfig.tsbuildinfo
 
 # UI audit artifacts
 artifacts/
+
+# MCP server config (may contain access tokens)
+.mcp.json
+
+# Claude Code local config and tooling state
+.claude/
+.claude-flow/
+
+# graphify knowledge graph (generated output)
+graphify-out/
+
+# Next.js generated type declarations
+next-env.d.ts
+
+# Test run artifacts
+test-results/
