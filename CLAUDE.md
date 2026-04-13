@@ -100,7 +100,7 @@ node scripts/validate-curriculum.js  # Validate all curriculum JSON files
 
 Route groups under `app/`:
 - `(auth)/` — unauthenticated: `/login`, `/offline`
-- `(dashboard)/` — protected: `/`, `/learning`, `/roadmap`, `/training`, `/projects`, `/progress`, `/settings`
+- `(dashboard)/` — protected: `/dashboard`, `/learning`, `/roadmap`, `/training`, `/projects`, `/progress`, `/settings`, `/settings/upgrade`
 - `api/` — REST endpoints for progress tracking and user data
 
 Key library files:
@@ -109,15 +109,21 @@ Key library files:
 - `lib/xp.ts` — XP values, level thresholds, achievement definitions (single source of truth)
 - `lib/roadmap.ts` — roadmap.sh API integration with 24-hour cache + local JSON fallback
 - `lib/supabase/server.ts` / `client.ts` — Supabase SSR/client helpers
+- `lib/subscription.ts` — `getUserTier()`, `isPro()`, `getFeatureFlags()`, `isFeatureAvailable()`
+- `lib/stripe.ts` — Stripe client singleton (API v2025-03-31.basil)
+- `lib/demo.ts` — `DEMO_SESSION_COOKIE`, `DEMO_USER_ID`, `hasDemoSession()`, `isDemoUser()`, `createDemoUser()`
+- `lib/i18n/config.ts` — locale list (`en`, `de`), `LOCALE_COOKIE`, `DEFAULT_LOCALE`
 - `content/curriculum/index.ts` — Curriculum loader; exports `CURRICULUM`, `TRACKS`, `getTrackById()`
 - `content/curriculum/tracks/javascript/month-01..12.json` — Per-month JSON curriculum files
 - `content/curriculum/types.ts` — Shared TypeScript interfaces for curriculum data
-- `proxy.ts` — Auth guard replacing `middleware.ts`
+- `proxy.ts` — Auth guard replacing `middleware.ts`; also sets `NEXT_LOCALE` cookie via `Accept-Language` detection
 
 Generated code: `app/generated/prisma/` — **never edit directly.**
 
 ### PUBLIC_PATHS in `proxy.ts`
-`/login`, `/offline`, `/sw.js`, `/manifest.webmanifest` — all must be publicly accessible (PWA + auth).
+`/`, `/login`, `/impressum`, `/datenschutz`, `/offline`, `/sw.js`, `/manifest.webmanifest`, `/robots.txt`, `/sitemap.xml`, `/opengraph-image`, `/api/auth` (prefix match), `/api/webhooks/stripe` — all must be publicly accessible.
+
+`DEMO_ALLOWED_PATHS`: `/dashboard`, `/learning`, `/api/ai/recommendations`, `/api/accountability`, `/api/progress/block` — demo users are redirected to `/dashboard` if they access any other path.
 
 ### API Patterns
 - Course/project/profile: action-based POST `{ action: "create"|"update"|"delete", ...data }`
@@ -132,9 +138,14 @@ Generated code: `app/generated/prisma/` — **never edit directly.**
 | `api/ai/recommendations` | AI coach — personalised suggestions via `claude-haiku-4-5-20251001`, cached 24h in `AiRecommendation` |
 | `api/accountability` | Link/unlink accountability partner by email |
 | `api/user/api-key` | Generate / regenerate / revoke `df_`-prefixed VS Code extension API keys |
+| `api/user/stats` | GET aggregated user stats (blocks, roadmap, courses, achievements, tier, XP progress) |
 | `api/auth/github` | GitHub OAuth initiation (CSRF state cookie) |
 | `api/auth/github/callback` | GitHub OAuth callback — token exchange + username fetch |
+| `api/auth/demo` | POST sets demo session cookie (1-week TTL); DELETE clears it |
 | `api/github/sync` | Sync last 30 days of GitHub events + award XP idempotently |
+| `api/stripe/checkout` | Create Stripe Checkout session; validates `priceId` against env vars; supports `subscription` and `payment` modes |
+| `api/stripe/portal` | Create Stripe Customer Portal session for self-service plan management |
+| `api/webhooks/stripe` | Public webhook handler; handles `checkout.session.completed`, `customer.subscription.updated/deleted`, `invoice.payment_failed`; all DB writes atomic via `prisma.$transaction` |
 
 ---
 
@@ -142,10 +153,11 @@ Generated code: `app/generated/prisma/` — **never edit directly.**
 
 | Model | Key fields | Notes |
 |---|---|---|
-| `User` | `dailyGoalBlocks` (default 3), `weeklyGoalBlocks` (default 10), `track` (default `"javascript"`), `githubUsername`, `githubAccessToken`, `githubLastSyncAt`, `apiKey @unique` | Multi-user ready |
+| `User` | `dailyGoalBlocks` (default 3), `weeklyGoalBlocks` (default 10), `track` (default `"javascript"`), `githubUsername`, `githubAccessToken`, `githubLastSyncAt`, `apiKey @unique`, `subscriptionTier` (default `FREE`) | Multi-user ready; `subscriptionTier` is a fallback — prefer `Subscription` row |
 | `AiRecommendation` | `userId @unique`, cached JSON, `updatedAt` | 1 row per user; 24h TTL checked at request time |
 | `AccountabilityPair` | `userId`, `partnerId` | Bidirectional link |
 | `GithubEvent` | `(userId, eventId) @unique` | Deduplication table for idempotent XP awards |
+| `Subscription` | `userId @unique`, `tier` (`SubscriptionTier`), `status` (`SubscriptionStatus`), `stripeCustomerId @unique`, `stripeSubId @unique`, `currentPeriodEnd`, `cancelAtPeriodEnd` | Enums: `SubscriptionTier` = FREE/PRO/LIFETIME; `SubscriptionStatus` = ACTIVE/CANCELLED/PAST\_DUE/TRIALING |
 
 ---
 
@@ -177,7 +189,7 @@ Defined in `lib/xp.ts` — single source of truth.
 
 | Export | Description |
 |---|---|
-| `getCurrentUser()` | Upserts authenticated user on first login (race-safe) |
+| `getCurrentUser()` | Checks demo session first, then Supabase auth; upserts user on first login (race-safe) |
 | `awardDailyLoginXP(userId)` | Awards 5 XP at most once per calendar day |
 | `awardXP(userId, amount, { db? })` | Awards XP + updates level; accepts optional transaction client |
 | `updateStreak(userId)` | Updates streak; awards streak bonuses idempotently via achievement records |
@@ -222,6 +234,35 @@ All XP-awarding routes wrap check → upsert → `awardXP` in a single `prisma.$
 ### Body-Double Mode
 - Supabase Realtime presence on `body-double` channel — anonymous headcount only
 - Component cleans up channel on unmount
+
+### Freemium Tier System
+- Tiers: FREE, PRO, LIFETIME — resolved by `getUserTier()` in `lib/subscription.ts` (checks `Subscription` row, falls back to `User.subscriptionTier`, defaults to FREE)
+- Pro-gated features: Focus sounds, AI recommendations, Accountability partner, Analytics heatmap
+- Free for all: Pomodoro timer, Streak freeze, Body-double mode
+- UI: `ProBadge` and `ProFeatureGate` components gate UI elements
+- `getFeatureFlags(tier)` returns a typed object of booleans for each feature
+
+### Stripe Payments
+- `STRIPE_SECRET_KEY`, `STRIPE_PRICE_MONTHLY_ID`, `STRIPE_PRICE_ANNUAL_ID`, `STRIPE_PRICE_LIFETIME_ID`, `STRIPE_WEBHOOK_SECRET` all required
+- Checkout: POST `/api/stripe/checkout` with `{ priceId }`; sets `metadata.userId` so the webhook can resolve the user without an extra DB lookup
+- Portal: POST `/api/stripe/portal` returns a Customer Portal URL for self-service management
+- Webhook at `/api/webhooks/stripe` (must remain in `PUBLIC_PATHS`) handles the full subscription lifecycle
+- Upgrade UI: `/settings/upgrade`; `/settings/upgrade/success` polls for tier activation after checkout
+
+### Demo Mode
+- POST `/api/auth/demo` sets a `demo_session=1` cookie (1-week TTL); DELETE clears it
+- `lib/demo.ts` exports `hasDemoSession()`, `isDemoUser()`; `getCurrentUser()` checks the demo cookie before Supabase auth
+- Demo user has pre-seeded stats (180 XP, Level 2, 4-day streak) for exploring the app without signing up
+- Proxy enforces `DEMO_ALLOWED_PATHS` whitelist; all other paths redirect to `/dashboard`
+
+### Hyperfocus Mode
+- `components/learning/hyperfocus-mode.tsx` — CSS-only fullscreen; toggles class `"hyperfocus"` on `document.documentElement` to suppress sidebar and nav via CSS
+- Opt-in per session; ESC exits; 3-second onboarding hint on first use; no modals, no data loss
+
+### Localisation (i18n)
+- Supported locales: `en` (default), `de` — defined in `lib/i18n/config.ts`
+- `proxy.ts` detects locale from `Accept-Language` header on first visit and writes a `NEXT_LOCALE` cookie (1-year TTL)
+- Dictionaries: `lib/i18n/dictionaries/en.ts`, `lib/i18n/dictionaries/de.ts`
 
 ### Focus Sounds (PomodoroTimer)
 - Web Audio API — no external files; 4 sounds: white noise, brown noise, rain, ocean
@@ -314,3 +355,12 @@ Relevant files: `compose.netcup.yml`, `nginx/netcup.conf`, `scripts/deploy-netcu
 ## Known Non-Critical Warnings
 
 - `lib/roadmap.ts` dynamic import of `@/content/roadmaps/*.json` produces a Turbopack module-not-found warning — intentional, it's a try/catch fallback returning `[]` on failure
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current
