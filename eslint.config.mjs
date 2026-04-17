@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".claude/**",
     // Playwright E2E tests — not React code; `use` is Playwright's fixture callback, not a hook
     "e2e/**",
+    // Generated coverage report files
+    "coverage/**",
   ]),
 ]);
 

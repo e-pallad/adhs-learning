@@ -54,6 +54,9 @@ export async function POST(req: NextRequest) {
   if (action === "update") {
     const { id, completedLessons } = data
     if (!id) return NextResponse.json({ error: "Missing course id" }, { status: 400 })
+    if (typeof completedLessons !== "number" || !Number.isInteger(completedLessons) || completedLessons < 0) {
+      return NextResponse.json({ error: "completedLessons must be a non-negative integer" }, { status: 400 })
+    }
 
     const { updated, justCompleted } = await prisma.$transaction(async (tx) => {
       const course = await tx.externalCourse.findUnique({ where: { id } })
@@ -65,7 +68,7 @@ export async function POST(req: NextRequest) {
       const updated = await tx.externalCourse.update({
         where: { id },
         data: {
-          completedLessons: Number(completedLessons),
+          completedLessons,
           isCompleted: isNowCompleted,
           completedAt: isNowCompleted && !wasCompleted ? new Date() : course.completedAt,
         },

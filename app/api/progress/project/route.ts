@@ -5,6 +5,17 @@ import { isDemoUser } from "@/lib/demo"
 import { XP_VALUES } from "@/lib/xp"
 import { getTrackById, CURRICULUM } from "@/content/curriculum"
 
+// Reject javascript: and other non-http(s) URL schemes
+function isSafeUrl(value: unknown): boolean {
+  if (!value || typeof value !== "string") return true
+  try {
+    const u = new URL(value)
+    return u.protocol === "https:" || u.protocol === "http:"
+  } catch {
+    return false
+  }
+}
+
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -19,16 +30,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing month" }, { status: 400 })
   }
 
-  // Validate URLs — reject javascript: and other non-http(s) schemes
-  function isSafeUrl(value: unknown): boolean {
-    if (!value || typeof value !== "string") return true
-    try {
-      const u = new URL(value)
-      return u.protocol === "https:" || u.protocol === "http:"
-    } catch {
-      return false
-    }
-  }
   if (!isSafeUrl(repoUrl) || !isSafeUrl(liveUrl)) {
     return NextResponse.json({ error: "Invalid URL" }, { status: 400 })
   }
