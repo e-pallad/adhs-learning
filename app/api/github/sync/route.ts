@@ -121,8 +121,8 @@ export async function POST() {
 
         // Calculate XP only for records we know we created (vs records that were skipped)
         const rawXP = toCreate
-          .filter((r: { event: { id: string }; xpToAward: number }) => createdEventIds.has(r.event.id))
-          .reduce((sum: number, r: { xpToAward: number }) => sum + r.xpToAward, 0)
+          .filter((r) => createdEventIds.has(r.event.id))
+          .reduce((sum, r) => sum + r.xpToAward, 0)
 
         // Apply daily cap: check how much GitHub XP has already been awarded today
         const todayStart = new Date()
@@ -132,7 +132,7 @@ export async function POST() {
             userId: user.id,
             createdAt: { gte: todayStart },
             // Exclude events we just created (they're in the DB but we're inside the transaction)
-            eventId: { notIn: toCreate.map((r: { event: { id: string } }) => r.event.id) },
+            eventId: { notIn: toCreate.map((r) => r.event.id) },
           },
           select: { xpAwarded: true },
         })
